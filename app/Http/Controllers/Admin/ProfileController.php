@@ -123,6 +123,26 @@ class ProfileController extends Controller
         return back();
     }
 
+    //user account list
+    public function userList(){
+        $user = User::select('id', 'name', 'email', 'address', 'phone', 'role', 'created_at')
+                ->whereIn('role', ['user'])
+                ->when( request('searchKey'), function($query){
+                $query->whereAny( ['name','email','address','phone','role'],'like', '%' . request('searchKey') . '%');
+            })
+            ->paginate(5);
+            // ->get();
+        return view('admin.userAccount.list',compact('user'));
+    }
+
+     //user account delete
+    public function userDelete($id){
+        User::where('id',$id)->delete();
+
+        Alert::success('Success User Delete', 'User Deleted Successfully');
+        return back();
+    }
+
      //change password validation check
     private function passwordValidationCheck($request){
         $request->validate([
@@ -160,7 +180,7 @@ class ProfileController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => 'admin' // if user change 'role' => 'user'
+            'role' => 'admin' // if user change 'role' => 'user' // default user
             ];
     }
 

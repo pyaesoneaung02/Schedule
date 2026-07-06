@@ -151,9 +151,9 @@
                                         <i class="mr-2 text-dark fa-solid fa-graduation-cap fa-sm fa-fw"></i>
                                         Department List
                                     </a>
-                                    <a class="dropdown-item" href="">
+                                    <a class="dropdown-item" href="{{ route('profile.userList')}}">
                                         <i class="mr-2 text-dark fa-solid fa-user-graduate fa-sm fa-fw"></i>
-                                        Teacher List
+                                        User List
                                     </a>
                                 @endif
                                 <a class="dropdown-item" href="{{ route('profile.changePassword.page') }}">

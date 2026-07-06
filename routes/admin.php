@@ -52,6 +52,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
             Route::post('add/newAdmin', [ProfileController::class, 'createAdminAccount'])->name('profile#createAdminAccount');
             Route::get('admin/list', [ProfileController::class, 'adminList'])->name('profile.adminList');
             Route::get('admin/delete/{id}', [ProfileController::class, 'delete'])->name('profile.adminDelete');
+
+            //user list
+            Route::get('user/list', [ProfileController::class, 'userList'])->name('profile.userList');
+            Route::get('user/delete/{id}', [ProfileController::class, 'userDelete'])->name('profile.userDelete');
         });
     });
 

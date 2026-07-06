@@ -265,7 +265,7 @@ class ScheduleController extends Controller
         ));
     }
 
-    //print & PDF
+    //create PDF
     public function downloadPdf($yearId, $roomId, $majorId)
     {
         $yearData = Year::findOrFail($yearId);
