@@ -1,0 +1,74 @@
+step1
+composer create-project laravel/laravel:^11 laravel11-app
+
+step2
+D:\laravel11-app\config\database.php
+'collation' => env('DB_COLLATION', 'utf8mb4_unicode_ci'), (ပြဿနာ)
+
+step3
+php artisan migrate
+php artisan migrate:rollback
+
+step4
+composer require laravel/breeze --dev (no need vpn)
+php artisan breeze:install
+php artisan migrate
+npm install
+npm run dev
+php artisan serve
+
+create tables
+php artisan make:model (table_name) -mc
+ပီးရင် protected $fillable ထည့်
+
+php artisan make:controller User/UserController
+
+
+php artisan migrate:status
+php artisan migrate --seed
+
+print & PDF
+composer require barryvdh/laravel-dompdf
+
+To work loign
+==============
+
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
+
+class SocialLoginController extends Controller
+{
+    //redirect to provider
+    public function redirect($provider)
+    {
+        return Socialite::driver($provider)->redirect();
+    }
+
+    //callback from provider
+    public function callback($provider)
+    {
+        $socialUser = Socialite::driver($provider)->user();
+        // $user->token
+
+          $user = User::create([
+        //     'provider_id' => $socialUser->id,
+        // ], [
+            'name' => $socialUser->name,
+            'nickname' => $socialUser->nickname,
+            'email' => $socialUser->email,
+            'provider_token' => $socialUser->token,
+            'provider' => $provider,
+            'role' => 'user'
+        ]);
+
+        Auth::login($user);
+
+        return to_route('userHome');
+    }
+}
+
+
