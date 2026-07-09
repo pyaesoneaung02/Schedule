@@ -1,128 +1,295 @@
 @extends('admin.layouts.master')
 
 @section('content')
-    <!-- Begin Page Content -->
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <div class="mb-4 d-sm-flex align-items-center justify-content-between">
-            <h1 class="mb-0 text-gray-800 h3">Dashboard</h1>
+        <div class="mb-4">
+
+            <h2 class="text-primary font-weight-bold">
+
+                <i class="mr-2 fa-solid fa-gauge-high"></i>
+                Dashboard
+
+            </h2>
+
+            <p class="mb-0 text-muted">
+                University Schedule Management Dashboard.
+            </p>
+
         </div>
 
-        <!-- Content Row -->
+
+        <!-- Cards Row -->
         <div class="row">
 
-            <!-- Teachers Card Example -->
+
+            <!-- Teachers -->
             <div class="mb-4 col-xl-3 col-md-6">
-                <div class="py-2 shadow card border-left-primary h-100">
+
+                <div class="border-0 shadow-sm card h-100">
+
                     <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="mr-2 col">
-                                <div class="mb-1 text-xs font-weight-bold text-primary text-uppercase">
-                                    Teachers</div>
-                                <div class="mb-0 text-gray-800 h5 font-weight-bold">{{ $teacherCount }}</div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+
+                                <h6 class="mb-2 text-uppercase text-primary fw-bold">
+                                    Teachers
+                                </h6>
+
+                                <h3 class="mb-0 fw-bold">
+                                    {{ $teacherCount }}
+                                </h3>
+
                             </div>
-                            <div class="col-auto">
-                                {{-- <i class="text-gray-300 fas fa-calendar fa-2x"></i> --}}
-                                <i class="text-gray-950 fa-solid fa-person-chalkboard fa-2x"></i>
+
+                            <div>
+                                <i class="text-primary fa-solid fa-person-chalkboard fa-3x"></i>
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- Years Card Example -->
+
+
+
+            <!-- Years -->
             <div class="mb-4 col-xl-3 col-md-6">
-                <div class="py-2 shadow card border-left-success h-100">
+
+                <div class="border-0 shadow-sm card h-100">
+
                     <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="mr-2 col">
-                                <div class="mb-1 text-xs font-weight-bold text-success text-uppercase">
-                                    Years</div>
-                                <div class="mb-0 text-gray-800 h5 font-weight-bold">{{ $yearCount }}</div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+
+                                <h6 class="mb-2 text-uppercase text-success fw-bold">
+                                    Years
+                                </h6>
+
+                                <h3 class="mb-0 fw-bold">
+                                    {{ $yearCount }}
+                                </h3>
+
                             </div>
-                            <div class="col-auto">
-                                {{-- <i class="text-gray-300 fas fa-dollar-sign fa-2x"></i> --}}
-                                <i class="text-gray-950 fa-solid fa-calendar fa-2x"></i>
+
+
+                            <div>
+
+                                <i class="text-success fa-solid fa-calendar-days fa-3x"></i>
+
                             </div>
+
+
                         </div>
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- Departments Card Example -->
+
+
+
+
+            <!-- Departments -->
             <div class="mb-4 col-xl-3 col-md-6">
-                <div class="py-2 shadow card border-left-info h-100">
+
+                <div class="border-0 shadow-sm card h-100">
+
                     <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="mr-2 col">
-                                <div class="mb-1 text-xs font-weight-bold text-info text-uppercase">Departments
-                                </div>
-                                <div class="row no-gutters align-items-center">
-                                    <div class="col-auto">
-                                        <div class="mb-0 mr-3 text-gray-800 h5 font-weight-bold">{{ $departmentCount }}</div>
-                                    </div>
-                                    {{-- <div class="col">
-                                        <div class="mr-2 progress progress-sm">
-                                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%"
-                                                aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div> --}}
-                                </div>
+
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+
+                            <div>
+
+                                <h6 class="mb-2 text-uppercase text-info fw-bold">
+                                    Departments
+                                </h6>
+
+
+                                <h3 class="mb-0 fw-bold">
+                                    {{ $departmentCount }}
+                                </h3>
+
+
                             </div>
-                            <div class="col-auto">
-                                {{-- <i class="text-gray-300 fas fa-clipboard-list fa-2x"></i> --}}
-                                <i class="text-gray-950 fa-solid fa-graduation-cap fa-2x"></i>
+
+
+                            <div>
+
+                                <i class="text-info fa-solid fa-graduation-cap fa-3x"></i>
+
                             </div>
+
+
                         </div>
+
+
                     </div>
+
                 </div>
+
             </div>
 
-            <!-- Subjects Card Example -->
+            <!-- Subjects -->
             <div class="mb-4 col-xl-3 col-md-6">
-                <div class="py-2 shadow card border-left-warning h-100">
+
+
+                <div class="border-0 shadow-sm card h-100">
+
+
                     <div class="card-body">
-                        <div class="row no-gutters align-items-center">
-                            <div class="mr-2 col">
-                                <div class="mb-1 text-xs font-weight-bold text-warning text-uppercase">
-                                    Subjects</div>
-                                <div class="mb-0 text-gray-800 h5 font-weight-bold">{{ $subjectCount }}</div>
+
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+
+                            <div>
+
+                                <h6 class="mb-2 text-uppercase text-warning fw-bold">
+                                    Subjects
+                                </h6>
+
+
+                                <h3 class="mb-0 fw-bold">
+                                    {{ $subjectCount }}
+                                </h3>
+
+
                             </div>
-                            <div class="col-auto">
-                                {{-- <i class="text-gray-300 fas fa-comments fa-2x"></i> --}}
-                                <i class="text-gray-950 fa-solid fa-book-open fa-2x"></i>
+
+
+
+                            <div>
+                                <i class="text-warning fa-solid fa-book fa-3x"></i>
                             </div>
+
+
+
                         </div>
+
+
                     </div>
+
+
                 </div>
+
+
             </div>
+
+
         </div>
 
-        <!-- Scroll to Top Button-->
-        <a class="rounded scroll-to-top" href="#page-top">
-            <i class="fas fa-angle-up"></i>
-        </a>
 
-        <!-- Logout Modal-->
-        <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
+
+
+
+        <!-- Quick Menu -->
+
+        <div class="mt-4 row">
+
+
+            <div class="mb-4 col-md-4">
+
+                <a href="{{ route('teacher.create') }}" class="text-decoration-none">
+
+                    <div class="text-white shadow-sm card bg-primary">
+
+                        <div class="py-4 text-center card-body">
+
+                            <i class="mb-2 fa-solid fa-person-chalkboard fa-2x"></i>
+
+                            <h5 class="mb-0">
+                                Manage Teachers
+                            </h5>
+
+                        </div>
+
                     </div>
-                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
-                    </div>
 
+                </a>
 
-                </div>
             </div>
+
+
+
+            <div class="mb-4 col-md-4">
+
+                <a href="{{ route('subject.create') }}" class="text-decoration-none">
+
+                    <div class="text-white shadow-sm card bg-success">
+
+
+                        <div class="py-4 text-center card-body">
+
+
+                            <i class="mb-2 fa-solid fa-book fa-2x"></i>
+
+
+                            <h5 class="mb-0">
+                                Manage Subjects
+                            </h5>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </a>
+
+            </div>
+
+
+
+
+            <div class="mb-4 col-md-4">
+
+
+                <a href="{{ route('schedule.create') }}" class="text-decoration-none">
+
+
+                    <div class="text-white shadow-sm card bg-info">
+
+
+                        <div class="py-4 text-center card-body">
+
+
+                            <i class="mb-2 fa-solid fa-calendar-days fa-2x"></i>
+
+
+                            <h5 class="mb-0">
+                                Create Schedule
+                            </h5>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                </a>
+
+
+            </div>
+
+
         </div>
-    @endsection
+
+
+    </div>
+@endsection

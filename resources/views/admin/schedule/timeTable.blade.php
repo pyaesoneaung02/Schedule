@@ -2,40 +2,118 @@
 
 @section('content')
 
-    <div class="container">
-        <div class="row">
+<div class="container-fluid">
 
-            @if (count($years) != 0)
-                @foreach ($years as $item)
-                    <div class="mt-4 mb-4 col-md-4">
+    <!-- Page Heading -->
+    <div class="mb-4">
 
-                        <a href="{{ route('schedule.viewSchedule', $item->id) }}" class="text-decoration-none">
+        <h2 class="text-primary font-weight-bold">
+            <i class="mr-2 fa-solid fa-calendar-days"></i>
+            Schedule Year List
+        </h2>
 
-                            <div class="text-center text-white shadow-lg card bg-info year-card">
+        <p class="mb-0 text-muted">
+            Select year to view weekly timetable.
+        </p>
 
-                                <div class="py-5 card-body">
+    </div>
 
-                                    <i class="mb-3 fa-solid fa-users fa-2x"></i>
 
-                                    <h3 class="mb-0 fw-bold">
+    <div class="border-0 shadow-sm card">
+
+        <div class="text-white card-header bg-primary">
+
+            <h5 class="mb-0">
+                <i class="mr-2 fa-solid fa-list"></i>
+                Available Years
+            </h5>
+
+        </div>
+
+
+        <div class="card-body">
+
+
+            <div class="row">
+
+
+                @forelse ($years as $item)
+
+                    <div class="mb-4 col-md-4">
+
+
+                        <a href="{{ route('schedule.viewSchedule', $item->id) }}"
+                           class="text-decoration-none">
+
+
+                            <div class="text-center border-0 shadow-sm card bg-primary">
+
+
+                                <div class="py-5 text-white card-body">
+
+
+                                    <i class="mb-3 fa-solid fa-users fa-3x"></i>
+
+
+                                    <h3 class="mb-0 font-weight-bold">
+
                                         {{ $item->name }}
+
                                     </h3>
+
+
+                                    <small>
+                                        View Schedule
+                                    </small>
+
 
                                 </div>
 
+
                             </div>
+
 
                         </a>
 
+
                     </div>
-                @endforeach
-            @else
-                <div class="col-md-12">
-                    <h2 class="text-center text-muted">There is no data</h2>
-                </div>
-            @endif
+
+
+                @empty
+
+
+                    <div class="col-12">
+
+
+                        <div class="py-5 text-center text-muted">
+
+
+                            <i class="mb-3 fa-solid fa-folder-open fa-3x"></i>
+
+                            <h5>
+                                There is no data
+                            </h5>
+
+
+                        </div>
+
+
+                    </div>
+
+
+                @endforelse
+
+
+            </div>
+
 
         </div>
+
+
     </div>
+
+
+</div>
+
 
 @endsection

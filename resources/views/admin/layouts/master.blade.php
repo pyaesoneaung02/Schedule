@@ -44,12 +44,11 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('adminHome') }}"><i class="fas fa-fw fa-table"></i><span>Dashboard
-                    </span></a>
+                <a class="nav-link" href="{{ route('adminHome') }}"><i class="fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('day.list') }}"><i class="fa-solid fa-calendar-day"></i><span>Day
+                <a class="nav-link" href="{{ route('day.list') }}"><i class="fa-solid fa-calendar-days"></i><span>Day
                     </span></a>
             </li>
 
@@ -59,11 +58,11 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{{ route('major.create')}}}"><i class="fa-solid fa-book"></i><span>Major</span></a>
+                <a class="nav-link" href="{{{ route('major.create')}}}"><i class="fa-solid fa-building-columns"></i><span>Major</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{{ route('room.create')}}}"><i class="fa-solid fa-people-roof"></i><span>Room</span></a>
+                <a class="nav-link" href="{{{ route('room.create')}}}"><i class="fa-solid fa-door-open"></i><span>Room</span></a>
             </li>
 
             <li class="nav-item">
@@ -71,20 +70,20 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('position.list') }}"><i class="fa-solid fa-user-graduate"></i><span>Position</span></a>
+                <a class="nav-link" href="{{ route('position.list') }}"><i class="fa-solid fa-user-tie"></i><span>Position</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('teacher.create') }}"><i class="fa-solid fa-person-chalkboard"></i><span>Teacher</span></a>
+                <a class="nav-link" href="{{ route('teacher.create') }}"><i class="fa-solid fa-chalkboard-user"></i><span>Teacher</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('subject.create') }}"><i class="fa-solid fa-book-open"></i><span>Subject
+                <a class="nav-link" href="{{ route('subject.create') }}"><i class="fa-solid fa-book"></i><span>Subject
                     </span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('time.list') }}"><i class="fa-solid fa-alarm-clock"></i><span>Time</span></a>
+                <a class="nav-link" href="{{ route('time.list') }}"><i class="fa-solid fa-clock"></i><span>Time</span></a>
             </li>
 
             <li class="nav-item">
@@ -93,11 +92,11 @@
 
             @if (auth()->check() && auth()->user()->role == 'superadmin')
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('schedule.create') }}"><i class="fa-solid fa-table"></i><span>Schedule</span></a>
+                <a class="nav-link" href="{{ route('schedule.create') }}"><i class="fa-solid fa-calendar-days"></i><span>Schedule</span></a>
             </li>
 
              <li class="nav-item">
-                <a class="nav-link" href="{{ route('schedule.timeTable') }}"><i class="fa-solid fa-table"></i><span>Time Table</span></a>
+                <a class="nav-link" href="{{ route('schedule.timeTable') }}"><i class="fa-solid fa-calendar-days"></i>Time Table</span></a>
             </li>
             @endif
 
