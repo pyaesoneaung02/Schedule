@@ -88,10 +88,6 @@
 
         </div>
 
-
-
-
-
         <div class="card-body">
 
 
@@ -115,9 +111,9 @@
 
                             <th>Room</th>
 
-                            <th>Subject</th>
+                            <th>Subject Name</th>
 
-                            <th>Short Name</th>
+                            <th width="150">Subject Code</th>
 
                             <th>Time</th>
 
@@ -125,15 +121,13 @@
 
                             <th width="150">Created Date</th>
 
-                            <th width="120">Action</th>
+                            <th width="100">Action</th>
 
 
                         </tr>
 
 
                     </thead>
-
-
 
 
                     <tbody>

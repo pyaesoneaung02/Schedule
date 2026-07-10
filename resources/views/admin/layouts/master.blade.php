@@ -129,10 +129,8 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span
-                                    class="mr-2 text-gray-600 d-none d-lg-inline small">{{ Auth::user()->name }}</span>
-                                <img class="img-profile rounded-circle"
-                                    src="{{ asset(Auth::user()->profile != null ? 'profile/' . Auth::user()->profile : 'admin/img/default-profile.jpg') }}">
+                                <span class="mr-2 text-gray-600 d-none d-lg-inline small">{{ Auth::user()->name }}</span>
+                                <img class="img-profile rounded-circle" src="{{ asset(Auth::user()->profile != null ? 'profile/' . Auth::user()->profile : 'admin/img/default-profile.jpg') }}">
                             </a>
                             <!-- Dropdown - User Information -->
                             <div class="shadow dropdown-menu dropdown-menu-right animated--grow-in"
@@ -151,7 +149,8 @@
                                         Department List
                                     </a>
                                     <a class="dropdown-item" href="{{ route('profile.userList')}}">
-                                        <i class="mr-2 text-dark fa-solid fa-user-graduate fa-sm fa-fw"></i>
+                                        {{-- <i class="mr-2 text-dark fa-solid fa-user-graduate fa-sm fa-fw"></i> --}}
+                                        <i class="mr-2 text-dark fa-solid fa-users fa-sm fa-fw"></i>
                                         User List
                                     </a>
                                 @endif

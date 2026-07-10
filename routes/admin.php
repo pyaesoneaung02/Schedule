@@ -151,6 +151,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::post('/schedule/result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
         //print & PDF
         Route::get('/schedule/pdf/{year}/{room}/{major}', [ScheduleController::class, 'downloadPDF'])->name('schedule.pdf');
+        //teacher time table
+        Route::get('/schedule/teacher-time-table/{yearID}',[ScheduleController::class,'teacherTimeTable'])->name('schedule.teacherTimeTable');
     });
 
 });

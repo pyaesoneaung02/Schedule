@@ -84,7 +84,7 @@ class TeachingController extends Controller
     public function checkValidationTeaching($request)
     {
         $rules = [
-            'name'      => 'required|unique:teachings,name',
+            'name'      => 'required',
             'yearID'    => 'required',
             'majorID'   => 'required',
             'subjectID' => 'required',
