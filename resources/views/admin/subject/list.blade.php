@@ -264,6 +264,25 @@
         </div>
 
 
+        <!-- Back Button -->
+
+        <div class="mt-4">
+
+
+            <a href="{{ route('subject.create') }}" class="btn btn-outline-primary">
+
+
+                <i class="mr-2 fa-solid fa-arrow-left"></i>
+
+                Back
+
+
+            </a>
+
+
+        </div>
+
+
 
     </div>
 @endsection

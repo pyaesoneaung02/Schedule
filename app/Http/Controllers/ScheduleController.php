@@ -99,76 +99,6 @@ class ScheduleController extends Controller
     }
 
     // Validation
-    // public function checkValidationSchedule($request)
-    // {
-    //     $request->validate([
-    //         'yearID'    => 'required',
-    //         'majorID'   => 'required',
-    //         'subjectID' => 'required',
-    //         'roomID'    => 'required',
-    //         'dayID'     => 'required',
-    //         'timeID'    => 'required',
-    //         'teacherID' => 'required',
-    //     ], [
-    //         'yearID.required'    => 'Please select Year.',
-    //         'majorID.required'   => 'Please select Major.',
-    //         'subjectID.required' => 'Please select Subject.',
-    //         'roomID.required'    => 'Please select Room.',
-    //         'dayID.required'     => 'Please select Day.',
-    //         'timeID.required'    => 'Please select Time.',
-    //         'teacherID.required' => 'Please select Teacher.',
-    //     ]);
-
-    //     // 1. Same Section (Year + Major + Section + Day + Time)
-    //     if (Schedule::where('year_id', $request->yearID)
-    //         ->where('major_id', $request->majorID)
-    //         ->where('room_id', $request->roomID)
-    //         ->where('day_id', $request->dayID)
-    //         ->where('time_id', $request->timeID)
-    //         ->exists()) {
-
-    //         return back()->withErrors([
-    //             'timeID' => '',
-    //         ])->withInput();
-    //     }
-
-    //     // 2. Same Teacher (Day + Time)
-    //     if (Schedule::where('teacher_id', $request->teacherID)
-    //         ->where('day_id', $request->dayID)
-    //         ->where('time_id', $request->timeID)
-    //         ->exists()) {
-
-    //         return back()->withErrors([
-    //             'teacherID' => '',
-    //         ])->withInput();
-    //     }
-
-    //     // 3. Same Room (Day + Time)
-    //     if (Schedule::where('room_id', $request->roomID)
-    //         ->where('day_id', $request->dayID)
-    //         ->where('time_id', $request->timeID)
-    //         ->exists()) {
-
-    //         return back()->withErrors([
-    //             'roomID' => '',
-    //         ])->withInput();
-    //     }
-
-    //     // 4. Same Subject + Room + Time
-    //     if (Schedule::where('year_id', $request->yearID)
-    //         ->where('major_id', $request->majorID)
-    //         ->where('subject_id', $request->subjectID)
-    //         ->where('day_id', $request->dayID)
-    //         ->where('room_id', $request->roomID)
-    //         ->where('time_id', $request->timeID)
-    //         ->exists()) {
-
-    //         return back()->withErrors([
-    //             'subjectID' => '',
-    //         ])->withInput();
-    //     }
-    // }
-
     public function checkValidationSchedule($request)
     {
 
@@ -202,7 +132,7 @@ class ScheduleController extends Controller
 
         $subject = Subject::find($request->subjectID);
 
-/*
+        /*
         |--------------------------------------------------------------------------
         | First Year Major Validation
         |--------------------------------------------------------------------------
@@ -474,58 +404,50 @@ class ScheduleController extends Controller
 
         $years = Year::findOrFail($yearID);
 
-
         $schedules = Schedule::select(
-                'schedules.*',
-                'teachers.name as teacher_name',
-                'subjects.short_name',
-                'subjects.long_name',
-                'rooms.name as room_name',
-                'years.name as year_name',
-                'majors.name as major_name',
-                'days.name as day_name',
-                'times.name as time_name'
-            )
+            'schedules.*',
+            'teachers.name as teacher_name',
+            'subjects.short_name',
+            'subjects.long_name',
+            'rooms.name as room_name',
+            'years.name as year_name',
+            'majors.name as major_name',
+            'days.name as day_name',
+            'times.name as time_name'
+        )
 
-            ->join('teachers','teachers.id','=','schedules.teacher_id')
-            ->join('subjects','subjects.id','=','schedules.subject_id')
-            ->join('rooms','rooms.id','=','schedules.room_id')
-            ->join('years','years.id','=','schedules.year_id')
-            ->join('majors','majors.id','=','schedules.major_id')
-            ->join('days','days.id','=','schedules.day_id')
-            ->join('times','times.id','=','schedules.time_id')
+            ->join('teachers', 'teachers.id', '=', 'schedules.teacher_id')
+            ->join('subjects', 'subjects.id', '=', 'schedules.subject_id')
+            ->join('rooms', 'rooms.id', '=', 'schedules.room_id')
+            ->join('years', 'years.id', '=', 'schedules.year_id')
+            ->join('majors', 'majors.id', '=', 'schedules.major_id')
+            ->join('days', 'days.id', '=', 'schedules.day_id')
+            ->join('times', 'times.id', '=', 'schedules.time_id')
 
-
-            ->where('schedules.year_id',$yearID)
-
+            ->where('schedules.year_id', $yearID)
 
             ->when(request('searchKey'), function ($query) {
 
                 $search = request('searchKey');
 
+                $query->where(function ($q) use ($search) {
 
-                $query->where(function($q) use($search){
-
-                    $q->where('teachers.name','like','%'.$search.'%')
-                        ->orWhere('times.name','like','%'.$search.'%')
-                        ->orWhere('days.name','like','%'.$search.'%')
-                        ->orWhere('subjects.short_name','like','%'.$search.'%')
-                        ->orWhere('subjects.long_name','like','%'.$search.'%')
-                        ->orWhere('rooms.name','like','%'.$search.'%')
-                        ->orWhere('majors.name','like','%'.$search.'%');
+                    $q->where('teachers.name', 'like', '%' . $search . '%')
+                        ->orWhere('times.name', 'like', '%' . $search . '%')
+                        ->orWhere('days.name', 'like', '%' . $search . '%')
+                        ->orWhere('subjects.short_name', 'like', '%' . $search . '%')
+                        ->orWhere('subjects.long_name', 'like', '%' . $search . '%')
+                        ->orWhere('rooms.name', 'like', '%' . $search . '%')
+                        ->orWhere('majors.name', 'like', '%' . $search . '%');
 
                 });
 
             })
 
+            ->orderBy('schedules.created_at', 'desc')
 
-            ->orderBy('schedules.created_at','desc')
-
-
-            ->paginate(5)
-            ->withQueryString();
-
-
+            ->paginate(5);
+        // ->withQueryString();
 
         return view(
             'admin.schedule.teacherTimeTable',
@@ -536,7 +458,6 @@ class ScheduleController extends Controller
         );
 
     }
-
 
     // list schedules
     public function list()
