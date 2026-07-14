@@ -17,7 +17,8 @@
             color: #000;
         }
 
-        h2, h3 {
+        h2,
+        h3 {
             text-align: center;
             margin: 5px 0;
         }
@@ -28,7 +29,9 @@
             margin-top: 20px;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #000;
         }
 
@@ -98,128 +101,118 @@
 
 <body>
 
-<h2>University Of Computer Studies (Magway)</h2>
+    <h2>University Of Computer Studies (Magway)</h2>
 
-<h3>
-    {{ $yearData->name }} |
-    {{ $room->name }} |
-    {{ $major->name }}
-</h3>
+    <h3>
+        {{ $yearData->name }} |
+        Semester - {{ $semesters->name }} |
+        {{ $major->name }} |
+        Section - {{ $sections->name }} |
+        {{ $room->name }}
+    </h3>
 
-@if($schedules->isEmpty())
+    @if ($schedules->isEmpty())
 
-    <h3>No Schedule Found</h3>
+        <h3>No Schedule Found</h3>
+    @else
+        @php
+            $scheduleMap = [];
 
-@else
+            foreach ($schedules as $schedule) {
+                $scheduleMap[$schedule->day_id][$schedule->time_id] = $schedule;
+            }
 
-@php
-    $scheduleMap = [];
+            $lunchTimes = ['12:00-01:00', '01:00-02:00', '02:00-03:00'];
+        @endphp
 
-    foreach ($schedules as $schedule) {
-        $scheduleMap[$schedule->day_id][$schedule->time_id] = $schedule;
-    }
+        <table>
 
-    $lunchTimes = ['12:00-01:00', '01:00-02:00', '02:00-03:00'];
-@endphp
+            <thead>
+                <tr>
+                    <th>Day / Time</th>
 
-<table>
+                    @foreach ($times as $time)
+                        <th>{{ $time->name }}</th>
+                    @endforeach
 
-    <thead>
-        <tr>
-            <th>Day / Time</th>
+                </tr>
+            </thead>
 
-            @foreach($times as $time)
-                <th>{{ $time->name }}</th>
+            <tbody>
+
+                @foreach ($days as $day)
+                    <tr>
+
+                        <td class="day">
+                            {{ $day->name }}
+                        </td>
+
+                        @foreach ($times as $time)
+                            @php
+                                $schedule = $scheduleMap[$day->id][$time->id] ?? null;
+                            @endphp
+
+                            <td>
+
+                                @if (in_array($time->name, $lunchTimes))
+                                    <span class="lunch">
+                                        Lunch Break
+                                    </span>
+                                @elseif($schedule)
+                                    {{ $schedule->subject->short_name }}
+                                @else
+                                    <span class="extra">
+                                        Extra Curriculum
+                                    </span>
+                                @endif
+
+                            </td>
+                        @endforeach
+
+                    </tr>
+                @endforeach
+
+            </tbody>
+
+        </table>
+
+        <!-- GAP -->
+        <div class="space"></div>
+
+        <!-- SUBJECT LIST -->
+        <div class="legend">
+
+            <div class="legend-header">
+                <span class="code">Subject Code</span>
+                <span class="name">Subject Name</span>
+            </div>
+
+            @foreach ($schedules->unique('subject_id') as $item)
+                <div class="legend-row">
+                    <span class="code">
+                        {{ $item->subject->short_name }}
+                    </span>
+
+                    <span class="name">
+                        {{ $item->subject->long_name }}
+
+                        @if ($item->teacher)
+                            ({{ $item->teacher->name }})
+                        @endif
+                    </span>
+                </div>
             @endforeach
 
-        </tr>
-    </thead>
-
-    <tbody>
-
-    @foreach($days as $day)
-
-        <tr>
-
-            <td class="day">
-                {{ $day->name }}
-            </td>
-
-            @foreach($times as $time)
-
-                @php
-                    $schedule = $scheduleMap[$day->id][$time->id] ?? null;
-                @endphp
-
-                <td>
-
-                    @if(in_array($time->name, $lunchTimes))
-
-                        <span class="lunch">
-                            Lunch Break
-                        </span>
-
-                    @elseif($schedule)
-
-                        {{ $schedule->subject->short_name }}
-
-                    @else
-
-                        <span class="extra">
-                            Extra Curriculum
-                        </span>
-
-                    @endif
-
-                </td>
-
-            @endforeach
-
-        </tr>
-
-    @endforeach
-
-    </tbody>
-
-</table>
-
-<!-- GAP -->
-<div class="space"></div>
-
-<!-- SUBJECT LIST -->
-<div class="legend">
-
-    <div class="legend-header">
-        <span class="code">Subject Code</span>
-        <span class="name">Subject Name</span>
-    </div>
-
-    @foreach($schedules->unique('subject_id') as $item)
-
-        <div class="legend-row">
-            <span class="code">
-                {{ $item->subject->short_name }}
-            </span>
-
-            <span class="name">
-                {{ $item->subject->long_name }}
-
-                @if($item->teacher)
-                    ({{ $item->teacher->name }})
-                @endif
-            </span>
         </div>
 
-    @endforeach
+        <!-- FOOTER -->
+        <div class="footer">
+            Generated on :
+            {{ now()->timezone('Asia/Yangon')->format('d-m-Y h:i A') }}
+        </div>
 
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-    Generated on : {{ now()->format('d-m-Y h:i A') }}
-</div>
-
-@endif
+    @endif
 
 </body>
+
 </html>

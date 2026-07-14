@@ -20,6 +20,8 @@ return new class extends Migration
             $table->foreignId('subject_id');
             $table->foreignId('day_id');
             $table->foreignId('time_id');
+            $table->foreignId('semester_id');
+            $table->foreignId('section_id');
             $table->timestamps();
         });
     }

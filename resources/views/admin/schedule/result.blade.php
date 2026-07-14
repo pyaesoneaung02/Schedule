@@ -21,9 +21,13 @@
 
             {{ $yearData->name }}
             |
-            {{ $room->name }}
+            Semester - {{ $semesters->name }}
             |
             {{ $major->name }}
+            |
+            Section - {{ $sections->name }}
+            |
+            {{ $room->name }}
 
         </h4>
 
@@ -344,20 +348,19 @@
         </button>
 
 
-
-
-        <a href="{{ route('schedule.pdf', [$yearData->id, $room->id, $major->id]) }}"
-            class="px-4 btn btn-danger">
-
+        <a href="{{ route('schedule.pdf', [
+            'year' => $yearData->id,
+            'room' => $room->id,
+            'major' => $major->id,
+            'semesterID' => $semesters->id,
+            'sectionID' => $sections->id,
+        ]) }}"
+        class="px-4 btn btn-danger">
 
             <i class="mr-1 fa-solid fa-file-pdf"></i>
-
             Download PDF
 
-
         </a>
-
-
 
 
         <a href="{{ route('schedule.list', [$yearData->id, $room->id, $major->id]) }}"

@@ -106,6 +106,10 @@
 
                                 <th>Room</th>
 
+                                <th>Section</th>
+
+                                <th>Semester</th>
+
                                 <th>Subject Name</th>
 
                                 <th width="150">Subject Code</th>
@@ -160,6 +164,18 @@
                                     <td>
 
                                         {{ $item->room_name }}
+
+                                    </td>
+
+                                    <td>
+
+                                        {{ $item->section_name }}
+
+                                    </td>
+
+                                     <td>
+
+                                        {{ $item->semester_name }}
 
                                     </td>
 

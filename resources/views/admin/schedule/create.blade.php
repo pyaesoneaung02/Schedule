@@ -169,7 +169,7 @@
                                     <div class="mb-3">
 
                                         <label class="form-label">
-                                            Select Subject
+                                            Select Subject Name
                                         </label>
 
 
@@ -187,6 +187,44 @@
                                                     @if (old('subjectID') == $item->id) selected @endif>
 
                                                     {{ $item->long_name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+
+                                        @error('subjectID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Section
+                                        </label>
+
+
+                                        <select name="sectionID"
+                                            class="form-control @error('sectionID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                Choose Section
+                                            </option>
+
+
+                                            @foreach ($sections as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('sectionID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
 
                                                 </option>
                                             @endforeach
@@ -326,7 +364,7 @@
                                     <div class="mb-3">
 
                                         <label class="form-label">
-                                            Select Subject
+                                            Select Subject Code
                                         </label>
 
                                         <select name="subjectID"
@@ -355,6 +393,44 @@
 
                                     </div>
 
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Semester
+                                        </label>
+
+
+                                        <select name="semesterID"
+                                            class="form-control @error('semesterID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                Choose Semester
+                                            </option>
+
+
+                                            @foreach ($semesters as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('semesterID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+
+                                        @error('semesterID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
 
 
 
@@ -378,11 +454,6 @@
 
 
                             </button>
-
-
-
-
-
 
 
                             <a href="{{ route('schedule.list') }}" class="btn btn-outline-primary w-100">

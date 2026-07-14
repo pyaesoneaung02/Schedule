@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="mt-5 container-fluid">
+<div class="mt-3 container-fluid">
 
 
     <!-- Page Heading -->
@@ -203,7 +203,7 @@
 
                             <i class="mr-2 fa-solid fa-list"></i>
 
-                            User Account List
+                            Admin Account List
 
 
                         </a>

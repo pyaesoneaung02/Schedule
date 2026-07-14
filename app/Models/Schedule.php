@@ -5,6 +5,8 @@ namespace App\Models;
 use App\Models\Day;
 use App\Models\Major;
 use App\Models\Room;
+use App\Models\Sections;
+use App\Models\Semesters;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Time;
@@ -21,7 +23,9 @@ class Schedule extends Model
         'teacher_id',
         'subject_id',
         'day_id',
-        'time_id'
+        'time_id',
+        'semester_id',
+        'section_id',
     ];
 
      //to delete schedule only
@@ -64,5 +68,17 @@ class Schedule extends Model
     public function time()
     {
         return $this->belongsTo(Time::class);
+    }
+
+    //to delete section only
+    public function section()
+    {
+        return $this->belongsTo(Sections::class);
+    }
+
+    //to delete semester only
+    public function semester()
+    {
+        return $this->belongsTo(Semesters::class);
     }
 }

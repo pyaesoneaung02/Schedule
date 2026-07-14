@@ -188,7 +188,7 @@
                                 <div class="mb-3">
 
                                     <label class="form-label">
-                                        Select Subject
+                                        Select Subject Name
                                     </label>
 
 
@@ -218,6 +218,47 @@
 
 
                                     @error('subjectID')
+                                        <span class="invalid-feedback">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
+
+
+                                </div>
+
+                                 <div class="mb-3">
+
+                                    <label class="form-label">
+                                        Select Section
+                                    </label>
+
+
+                                    <select name="sectionID"
+                                        class="form-control @error('sectionID') is-invalid @enderror">
+
+
+                                        <option value="">
+                                            Choose Section
+                                        </option>
+
+
+                                        @foreach ($sections as $item)
+
+                                            <option value="{{ $item->id }}"
+                                                @if(old('sectionID',$schedule->section_id)==$item->id) selected @endif>
+
+                                                {{ $item->name }}
+
+                                            </option>
+
+
+                                        @endforeach
+
+
+                                    </select>
+
+
+                                    @error('sectionID')
                                         <span class="invalid-feedback">
                                             {{ $message }}
                                         </span>
@@ -372,7 +413,7 @@
                                 <div class="mb-3">
 
                                     <label class="form-label">
-                                        Select Subject
+                                        Select Subject Code
                                     </label>
 
 
@@ -402,6 +443,47 @@
 
 
                                     @error('subjectID')
+                                        <span class="invalid-feedback">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
+
+
+                                </div>
+
+                                <div class="mb-3">
+
+                                    <label class="form-label">
+                                        Select Semester
+                                    </label>
+
+
+                                    <select name="semesterID"
+                                        class="form-control @error('semesterID') is-invalid @enderror">
+
+
+                                        <option value="">
+                                            Choose Semester
+                                        </option>
+
+
+                                        @foreach ($semesters as $item)
+
+                                            <option value="{{ $item->id }}"
+                                                @if(old('semesterID',$schedule->semester_id)==$item->id) selected @endif>
+
+                                                {{ $item->name }}
+
+                                            </option>
+
+
+                                        @endforeach
+
+
+                                    </select>
+
+
+                                    @error('semesterID')
                                         <span class="invalid-feedback">
                                             {{ $message }}
                                         </span>

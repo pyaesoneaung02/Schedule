@@ -2,7 +2,7 @@
 
 @section('content')
 
-<div class="mt-5 container-fluid">
+<div class="mt-3 container-fluid">
 
 
     <!-- Page Heading -->

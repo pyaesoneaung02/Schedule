@@ -7,6 +7,8 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\PositionController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SectionsController;
+use App\Http\Controllers\SemestersController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TeachingController;
@@ -37,6 +39,24 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('delete/{id}', [YearController::class, 'delete'])->name('year#delete');
     });
 
+    //sections
+    Route::group(['prefix' => 'section'], function () {
+        Route::get('list', [SectionsController::class, 'list'])->name('section.list');
+        Route::post('create', [SectionsController::class, 'create'])->name('section.create');
+        Route::get('update/{id}', [SectionsController::class, 'updatePage'])->name('section.updatePage');
+        Route::post('update/{id}', [SectionsController::class, 'update'])->name('section.update');
+        Route::get('delete/{id}', [SectionsController::class, 'delete'])->name('section.delete');
+    });
+
+    //semesters
+    Route::group(['prefix' => 'semester'], function () {
+        Route::get('list', [SemestersController::class, 'list'])->name('semester.list');
+        Route::post('create', [SemestersController::class, 'create'])->name('semester.create');
+        Route::get('update/{id}', [SemestersController::class, 'updatePage'])->name('semester.updatePage');
+        Route::post('update/{id}', [SemestersController::class, 'update'])->name('semester.update');
+        Route::get('delete/{id}', [SemestersController::class, 'delete'])->name('semester.delete');
+    });
+
     //profile
     Route::group(['prefix' => 'profile'], function () {
         Route::get('changePassword', [ProfileController::class, 'changePasswordPage'])
@@ -52,11 +72,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
             Route::post('add/newAdmin', [ProfileController::class, 'createAdminAccount'])->name('profile#createAdminAccount');
             Route::get('admin/list', [ProfileController::class, 'adminList'])->name('profile.adminList');
             Route::get('admin/delete/{id}', [ProfileController::class, 'delete'])->name('profile.adminDelete');
-
-            //user list
-            Route::get('user/list', [ProfileController::class, 'userList'])->name('profile.userList');
-            Route::get('user/delete/{id}', [ProfileController::class, 'userDelete'])->name('profile.userDelete');
         });
+
+        //user list
+        Route::get('user/list', [ProfileController::class, 'userList'])->name('profile.userList');
+        Route::get('user/delete/{id}', [ProfileController::class, 'userDelete'])->name('profile.userDelete');
     });
 
     //majors
@@ -136,23 +156,50 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('delete/{id}', [TeachingController::class, 'delete'])->name('teaching.delete');
     });
 
-    //schedules
+    // schedules
     Route::group(['prefix' => 'schedule'], function () {
-        Route::get('create', [ScheduleController::class, 'create'])->name('schedule.create');
-        Route::post('create', [ScheduleController::class, 'createSchedule'])->name('schedule.createSchedule');
-        Route::get('list', [ScheduleController::class, 'list'])->name('schedule.list');
-        Route::get('update/{id}', [ScheduleController::class, 'updatePage'])->name('schedule.updatePage');
-        Route::post('update/{id}', [ScheduleController::class, 'update'])->name('schedule.update');
-        Route::get('delete/{id}', [ScheduleController::class, 'delete'])->name('schedule.delete');
 
-        //time table
-        Route::get('timetable', [ScheduleController::class, 'timetable'])->name('schedule.timeTable');
-        Route::get('viewSchedule/{id}', [ScheduleController::class, 'viewSchedule'])->name('schedule.viewSchedule');
-        Route::post('/schedule/result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
-        //print & PDF
-        Route::get('/schedule/pdf/{year}/{room}/{major}', [ScheduleController::class, 'downloadPDF'])->name('schedule.pdf');
-        //teacher time table
-        Route::get('/schedule/teacher-time-table/{yearID}',[ScheduleController::class,'teacherTimeTable'])->name('schedule.teacherTimeTable');
+        Route::get('create', [ScheduleController::class, 'create'])
+            ->name('schedule.create');
+
+        Route::post('create', [ScheduleController::class, 'createSchedule'])
+            ->name('schedule.createSchedule');
+
+        Route::get('list', [ScheduleController::class, 'list'])
+            ->name('schedule.list');
+
+        Route::get('update/{id}', [ScheduleController::class, 'updatePage'])
+            ->name('schedule.updatePage');
+
+        Route::post('update/{id}', [ScheduleController::class, 'update'])
+            ->name('schedule.update');
+
+        Route::get('delete/{id}', [ScheduleController::class, 'delete'])
+            ->name('schedule.delete');
+
+
+        // timetable
+        Route::get('timetable', [ScheduleController::class, 'timetable'])
+            ->name('schedule.timeTable');
+
+        Route::get('viewSchedule/{id}', [ScheduleController::class, 'viewSchedule'])
+            ->name('schedule.viewSchedule');
+
+
+        // Auto Generate Result
+        Route::post('result/{year}', [ScheduleController::class, 'result'])
+            ->name('schedule.result');
+
+
+        // PDF
+        Route::get('pdf/{year}/{room}/{major}', [ScheduleController::class, 'downloadPDF'])
+            ->name('schedule.pdf');
+
+
+        // Teacher timetable
+        Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])
+            ->name('schedule.teacherTimeTable');
+
     });
 
 });

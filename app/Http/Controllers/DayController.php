@@ -58,7 +58,7 @@ class DayController extends Controller
         return to_route('day.list');
     }
 
-    //check year validation
+    //check day validation
     private function checkValidation($request){
         $request->validate([
             'dayName' => 'required|unique:days,name'

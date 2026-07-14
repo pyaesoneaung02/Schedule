@@ -5,6 +5,8 @@ use App\Models\Day;
 use App\Models\Major;
 use App\Models\Room;
 use App\Models\Schedule;
+use App\Models\Sections;
+use App\Models\Semesters;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Time;
@@ -25,9 +27,11 @@ class ScheduleController extends Controller
         $times    = Time::get();
         $teachers = Teacher::get();
         $days     = Day::get();
+        $semesters = Semesters::get();
+        $sections = Sections::get();
 
         return view('admin.schedule.create', compact(
-            'years', 'majors', 'rooms', 'subjects', 'times', 'teachers', 'days'
+            'years', 'majors', 'rooms', 'subjects', 'times', 'teachers', 'days', 'semesters', 'sections'
         ));
     }
 
@@ -59,8 +63,10 @@ class ScheduleController extends Controller
         $days     = Day::get();
         $times    = Time::get();
         $teachers = Teacher::get();
+        $semesters = Semesters::get();
+        $sections = Sections::get();
         $schedule = Schedule::where('id', $id)->first();
-        return view('admin.schedule.edit', compact('schedule', 'rooms', 'subjects', 'years', 'majors', 'days', 'times', 'teachers'));
+        return view('admin.schedule.edit', compact('schedule', 'rooms', 'subjects', 'years', 'majors', 'days', 'times', 'teachers', 'semesters', 'sections'));
     }
 
     //update process
@@ -95,6 +101,8 @@ class ScheduleController extends Controller
             'day_id'     => $request->dayID,
             'time_id'    => $request->timeID,
             'teacher_id' => $request->teacherID,
+            'semester_id' => $request->semesterID,
+            'section_id' => $request->sectionID,
         ];
     }
 
@@ -117,6 +125,8 @@ class ScheduleController extends Controller
             'teacherID' => 'required',
             'dayID'     => 'required',
             'timeID'    => 'required',
+            'semesterID' => 'required',
+            'sectionID' => 'required'
 
         ], [
 
@@ -127,6 +137,8 @@ class ScheduleController extends Controller
             'teacherID.required' => 'Please select Teacher.',
             'dayID.required'     => 'Please select Day.',
             'timeID.required'    => 'Please select Time.',
+            'semesterID.required' => 'Please select Semester.',
+            'sectionID.required' => 'Please select Section.',
 
         ]);
 
@@ -413,7 +425,9 @@ class ScheduleController extends Controller
             'years.name as year_name',
             'majors.name as major_name',
             'days.name as day_name',
-            'times.name as time_name'
+            'times.name as time_name',
+            'semesters.name as semester_name',
+            'sections.name as section_name'
         )
 
             ->join('teachers', 'teachers.id', '=', 'schedules.teacher_id')
@@ -423,6 +437,8 @@ class ScheduleController extends Controller
             ->join('majors', 'majors.id', '=', 'schedules.major_id')
             ->join('days', 'days.id', '=', 'schedules.day_id')
             ->join('times', 'times.id', '=', 'schedules.time_id')
+            ->join('semesters', 'semesters.id', '=', 'schedules.semester_id')
+            ->join('sections', 'sections.id', '=', 'schedules.section_id')
 
             ->where('schedules.year_id', $yearID)
 
@@ -438,7 +454,9 @@ class ScheduleController extends Controller
                         ->orWhere('subjects.short_name', 'like', '%' . $search . '%')
                         ->orWhere('subjects.long_name', 'like', '%' . $search . '%')
                         ->orWhere('rooms.name', 'like', '%' . $search . '%')
-                        ->orWhere('majors.name', 'like', '%' . $search . '%');
+                        ->orWhere('majors.name', 'like', '%' . $search . '%')
+                        ->orWhere('semesters.name', 'like', '%' . $search . '%')
+                        ->orWhere('sections.name', 'like', '%' . $search . '%');
 
                 });
 
@@ -476,7 +494,9 @@ class ScheduleController extends Controller
             'subjects.long_name as subject_long_name',
             'days.name as day_name',
             'times.name as time_name',
-            'teachers.name as teacher_name'
+            'teachers.name as teacher_name',
+            'semesters.name as semester_name',
+            'sections.name as section_name'
         )
             ->leftJoin('years', 'schedules.year_id', '=', 'years.id')
             ->leftJoin('majors', 'schedules.major_id', '=', 'majors.id')
@@ -485,6 +505,8 @@ class ScheduleController extends Controller
             ->leftJoin('days', 'schedules.day_id', '=', 'days.id')
             ->leftJoin('times', 'schedules.time_id', '=', 'times.id')
             ->leftJoin('teachers', 'schedules.teacher_id', '=', 'teachers.id')
+            ->leftJoin('semesters', 'schedules.semester_id', '=', 'semesters.id')
+            ->leftJoin('sections', 'schedules.section_id', '=', 'sections.id')
             ->when(request('searchKey'), function ($query) {
                 $query->where('schedules.id', 'like', '%' . request('searchKey') . '%')
                     ->orWhere('teachers.name', 'like', '%' . request('searchKey') . '%')
@@ -494,7 +516,9 @@ class ScheduleController extends Controller
                     ->orWhere('subjects.long_name', 'like', '%' . request('searchKey') . '%')
                     ->orWhere('rooms.name', 'like', '%' . request('searchKey') . '%')
                     ->orWhere('years.name', 'like', '%' . request('searchKey') . '%')
-                    ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%');
+                    ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%')
+                    ->orWhere('semesters.name', 'like', '%' . request('searchKey') . '%')
+                    ->orWhere('sections.name', 'like', '%' . request('searchKey') . '%');
             })
             ->orderBy('schedules.created_at', 'desc')
             ->paginate(5);
@@ -517,50 +541,82 @@ class ScheduleController extends Controller
 
         $majors = Major::all();
         $rooms  = Room::all();
+        $semesters = Semesters::all();
+        $sections = Sections::all();
 
-        return view('admin.schedule.viewSchedule', compact('years', 'majors', 'rooms'));
+        return view('admin.schedule.viewSchedule', compact('years', 'majors', 'rooms', 'semesters', 'sections'));
     }
 
     // result schedule
     public function result(Request $request, $year)
     {
         $request->validate([
-            'roomID'  => 'required',
+
+            'roomID' => 'required',
             'majorID' => 'required',
+            'semesterID' => 'required',
+            'sectionID' => 'required',
+
+        ], [
+
+            'roomID.required' => 'Please select Room.',
+            'majorID.required' => 'Please select Major.',
+            'semesterID.required' => 'Please select Semester.',
+            'sectionID.required' => 'Please select Section.',
+
         ]);
 
-        // EXACT MATCH (Year + Room + Major)
-        $days     = Day::all();
-        $times    = Time::all();
-        $teachers = Teacher::all();
 
-        $schedules = Schedule::with(['day', 'subject', 'time', 'teacher'])
-            ->where('year_id', $year)
-            ->where('room_id', $request->roomID)
-            ->where('major_id', $request->majorID)
-            ->get();
+        $days = Day::all();
+        $times = Time::all();
+
+
+        $schedules = Schedule::with([
+            'day',
+            'subject',
+            'time',
+            'teacher'
+        ])
+        ->where('year_id', $year)
+        ->where('room_id', $request->roomID)
+        ->where('major_id', $request->majorID)
+        ->where('semester_id', $request->semesterID)
+        ->where('section_id', $request->sectionID)
+        ->get();
 
         $yearData = Year::findOrFail($year);
-        $room     = Room::findOrFail($request->roomID);
-        $major    = Major::findOrFail($request->majorID);
 
-        return view('admin.schedule.result', compact(
-            'schedules',
-            'yearData',
-            'room',
-            'major',
-            'days',
-            'times',
-            'teachers'
-        ));
+        $room = Room::findOrFail($request->roomID);
+
+        $major = Major::findOrFail($request->majorID);
+
+
+        $semesters = Semesters::findOrFail($request->semesterID);
+
+        $sections = Sections::findOrFail($request->sectionID);
+
+        return view('admin.schedule.result',
+            compact(
+                'schedules',
+                'yearData',
+                'room',
+                'major',
+                'days',
+                'times',
+                'semesters',
+                'sections'
+            )
+        );
     }
 
     //create PDF
-    public function downloadPdf($yearId, $roomId, $majorId)
+    public function downloadPDF($yearId, $roomId, $majorId)
     {
         $yearData = Year::findOrFail($yearId);
         $room     = Room::findOrFail($roomId);
         $major    = Major::findOrFail($majorId);
+        $semesters = Semesters::findOrFail(request('semesterID'));
+        $sections = Sections::findOrFail(request('sectionID'));
 
         $days  = Day::all();
         $times = Time::all();
@@ -569,6 +625,8 @@ class ScheduleController extends Controller
             ->where('year_id', $yearId)
             ->where('room_id', $roomId)
             ->where('major_id', $majorId)
+            ->where('semester_id', request('semesterID'))
+            ->where('section_id', request('sectionID'))
             ->get();
 
         $pdf = Pdf::loadView('admin.schedule.pdf', compact(
@@ -577,7 +635,9 @@ class ScheduleController extends Controller
             'major',
             'days',
             'times',
-            'schedules'
+            'schedules',
+            'semesters',
+            'sections'
         ));
 
         $pdf->setPaper('a4', 'landscape');
