@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('long_name');
             $table->string('short_name');
+            $table->longText('description')->nullable();
             $table->integer('year_id');
             $table->integer('major_id');
             $table->string('time_number');

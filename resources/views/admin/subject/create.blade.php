@@ -198,12 +198,7 @@
                                         </option>
                                     @endforeach
 
-
-
                                 </select>
-
-
-
 
                                 @error('majorID')
                                     <span class="invalid-feedback">
@@ -212,6 +207,27 @@
                                 @enderror
 
 
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Subject Description
+                                </label>
+
+                                <textarea id="editor" name="description" class="form-control @error('description') is-invalid @enderror">
+                                    {{ old('description') }}
+                                </textarea>
+
+                                {{-- {!! $subject->description !!} --}}
+
+
+                                @error('description')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
                             </div>
 
@@ -251,3 +267,34 @@
 
     </div>
 @endsection
+
+
+@push('scripts')
+    <script>
+        tinymce.init({
+
+            selector: '#editor',
+
+            height: 300,
+
+            menubar: false,
+
+            plugins: [
+                'lists',
+                'advlist',
+                'wordcount'
+            ],
+
+            toolbar: 'undo redo | ' +
+                'fontfamily fontsize | ' +
+                'bold italic underline | ' +
+                'forecolor backcolor | ' +
+                'alignleft aligncenter alignright alignjustify | ' +
+                'bullist numlist',
+
+
+            font_size_formats: '8pt 10pt 12pt 14pt 16pt 18pt 24pt 36pt 48pt 60pt 72pt 96pt'
+
+        });
+    </script>
+@endpush

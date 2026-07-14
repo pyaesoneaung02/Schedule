@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Subject extends Model
 {
     //subject
-    protected $fillable = ['long_name','short_name','year_id','major_id','time_number'];
+    protected $fillable = ['long_name','short_name','year_id','major_id','time_number','description'];
 
      //to delete subject only
     public function year()

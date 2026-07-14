@@ -17,6 +17,8 @@ npm install
 npm run dev
 php artisan serve
 
+php artisan make:migration add_phone_to_users_table --table=users
+
 create tables
 php artisan make:model (table_name) -mc
 ပီးရင် protected $fillable ထည့်

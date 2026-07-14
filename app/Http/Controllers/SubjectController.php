@@ -6,6 +6,7 @@ use App\Models\Major;
 use App\Models\Subject;
 use App\Models\Year;
 use Illuminate\Http\Request;
+use Mews\Purifier\Facades\Purifier;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class SubjectController extends Controller
@@ -63,6 +64,7 @@ class SubjectController extends Controller
         return [
             'long_name' => $request->longName,
             'short_name' => $request->shortName,
+            'description' => Purifier::clean($request->description),
             'time_number' => $request->timeNumber,
             'year_id'  => $request->yearID,
             'major_id' => $request->majorID,
@@ -76,6 +78,7 @@ class SubjectController extends Controller
             'longName' => 'required',
             'shortName' => 'required',
             'timeNumber' => 'required',
+            'description' => 'required',
             'yearID'  => 'required',
             'majorID' => 'required',
         ];
@@ -95,6 +98,7 @@ class SubjectController extends Controller
             'subjects.long_name',
             'subjects.short_name',
             'subjects.time_number',
+            'subjects.description',
             'subjects.year_id',
             'subjects.major_id',
             'subjects.created_at'

@@ -313,6 +313,11 @@
     <!-- Custom scripts for all pages-->
     <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
 
+    <!-- Word Editor -->
+    <script src="https://cdn.tiny.cloud/1/cxfmq7z44c9ld3ajd9mhnol91kopl886kwjehdhk0ompr4nj/tinymce/8/tinymce.min.js"
+        referrerpolicy="origin"></script>
+    @stack('scripts')
+
     <!-- Page level plugins -->
     {{-- <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script> --}}
 
