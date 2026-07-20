@@ -11,7 +11,7 @@
 
                 <i class="mr-2 fa-solid fa-calendar-days"></i>
 
-                {{ $years->name }} Schedule
+                {{ $years->name }} အတန်းအချိန်ဇယား
 
             </h2>
 

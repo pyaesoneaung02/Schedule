@@ -35,7 +35,7 @@
                     <h5 class="mb-0">
 
                         <i class="mr-2 fa-solid fa-plus"></i>
-                        Add New Position
+                        Add Position
 
                     </h5>
 

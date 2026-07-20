@@ -97,9 +97,13 @@
 
                                 <th width="150">Time Number</th>
 
+                                <th>Academic Year</th>
+
                                 <th>Year</th>
 
                                 <th>Major</th>
+
+                                <th>Semester</th>
 
                                 <th width="150">Created Date</th>
 
@@ -141,13 +145,13 @@
                                     </td>
 
 
-
-
                                     <td class="text-center">
                                         {{ $item->time_number }}
                                     </td>
 
-
+                                    <td>
+                                        {{ $item->academic_year_name }}
+                                    </td>
 
 
                                     <td>
@@ -162,7 +166,9 @@
                                     </td>
 
 
-
+                                    <td>
+                                        {{ $item->semester_name }}
+                                    </td>
 
                                     <td class="text-center">
                                         {{ $item->created_at->format('d M Y') }}
@@ -214,7 +220,7 @@
                                 <tr>
 
 
-                                    <td colspan="8" class="py-5 text-center text-muted">
+                                    <td colspan="10" class="py-5 text-center text-muted">
 
 
                                         <i class="mb-2 fa-solid fa-folder-open fa-3x"></i>

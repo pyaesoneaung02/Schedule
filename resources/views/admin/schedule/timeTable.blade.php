@@ -9,11 +9,11 @@
 
         <h2 class="text-primary font-weight-bold">
             <i class="mr-2 fa-solid fa-calendar-days"></i>
-            Schedule Year List
+            အတန်းနှစ်အလိုက် အချိန်ဇယားစာရင်း
         </h2>
 
         <p class="mb-0 text-muted">
-            Select year to view weekly timetable.
+            အပတ်စဉ်အချိန်ဇယားကြည့်ရန် ပညာသင်နှစ်ကို ရွေးချယ်ပါ။
         </p>
 
     </div>
@@ -25,7 +25,7 @@
 
             <h5 class="mb-0">
                 <i class="mr-2 fa-solid fa-list"></i>
-                Available Years
+                ပညာသင်နှစ်များ
             </h5>
 
         </div>
@@ -55,7 +55,7 @@
                                     <i class="mb-3 fa-solid fa-users fa-3x"></i>
 
 
-                                    <h3 class="mb-0 font-weight-bold">
+                                    <h3 class="mb-2 font-weight-bold">
 
                                         {{ $item->name }}
 
@@ -63,7 +63,7 @@
 
 
                                     <small>
-                                        View Schedule
+                                        အချိန်ဇယားကြည့်ရန်
                                     </small>
 
 

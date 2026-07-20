@@ -22,7 +22,7 @@
                     <div class="text-white card-header bg-primary">
                         <h5 class="mb-0">
                             <i class="mr-2 fa-solid fa-plus"></i>
-                            Add New Semester
+                            Add Semester
                         </h5>
                     </div>
 

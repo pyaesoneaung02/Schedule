@@ -22,10 +22,6 @@
 
     </div>
 
-
-
-
-
     <div class="row">
 
 
@@ -43,16 +39,12 @@
                     <h5 class="mb-0">
 
                         <i class="mr-2 fa-solid fa-plus"></i>
-                        Add New Time
+                        Add Time
 
                     </h5>
 
 
                 </div>
-
-
-
-
 
                 <div class="card-body">
 

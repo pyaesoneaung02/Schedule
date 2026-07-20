@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('academic_year_id') ->nullable();
             $table->foreignId('year_id');
             $table->foreignId('major_id');
             $table->foreignId('room_id');

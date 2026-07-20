@@ -1,0 +1,71 @@
+Schema::create('years', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
+Schema::create('majors', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('year_id');
+            $table->timestamps();
+        });
+
+ Schema::create('rooms', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('year_id');
+            $table->integer('major_id');
+            $table->timestamps();
+        });
+Schema::create('departments', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+Schema::create('positions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+ Schema::create('teachers', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('position_id');
+            $table->integer('department_id');
+            $table->timestamps();
+        });
+Schema::create('subjects', function (Blueprint $table) {
+            $table->id();
+            $table->string('long_name');
+            $table->string('short_name');
+            $table->longText('description')->nullable();
+            $table->integer('year_id');
+            $table->integer('major_id');
+            $table->string('time_number');
+            $table->timestamps();
+        });
+Schema::create('times', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+Schema::create('teachings', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('year_id');
+            $table->integer('major_id');
+            $table->integer('room_id');
+            $table->integer('subject_id');
+            $table->timestamps();
+        });
+ Schema::create('days', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+Schema::create('sections', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });

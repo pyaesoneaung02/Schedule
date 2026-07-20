@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AcademicYears;
 use App\Models\Major;
+use App\Models\Semesters;
 use App\Models\Subject;
 use App\Models\Year;
 use Illuminate\Http\Request;
@@ -15,7 +17,9 @@ class SubjectController extends Controller
     public function create(){
         $years = Year::get();
         $majors = Major::get();
-        return view('admin.subject.create',compact('years','majors'));
+        $academicYears = AcademicYears::get();
+        $semesters = Semesters::get();
+        return view('admin.subject.create',compact('years','majors','academicYears','semesters'));
     }
 
     //create subject
@@ -35,8 +39,10 @@ class SubjectController extends Controller
     public function updatePage($id){
         $years = Year::get();
         $majors = Major::get();
+        $academicYears = AcademicYears::get();
+        $semesters = Semesters::get();
         $subject = Subject::where('id', $id)->first();
-        return view('admin.subject.edit', compact('subject','years','majors'));
+        return view('admin.subject.edit', compact('subject','years','majors','academicYears','semesters'));
     }
 
     //update process
@@ -68,6 +74,8 @@ class SubjectController extends Controller
             'time_number' => $request->timeNumber,
             'year_id'  => $request->yearID,
             'major_id' => $request->majorID,
+            'academic_year_id' => $request->academicID,
+            'semester_id' => $request->semesterID
         ];
     }
 
@@ -81,6 +89,8 @@ class SubjectController extends Controller
             'description' => 'required',
             'yearID'  => 'required',
             'majorID' => 'required',
+            'academicID' => 'required',
+            'semesterID' => 'required'
         ];
 
         $messages = [];
@@ -88,12 +98,14 @@ class SubjectController extends Controller
         $request->validate($rules, $messages);
     }
 
-     //subject list
+    //subject list
     public function list()
     {
         $subjects = Subject::select(
             'majors.name as major_name',
             'years.name as year_name',
+            'academic_years.name as academic_year_name',
+            'semesters.name as semester_name',
             'subjects.id',
             'subjects.long_name',
             'subjects.short_name',
@@ -101,16 +113,22 @@ class SubjectController extends Controller
             'subjects.description',
             'subjects.year_id',
             'subjects.major_id',
+            'subjects.academic_year_id',
+            'subjects.semester_id',
             'subjects.created_at'
         )
         ->leftJoin('years', 'subjects.year_id', '=', 'years.id')
         ->leftJoin('majors', 'subjects.major_id', '=', 'majors.id')
+        ->leftJoin('academic_years', 'subjects.academic_year_id', '=', 'academic_years.id')
+        ->leftJoin('semesters', 'subjects.semester_id', '=', 'semesters.id')
         ->when(request('searchKey'), function ($query) {
             $query->where('subjects.long_name', 'like', '%' . request('searchKey') . '%')
                   ->orwhere('subjects.short_name', 'like', '%' . request('searchKey') . '%')
                   ->orwhere('subjects.time_number', 'like', '%' . request('searchKey') . '%')
                   ->orWhere('years.name', 'like', '%' . request('searchKey') . '%')
-                  ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%');
+                  ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%')
+                  ->orwhere('academic_years.name', 'like', '%'. request('searchKey') . '%')
+                  ->orwhere('semesters.name', 'like', '%'. request('searchKey') . '%');
         })
         ->orderBy('subjects.created_at', 'desc')
         ->paginate(5);

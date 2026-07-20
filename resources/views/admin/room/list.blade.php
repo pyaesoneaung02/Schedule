@@ -63,6 +63,7 @@
                                 <th>Room Name</th>
                                 <th>Year</th>
                                 <th>Major</th>
+                                <th>Scetion</th>
                                 <th width="180">Created Date</th>
                                 <th width="120">Action</th>
 
@@ -89,6 +90,10 @@
 
                                     <td>
                                         {{ $item->major_name }}
+                                    </td>
+
+                                    <td>
+                                        {{ $item->section_name }}
                                     </td>
 
                                     <td class="text-center">

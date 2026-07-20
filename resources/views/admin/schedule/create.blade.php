@@ -23,6 +23,126 @@
 
         </div>
 
+
+        <!-- Auto Generate Card -->
+        {{-- <div class="mb-4 border-0 shadow-sm card">
+
+            <div class="text-white card-header bg-success">
+
+                <h5 class="mb-0">
+                    <i class="mr-2 fa-solid fa-wand-magic-sparkles"></i>
+                    Auto Generate Schedule
+                </h5>
+
+            </div>
+
+
+            <div class="card-body">
+
+
+                <form action="{{ route('schedule.autoGenerate') }}" method="POST">
+
+                    @csrf
+
+
+                    <div class="row align-items-end">
+
+
+                        <div class="col-md-5 mb-3">
+
+
+                            <label class="form-label">
+                                Academic Year
+                            </label>
+
+
+                            <select name="academic_year_id" class="form-control">
+
+
+                                <option value="">
+                                    Select Academic Year
+                                </option>
+
+
+                                @foreach ($academicYears as $item)
+                                    <option value="{{ $item->id }}">
+
+                                        {{ $item->name }}
+
+                                    </option>
+                                @endforeach
+
+
+                            </select>
+
+
+                        </div>
+
+
+
+
+                        <div class="col-md-5 mb-3">
+
+
+                            <label class="form-label">
+                                Semester
+                            </label>
+
+
+                            <select name="semester_id" class="form-control">
+
+
+                                <option value="">
+                                    Select Semester
+                                </option>
+
+
+                                @foreach ($semesters as $item)
+                                    <option value="{{ $item->id }}">
+
+                                        {{ $item->name }}
+
+                                    </option>
+                                @endforeach
+
+
+                            </select>
+
+
+                        </div>
+
+
+
+
+                        <div class="col-md-2 mb-3">
+
+
+                            <button type="submit" class="btn btn-success w-100">
+
+
+                                <i class="fa fa-magic mr-2"></i>
+
+                                Generate
+
+
+                            </button>
+
+
+                        </div>
+
+
+
+                    </div>
+
+
+                </form>
+
+
+            </div>
+
+
+        </div> --}}
+
         <div class="row justify-content-center">
 
 
@@ -40,7 +160,7 @@
                         <h5 class="mb-0">
 
                             <i class="mr-2 fa-solid fa-plus"></i>
-                            Add New Schedule
+                            Add Schedule
 
 
                         </h5>
@@ -54,6 +174,46 @@
                         <form action="{{ route('schedule.createSchedule') }}" method="POST">
                             @csrf
                             <div class="row">
+
+                                <div class="col-md-12">
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Academic Year
+                                        </label>
+
+
+                                        <select name="academicYearID"
+                                            class="form-control @error('academicYearID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                Choose Academic Year
+                                            </option>
+
+
+                                            @foreach ($academicYears as $item)
+                                                <option value="{{ $item->id }}"
+                                                    {{ old('academicYearID') == $item->id ? 'selected' : '' }}>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+
+                                        @error('academicYearID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+                                </div>
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
@@ -436,14 +596,7 @@
 
                                 </div>
 
-
-
                             </div>
-
-
-
-
-
 
 
                             <button type="submit" class="mb-3 btn btn-primary w-100">

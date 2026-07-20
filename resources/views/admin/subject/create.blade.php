@@ -32,7 +32,7 @@
                         <h5 class="mb-0">
 
                             <i class="mr-2 fa-solid fa-plus"></i>
-                            Add New Subject
+                            Add Subject
 
                         </h5>
 
@@ -56,7 +56,7 @@
 
 
                                         <label class="form-label">
-                                            Long Name
+                                            Subject Name
                                         </label>
 
 
@@ -80,7 +80,7 @@
 
 
                                         <label class="form-label">
-                                            Short Name
+                                            Subject Code
                                         </label>
 
 
@@ -93,6 +93,45 @@
                                                 {{ $message }}
                                             </span>
                                         @enderror
+
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+
+                                        <label class="form-label">
+                                            Select Academic Year
+                                        </label>
+
+                                        <select name="academicID" class="form-control @error('academicID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                Choose Academic Year
+                                            </option>
+
+
+
+                                            @foreach ($academicYears as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('academicID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+
+                                        </select>
+
+                                        @error('academicID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
 
 
                                     </div>
@@ -159,6 +198,45 @@
                                         </select>
 
                                         @error('yearID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+
+                                    </div>
+
+                                    <div class="mb-3">
+
+
+                                        <label class="form-label">
+                                            Select Semester
+                                        </label>
+
+                                        <select name="semesterID" class="form-control @error('semesterID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                Choose Semester
+                                            </option>
+
+
+
+                                            @foreach ($semesters as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('semesterID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+
+                                        </select>
+
+                                        @error('semesterID')
                                             <span class="invalid-feedback">
                                                 {{ $message }}
                                             </span>

@@ -22,7 +22,7 @@
                     <div class="text-white card-header bg-primary">
                         <h5 class="mb-0">
                             <i class="mr-2 fa-solid fa-plus"></i>
-                            Add New Section
+                            Add Section
                         </h5>
                     </div>
 
@@ -43,6 +43,79 @@
                                         {{ $message }}
                                     </span>
                                 @enderror
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Select Year
+                                </label>
+
+
+                                <select name="yearID" class="form-control @error('yearID') is-invalid @enderror">
+
+
+                                    <option value="">
+                                        Choose Year
+                                    </option>
+
+
+                                    @foreach ($years as $item)
+                                        <option value="{{ $item->id }}"
+                                            @if (old('yearID') == $item->id) selected @endif>
+
+                                            {{ $item->name }}
+
+                                        </option>
+                                    @endforeach
+
+
+                                </select>
+
+
+                                @error('yearID')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Select Major
+                                </label>
+
+
+                                <select name="majorID" class="form-control @error('majorID') is-invalid @enderror">
+
+
+                                    <option value="">
+                                        Choose Major
+                                    </option>
+
+
+                                    @foreach ($majors as $item)
+                                        <option value="{{ $item->id }}"
+                                            @if (old('majorID') == $item->id) selected @endif>
+
+                                            {{ $item->name }}
+
+                                        </option>
+                                    @endforeach
+
+
+                                </select>
+
+
+                                @error('majorID')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+
+
                             </div>
 
                             <button class="btn btn-primary btn-block">
@@ -78,8 +151,10 @@
 
                                 <thead class="thead-light">
                                     <tr class="text-center">
-                                        <th width="70">ID</th>
+                                        {{-- <th width="70">ID</th> --}}
                                         <th>Section Name</th>
+                                        <th>Years</th>
+                                        <th>Majors</th>
                                         <th width="180">Created Date</th>
                                         <th width="120">Action</th>
                                     </tr>
@@ -90,12 +165,20 @@
                                     @forelse ($sections as $item)
                                         <tr>
 
-                                            <td class="text-center">
+                                            {{-- <td class="text-center">
                                                 {{ $item->id }}
-                                            </td>
+                                            </td> --}}
 
                                             <td>
                                                 {{ $item->name }}
+                                            </td>
+
+                                            <td>
+                                                {{ $item->year_name}}
+                                            </td>
+
+                                            <td>
+                                                {{ $item->major_name}}
                                             </td>
 
                                             <td class="text-center">

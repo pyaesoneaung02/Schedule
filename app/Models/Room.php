@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Room extends Model
 {
     //rooms
-    protected $fillable = ['name','year_id','major_id'];
+    protected $fillable = ['name','year_id','major_id','section_id'];
 
     //to delete room only
     public function year()

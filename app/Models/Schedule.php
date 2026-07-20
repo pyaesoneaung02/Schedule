@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\AcademicYears;
 use App\Models\Day;
 use App\Models\Major;
 use App\Models\Room;
@@ -17,6 +18,7 @@ class Schedule extends Model
 {
     //schedule
     protected $fillable=[
+        'academic_year_id',
         'year_id',
         'major_id',
         'room_id',
@@ -80,5 +82,11 @@ class Schedule extends Model
     public function semester()
     {
         return $this->belongsTo(Semesters::class);
+    }
+
+    //to delete academic years only
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYears::class);
     }
 }

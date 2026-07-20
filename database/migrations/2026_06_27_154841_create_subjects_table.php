@@ -18,7 +18,9 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->integer('year_id');
             $table->integer('major_id');
-            $table->string('time_number');
+            $table->integer('time_number');
+            $table->integer('academic_year_id')->nullable();
+            $table->integer('semester_id')->nullable();
             $table->timestamps();
         });
     }

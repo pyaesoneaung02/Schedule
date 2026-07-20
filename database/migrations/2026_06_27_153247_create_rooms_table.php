@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('year_id');
             $table->integer('major_id');
+            $table->integer('section_id')->nullable();
             $table->timestamps();
         });
     }

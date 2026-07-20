@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\AcademicYearsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\DayController;
@@ -20,6 +21,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
     // homepage route
     Route::get('home', [AdminController::class, 'adminHome'])->name('adminHome');
+
+    //academic years
+    Route::group(['prefix' => 'academic_years'], function () {
+        Route::get('list', [AcademicYearsController::class, 'list'])->name('academicYear.list');
+        Route::post('create', [AcademicYearsController::class, 'create'])->name('academicYear.create');
+        Route::get('update/{id}', [AcademicYearsController::class, 'updatePage'])->name('academicYear.updatePage');
+        Route::post('update/{id}', [AcademicYearsController::class, 'update'])->name('academicYear.update');
+        Route::get('delete/{id}', [AcademicYearsController::class, 'delete'])->name('academicYear.delete');
+    });
 
     //days
     Route::group(['prefix' => 'day'], function () {
@@ -177,7 +187,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('delete/{id}', [ScheduleController::class, 'delete'])
             ->name('schedule.delete');
 
-
         // timetable
         Route::get('timetable', [ScheduleController::class, 'timetable'])
             ->name('schedule.timeTable');
@@ -185,20 +194,21 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('viewSchedule/{id}', [ScheduleController::class, 'viewSchedule'])
             ->name('schedule.viewSchedule');
 
-
         // Auto Generate Result
-        Route::post('result/{year}', [ScheduleController::class, 'result'])
-            ->name('schedule.result');
-
+        Route::post('result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
+        // Route::match(['get','post'],'result/{year}',[ScheduleController::class,'result'])->name('schedule.result');
 
         // PDF
         Route::get('pdf/{year}/{room}/{major}', [ScheduleController::class, 'downloadPDF'])
             ->name('schedule.pdf');
 
-
         // Teacher timetable
         Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])
             ->name('schedule.teacherTimeTable');
+
+        //auto generate
+        // Route::post('/schedule/auto-generate', [ScheduleController::class, 'autoGenerate'])->name('schedule.autoGenerate');
+        // Route::get('auto-result/{academic_year}/{semester}',[ScheduleController::class,'autoResult'])->name('schedule.autoResult');
 
     });
 

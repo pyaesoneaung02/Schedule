@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Sections extends Model
 {
     //sections
-    protected $fillable=['name'];
+    protected $fillable=['name','year_id','major_id'];
 }

@@ -100,6 +100,8 @@
 
                                 <th width="80">Day</th>
 
+                                <th>Academic Year</th>
+
                                 <th>Year</th>
 
                                 <th>Major</th>
@@ -143,6 +145,11 @@
 
                                     </td>
 
+                                    <td class="text-center">
+
+                                        {{ $item->academic_year_name }}
+
+                                    </td>
 
 
                                     <td>
@@ -173,7 +180,7 @@
 
                                     </td>
 
-                                     <td>
+                                    <td>
 
                                         {{ $item->semester_name }}
 

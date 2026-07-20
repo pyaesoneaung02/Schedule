@@ -1,194 +1,204 @@
 @extends('admin.layouts.master')
 
 @section('content')
+    <div class="container-fluid">
 
-<div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="mb-4">
+            <h2 class="text-primary font-weight-bold">
+                <i class="mr-2 fa-solid fa-door-open"></i>
+                Room Management
+            </h2>
 
-    <!-- Page Heading -->
-    <div class="mb-4">
-        <h2 class="text-primary font-weight-bold">
-            <i class="mr-2 fa-solid fa-door-open"></i>
-            Room Management
-        </h2>
+            <p class="text-muted">
+                Create and manage rooms.
+            </p>
+        </div>
 
-        <p class="text-muted">
-            Create and manage rooms.
-        </p>
-    </div>
 
+        <div class="row justify-content-center">
 
-    <div class="row justify-content-center">
+            <div class="col-lg-5">
 
-        <div class="col-lg-5">
 
+                <div class="border-0 shadow-sm card">
 
-            <div class="border-0 shadow-sm card">
 
+                    <div class="text-white card-header bg-primary">
 
-                <div class="text-white card-header bg-primary">
+                        <h5 class="mb-0">
 
-                    <h5 class="mb-0">
+                            <i class="mr-2 fa-solid fa-plus"></i>
+                            Add Room
 
-                        <i class="mr-2 fa-solid fa-plus"></i>
-                        Add New Room
+                        </h5>
 
-                    </h5>
+                    </div>
 
-                </div>
 
 
+                    <div class="card-body">
 
-                <div class="card-body">
 
+                        <form action="{{ route('room.createRoom') }}" method="POST">
 
-                    <form action="{{ route('room.createRoom')}}" method="POST">
+                            @csrf
 
-                        @csrf
 
 
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
 
-                        <div class="mb-3">
+                                        <label class="form-label">
+                                            Room Number
+                                        </label>
 
-                            <label class="form-label">
-                                Room Name
-                            </label>
 
+                                        <input type="text" name="name" value="{{ old('name') }}"
+                                            class="form-control @error('name') is-invalid @enderror"
+                                            placeholder="Enter Room Name...">
 
-                            <input type="text"
-                                name="name"
-                                value="{{ old('name') }}"
-                                class="form-control @error('name') is-invalid @enderror"
-                                placeholder="Enter Room Name...">
 
+                                        @error('name')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
 
-                            @error('name')
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
+                                    </div>
 
-                            @enderror
+                                    <div class="mb-3">
 
+                                        <label class="form-label">
+                                            Select Year
+                                        </label>
 
-                        </div>
 
+                                        <select name="yearID" class="form-control @error('yearID') is-invalid @enderror">
 
 
+                                            <option value="">
+                                                Choose Year
+                                            </option>
 
-                        <div class="mb-3">
 
-                            <label class="form-label">
-                                Select Year
-                            </label>
+                                            @foreach ($years as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('yearID') == $item->id) selected @endif>
 
+                                                    {{ $item->name }}
 
-                            <select name="yearID"
-                                class="form-control @error('yearID') is-invalid @enderror">
+                                                </option>
+                                            @endforeach
 
 
-                                <option value="">
-                                    Choose Year
-                                </option>
+                                        </select>
 
 
-                                @foreach ($years as $item)
+                                        @error('yearID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
 
-                                    <option value="{{ $item->id }}"
-                                        @if(old('yearID') == $item->id) selected @endif>
 
-                                        {{ $item->name }}
+                                    </div>
+                                </div>
 
-                                    </option>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
 
-                                @endforeach
+                                        <label class="form-label">
+                                            Select Major
+                                        </label>
 
 
-                            </select>
+                                        <select name="majorID" class="form-control @error('majorID') is-invalid @enderror">
 
 
-                            @error('yearID')
+                                            <option value="">
+                                                Choose Major
+                                            </option>
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
 
-                            @enderror
+                                            @foreach ($majors as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('majorID') == $item->id) selected @endif>
 
+                                                    {{ $item->name }}
 
-                        </div>
+                                                </option>
+                                            @endforeach
 
 
+                                        </select>
 
 
+                                        @error('majorID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
 
-                        <div class="mb-3">
 
-                            <label class="form-label">
-                                Select Major
-                            </label>
+                                    </div>
 
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            Select Section
+                                        </label>
 
-                            <select name="majorID"
-                                class="form-control @error('majorID') is-invalid @enderror">
+                                        <select name="sectionID"
+                                            class="form-control @error('sectionID') is-invalid @enderror">
 
+                                            <option value="">Choose Section</option>
 
-                                <option value="">
-                                    Choose Major
-                                </option>
+                                            @foreach ($sections as $item)
+                                                <option value="{{ $item->id }}"
+                                                    {{ old('sectionID') == $item->id ? 'selected' : '' }}>
+                                                    {{ $item->name }}
+                                                </option>
+                                            @endforeach
 
+                                        </select>
 
-                                @foreach ($majors as $item)
+                                        @error('sectionID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <option value="{{ $item->id }}"
-                                        @if(old('majorID') == $item->id) selected @endif>
 
-                                        {{ $item->name }}
 
-                                    </option>
+                            <button type="submit" class="mb-3 btn btn-primary w-100">
 
-                                @endforeach
+                                <i class="mr-2 fa-solid fa-floppy-disk"></i>
+                                Create Room
 
+                            </button>
 
-                            </select>
 
 
-                            @error('majorID')
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
 
-                            @enderror
+                            <a href="{{ route('room.list') }}" class="btn btn-outline-primary w-100">
 
+                                <i class="mr-2 fa-solid fa-list"></i>
+                                View Room List
 
-                        </div>
+                            </a>
 
 
 
+                        </form>
 
 
-                        <button type="submit" class="mb-3 btn btn-primary w-100">
-
-                            <i class="mr-2 fa-solid fa-floppy-disk"></i>
-                            Create Room
-
-                        </button>
-
-
-
-
-
-                        <a href="{{ route('room.list') }}"
-                            class="btn btn-outline-primary w-100">
-
-                            <i class="mr-2 fa-solid fa-list"></i>
-                            View Room List
-
-                        </a>
-
-
-
-                    </form>
+                    </div>
 
 
                 </div>
@@ -201,8 +211,4 @@
 
 
     </div>
-
-
-</div>
-
 @endsection
