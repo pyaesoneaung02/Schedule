@@ -27,7 +27,7 @@ class UserMiddleware
                 return redirect()->route('login');
             }
 
-            if (Auth::user()->role == 'user') {
+            if (Auth::user()->role == 'user' || Auth::user()->role == 'teacher') {
 
                 if (str_contains($request->path(), 'admin')) {
                     return back();
@@ -43,7 +43,8 @@ class UserMiddleware
                 return $next($request);
             }
 
-            return back();
+            // return back();
+            return redirect()->route('login');
         }
     }
 

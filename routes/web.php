@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialLoginController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Directory Connection
@@ -13,7 +14,10 @@ require __DIR__ . '/auth.php';
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-Route::redirect('/', '/login');
+// Route::redirect('/', '/login');
+
+Route::get('/', [UserController::class, 'landingPage'])->name('landingPage');
+
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -31,4 +35,16 @@ Route::middleware('auth')->group(function () {
 Route::get('/auth/{provider}/redirect', [SocialLoginController::class, 'redirect'])->name('socialLogin');
 
 Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'callback'])->name('socialCallback');
+
+
+//landing page
+// Route::get('/landingPage', [UserController::class, 'landingPage'])->name('landingPage');
+
+//show subjects by year
+Route::get('/subjects/year/{id}', [UserController::class, 'filterByYear'])->name('subjects.byYear');
+
+//detail subject page
+Route::get('/subject/detail/{id}',[UserController::class, 'subjectDetail'])->name('subject.detail');
+
+
 

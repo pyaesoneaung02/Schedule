@@ -17,19 +17,35 @@ class AdminMiddleware
     {
         // return $next($request);
 
-        if( Auth::user()) {
-            if (Auth::user()->role == 'admin' || Auth::user()->role == 'superadmin') {
+        // if( Auth::user()) {
+        //     if (Auth::user()->role == 'admin' || Auth::user()->role == 'superadmin') {
 
-                if( $request->route()->getName() == 'login' || $request->route()->getName() == 'register' ) {
-                    return back();
-                }
-                return $next($request);
-            }
+        //         if( $request->route()->getName() == 'login' || $request->route()->getName() == 'register' ) {
+        //             return back();
+        //         }
+        //         return $next($request);
+        //     }
 
-            return back();
-        }else {
+        //     return back();
+        // }else {
+        //     return $next($request);
+        // }
+
+        // Not login
+        if (! Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        // Admin and Superadmin only
+        if (
+            Auth::user()->role == 'admin' ||
+            Auth::user()->role == 'superadmin'
+        ) {
             return $next($request);
         }
-        
+
+        // User / Teacher cannot access admin
+        return redirect()->route('userHome');
+
     }
 }

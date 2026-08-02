@@ -20,7 +20,7 @@
         <div class="row justify-content-center">
 
 
-            <div class="col-lg-6">
+            <div class="col-lg-10">
 
 
                 <div class="border-0 shadow-sm card">
@@ -42,14 +42,52 @@
                     <div class="card-body">
 
 
-                        <form action="{{ route('subject.createSubject') }}" method="POST">
+                        <form action="{{ route('subject.createSubject') }}" method="POST" enctype="multipart/form-data">
 
                             @csrf
 
                             <div class="row">
 
+                                <div class="col-md-4">
+                                    <!-- Image Upload -->
+                                    <div class="mb-4 text-center">
 
-                                <div class="col-md-6">
+
+                                        <div class="mb-3">
+
+
+                                            <img id="preview" src="https://via.placeholder.com/150" class="rounded-circle shadow"
+                                                width="150" height="150" style="object-fit:cover;">
+
+
+                                        </div>
+
+                                        <label class="btn btn-outline-primary">
+
+
+                                            <i class="fa-solid fa-image me-2"></i>
+                                            Choose Subject Image
+
+
+                                            <input type="file" name="image" hidden onchange="previewImage(event)">
+
+
+                                        </label>
+
+
+
+                                        @error('image')
+                                            <div class="text-danger mt-2">
+                                                {{ $message }}
+                                            </div>
+                                        @enderror
+
+
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-4">
 
 
                                     <div class="mb-3">
@@ -63,7 +101,7 @@
 
                                         <input type="text" name="longName" value="{{ old('longName') }}"
                                             class="form-control @error('longName') is-invalid @enderror"
-                                            placeholder="Enter Long Name...">
+                                            placeholder="Enter Subject Name...">
 
 
 
@@ -86,7 +124,7 @@
 
                                         <input type="text" name="shortName" value="{{ old('shortName') }}"
                                             class="form-control @error('shortName') is-invalid @enderror"
-                                            placeholder="Enter Short Name...">
+                                            placeholder="Enter Subject Code...">
 
                                         @error('shortName')
                                             <span class="invalid-feedback">
@@ -104,7 +142,8 @@
                                             Select Academic Year
                                         </label>
 
-                                        <select name="academicID" class="form-control @error('academicID') is-invalid @enderror">
+                                        <select name="academicID"
+                                            class="form-control @error('academicID') is-invalid @enderror">
 
 
                                             <option value="">
@@ -139,7 +178,7 @@
 
                                 </div>
 
-                                <div class="col-md-6">
+                                <div class="col-md-4">
 
 
                                     <div class="mb-3">
@@ -214,7 +253,8 @@
                                             Select Semester
                                         </label>
 
-                                        <select name="semesterID" class="form-control @error('semesterID') is-invalid @enderror">
+                                        <select name="semesterID"
+                                            class="form-control @error('semesterID') is-invalid @enderror">
 
 
                                             <option value="">
@@ -349,11 +389,21 @@
 
 @push('scripts')
     <script>
+        //image preview
+        function previewImage(event) {
+
+            let image = document.getElementById('preview');
+
+            image.src = URL.createObjectURL(event.target.files[0]);
+
+        }
+
+        //description editor
         tinymce.init({
 
             selector: '#editor',
 
-            height: 300,
+            height: 200,
 
             menubar: false,
 

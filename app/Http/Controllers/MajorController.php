@@ -1,95 +1,72 @@
 <?php
-
 namespace App\Http\Controllers;
+
 use App\Models\Major;
-use App\Models\Year;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class MajorController extends Controller
 {
-    //create
-    public function create(){
-        $years = Year::get();
-        return view('admin.major.create',compact('years'));
+    //major route list
+    public function list()
+    {
+        $majors = Major::orderBy('created_at', 'desc')->paginate(5);
+        return view('admin.major.list', compact('majors'));
     }
 
-    //create major
-    public function createMajor(Request $request){
-        $this->checkValidationMajor($request);
-        $major = $this->getMajorData($request);
+    //create
+    public function create(Request $request)
+    {
 
-        Major::create($major);
+        // dd('create method reached');
+
+        $this->checkValidation($request);
+
+        Major::create([
+            'name'       => $request->majorName,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
 
         Alert::success('Success Major', 'Major Created Successfully');
-
         return back();
     }
 
-    //updatePage
-    public function updatePage($id){
-        $years = Year::get();
-        $major = Major::where('id', $id)->first();
-        return view('admin.major.edit', compact('major','years'));
-    }
-
-    //update process
-    public function update(Request $request,$id){
-        $this->checkValidationMajor($request);
-        $major = $this->getMajorData($request);
-
-        Major::where('id', $id)->update($major);
-
-        Alert::success('Success Major', 'Major Updated Successfully');
-
-        return to_route('major.list');
-    }
-
     //delete
-    public function delete($id){
+    public function delete($id)
+    {
         Major::find($id)->delete();
         Alert::success('Success Major', 'Major Deleted Successfully');
         return back();
     }
 
-    //request major data
-    private function getMajorData($request){
-        return [
-            'name' => $request->name,
-            'year_id' => $request->yearID
-        ];
-    }
-
-    //check validation major
-    public function checkValidationMajor($request){
-        $rules = [
-            'name' => 'required',
-            'yearID' => 'required'
-        ];
-
-        $messages = [];
-
-        $request->validate($rules,$messages);
-    }
-
-    //major list
-    public function list()
+    //update page
+    public function updatePage($id)
     {
-        $majors = Major::select(
-                'years.name as year_name',
-                'majors.id',
-                'majors.name',
-                'majors.year_id',
-                'majors.created_at'
-            )
-            ->leftJoin('years', 'majors.year_id', '=', 'years.id')
-            ->when(request('searchKey'), function ($query) {
-                $query->where('majors.name', 'like', '%' . request('searchKey') . '%')
-                      ->orWhere('years.name', 'like', '%' . request('searchKey') . '%');
-            })
-            ->orderBy('majors.created_at', 'desc')
-            ->paginate(5);
+        $major = Major::where('id', $id)->first();
+        return view('admin.major.update', compact('major'));
+    }
 
-        return view('admin.major.list', compact('majors'));
+    //update
+    public function update($id, Request $request)
+    {
+        $this->checkValidation($request);
+
+        Major::where('id', $id)->update([
+            'name'       => $request->majorName,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        Alert::success('Success Major', 'Major Updated Successfully');
+        return to_route('major.list');
+    }
+
+    //check major validation
+    private function checkValidation($request)
+    {
+        $request->validate([
+            'majorName' => 'required|unique:majors,name',
+        ]);
     }
 }

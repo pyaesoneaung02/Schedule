@@ -23,6 +23,8 @@ class Teaching extends Model
         'section_id',
         'academic_year_id',
         'semester_id',
+        'day_id',
+        'time_id',
     ];
 
     // Academic Year
@@ -97,4 +99,21 @@ class Teaching extends Model
         );
     }
 
+    //Day
+    public function day()
+    {
+        return $this->belongsTo(
+            Year::class,
+            'year_id'
+        );
+    }
+
+    //Time
+    public function time()
+    {
+        return $this->belongsTo(
+            Time::class,
+            'time_id'
+        );
+    }
 }

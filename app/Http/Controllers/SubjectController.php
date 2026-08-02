@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\AcademicYears;
@@ -14,12 +13,13 @@ use RealRashid\SweetAlert\Facades\Alert;
 class SubjectController extends Controller
 {
     //create
-    public function create(){
-        $years = Year::get();
-        $majors = Major::get();
+    public function create()
+    {
+        $years         = Year::get();
+        $majors        = Major::get();
         $academicYears = AcademicYears::get();
-        $semesters = Semesters::get();
-        return view('admin.subject.create',compact('years','majors','academicYears','semesters'));
+        $semesters     = Semesters::get();
+        return view('admin.subject.create', compact('years', 'majors', 'academicYears', 'semesters'));
     }
 
     //create subject
@@ -36,17 +36,19 @@ class SubjectController extends Controller
     }
 
     //updatePage
-    public function updatePage($id){
-        $years = Year::get();
-        $majors = Major::get();
+    public function updatePage($id)
+    {
+        $years         = Year::get();
+        $majors        = Major::get();
         $academicYears = AcademicYears::get();
-        $semesters = Semesters::get();
-        $subject = Subject::where('id', $id)->first();
-        return view('admin.subject.edit', compact('subject','years','majors','academicYears','semesters'));
+        $semesters     = Semesters::get();
+        $subject       = Subject::where('id', $id)->first();
+        return view('admin.subject.edit', compact('subject', 'years', 'majors', 'academicYears', 'semesters'));
     }
 
     //update process
-    public function update(Request $request,$id){
+    public function update(Request $request, $id)
+    {
         $this->checkValidationSubject($request);
         $subject = $this->getSubjectData($request);
 
@@ -58,7 +60,8 @@ class SubjectController extends Controller
     }
 
     //delete
-    public function delete($id){
+    public function delete($id)
+    {
         Subject::find($id)->delete();
         Alert::success('Success Subject', 'Subject Deleted Successfully');
         return back();
@@ -67,15 +70,31 @@ class SubjectController extends Controller
     //request subject data
     private function getSubjectData($request)
     {
+
+        $image = null;
+
+        if ($request->hasFile('image')) {
+
+            $imageName = time() . '.' . $request->image->extension();
+
+            $request->image->move(
+                public_path('images/subjects'),
+                $imageName
+            );
+
+            $image = 'images/subjects/' . $imageName;
+        }
+
         return [
-            'long_name' => $request->longName,
-            'short_name' => $request->shortName,
-            'description' => Purifier::clean($request->description),
-            'time_number' => $request->timeNumber,
-            'year_id'  => $request->yearID,
-            'major_id' => $request->majorID,
+            'image'            => $image,
+            'long_name'        => $request->longName,
+            'short_name'       => $request->shortName,
+            'description'      => Purifier::clean($request->description),
+            'time_number'      => $request->timeNumber,
+            'year_id'          => $request->yearID,
+            'major_id'         => $request->majorID,
             'academic_year_id' => $request->academicID,
-            'semester_id' => $request->semesterID
+            'semester_id'      => $request->semesterID,
         ];
     }
 
@@ -83,14 +102,15 @@ class SubjectController extends Controller
     public function checkValidationSubject($request)
     {
         $rules = [
-            'longName' => 'required',
-            'shortName' => 'required',
-            'timeNumber' => 'required',
+            'image'       => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'longName'    => 'required',
+            'shortName'   => 'required',
+            'timeNumber'  => 'required',
             'description' => 'required',
-            'yearID'  => 'required',
-            'majorID' => 'required',
-            'academicID' => 'required',
-            'semesterID' => 'required'
+            'yearID'      => 'required',
+            'majorID'     => 'required',
+            'academicID'  => 'required',
+            'semesterID'  => 'required',
         ];
 
         $messages = [];
@@ -103,10 +123,12 @@ class SubjectController extends Controller
     {
         $subjects = Subject::select(
             'majors.name as major_name',
+            'majors.name as major_name',
             'years.name as year_name',
             'academic_years.name as academic_year_name',
             'semesters.name as semester_name',
             'subjects.id',
+            'subjects.image',
             'subjects.long_name',
             'subjects.short_name',
             'subjects.time_number',
@@ -117,21 +139,21 @@ class SubjectController extends Controller
             'subjects.semester_id',
             'subjects.created_at'
         )
-        ->leftJoin('years', 'subjects.year_id', '=', 'years.id')
-        ->leftJoin('majors', 'subjects.major_id', '=', 'majors.id')
-        ->leftJoin('academic_years', 'subjects.academic_year_id', '=', 'academic_years.id')
-        ->leftJoin('semesters', 'subjects.semester_id', '=', 'semesters.id')
-        ->when(request('searchKey'), function ($query) {
-            $query->where('subjects.long_name', 'like', '%' . request('searchKey') . '%')
-                  ->orwhere('subjects.short_name', 'like', '%' . request('searchKey') . '%')
-                  ->orwhere('subjects.time_number', 'like', '%' . request('searchKey') . '%')
-                  ->orWhere('years.name', 'like', '%' . request('searchKey') . '%')
-                  ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%')
-                  ->orwhere('academic_years.name', 'like', '%'. request('searchKey') . '%')
-                  ->orwhere('semesters.name', 'like', '%'. request('searchKey') . '%');
-        })
-        ->orderBy('subjects.created_at', 'desc')
-        ->paginate(5);
+            ->leftJoin('years', 'subjects.year_id', '=', 'years.id')
+            ->leftJoin('majors', 'subjects.major_id', '=', 'majors.id')
+            ->leftJoin('academic_years', 'subjects.academic_year_id', '=', 'academic_years.id')
+            ->leftJoin('semesters', 'subjects.semester_id', '=', 'semesters.id')
+            ->when(request('searchKey'), function ($query) {
+                $query->where('subjects.long_name', 'like', '%' . request('searchKey') . '%')
+                    ->orwhere('subjects.short_name', 'like', '%' . request('searchKey') . '%')
+                    ->orwhere('subjects.time_number', 'like', '%' . request('searchKey') . '%')
+                    ->orWhere('years.name', 'like', '%' . request('searchKey') . '%')
+                    ->orWhere('majors.name', 'like', '%' . request('searchKey') . '%')
+                    ->orwhere('academic_years.name', 'like', '%' . request('searchKey') . '%')
+                    ->orwhere('semesters.name', 'like', '%' . request('searchKey') . '%');
+            })
+            ->orderBy('subjects.created_at', 'desc')
+            ->paginate(5);
         return view('admin.subject.list', compact('subjects'));
     }
 }

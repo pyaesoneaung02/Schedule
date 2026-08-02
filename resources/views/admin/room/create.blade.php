@@ -18,7 +18,7 @@
 
         <div class="row justify-content-center">
 
-            <div class="col-lg-5">
+            <div class="col-lg-8 col-xl-7">
 
 
                 <div class="border-0 shadow-sm card">

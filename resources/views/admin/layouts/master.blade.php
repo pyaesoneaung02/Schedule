@@ -21,6 +21,97 @@
     <!-- SB Admin 2 CSS -->
     <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
 
+    {{-- <style>
+        .timetable-info{
+            width:100%;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:10px;
+        }
+
+        .left-info{
+            text-align:left;
+            font-weight:bold;
+        }
+
+        .right-info{
+            text-align:right;
+            font-weight:bold;
+        }
+
+        .table-header th {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+
+        .day-cell {
+            background-color: #6c757d !important;
+            color: white !important;
+        }
+
+
+        .lunch-cell {
+            background-color: #dee2e6 !important;
+        }
+
+
+        @media print {
+
+            .table-header th {
+                background-color: #6c757d !important;
+                color: white !important;
+            }
+
+
+            .day-cell {
+                background-color: #6c757d !important;
+                color: white !important;
+            }
+
+
+            .lunch-cell {
+                background-color: #dee2e6 !important;
+            }
+
+        }
+
+
+        @media print{
+
+            .timetable-info{
+                display:flex !important;
+                justify-content:space-between !important;
+                width:100% !important;
+            }
+
+            .left-info{
+                float:left;
+            }
+
+            .right-info{
+                float:right;
+            }
+
+        }
+
+        @media print {
+
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            th,
+            td {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+        }
+    </style> --}}
+
 </head>
 
 <body id="page-top">
@@ -97,7 +188,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{{ route('major.create')}}}"><i class="fa-solid fa-building-columns mr-3"></i><span>Majors</span></a>
+                        <a class="nav-link" href="{{{ route('major.list')}}}"><i class="fa-solid fa-building-columns mr-3"></i><span>Majors</span></a>
                     </li>
 
                     <li>
@@ -347,6 +438,7 @@
             reader.readAsDataURL(event.target.files[0]);
         }
     </script>
+
 
 </body>
 

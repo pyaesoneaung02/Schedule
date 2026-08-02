@@ -11,7 +11,7 @@ use App\Models\Year;
 
 class AdminController extends Controller
 {
-//direct user home page
+//direct admin home page
     public function adminHome()
     {
         // return view('admin.home.list');

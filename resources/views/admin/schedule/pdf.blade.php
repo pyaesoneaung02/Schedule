@@ -2,217 +2,562 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <title>Time Table PDF</title>
+
+    <title>Weekly Timetable</title>
+
 
     <style>
         @page {
+
             size: A4 landscape;
-            margin: 20px;
+
+            margin: 10mm;
+
         }
+
 
         body {
+
             font-family: DejaVu Sans, sans-serif;
-            font-size: 12px;
+
+            font-size: 10px;
+
             color: #000;
+
         }
 
-        h2,
-        h3 {
+
+        /* ================= HEADER ================= */
+
+
+        .header {
+
             text-align: center;
-            margin: 5px 0;
+
+            margin-bottom: 15px;
+
         }
 
-        table {
+
+        .university {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            color: #007bff;
+
+        }
+
+
+        .title {
+
+            margin-top: 8px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            line-height: 18px;
+
+        }
+
+
+
+        /* ================= INFO ================= */
+
+
+        .info-table {
+
             width: 100%;
+
+            margin-bottom: 10px;
+
             border-collapse: collapse;
-            margin-top: 20px;
+
         }
 
-        table,
-        th,
-        td {
+
+        .info-table td {
+
+            border: none;
+
+            font-weight: bold;
+
+        }
+
+
+
+        /* ================= TIMETABLE ================= */
+
+
+        .timetable {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+
+        }
+
+
+        .timetable th {
+
+            background: #6c757d;
+
+            color: white;
+
             border: 1px solid #000;
+
+            padding: 6px;
+
+            text-align: center;
+
+            font-size: 10px;
+
         }
 
-        th {
-            background: #d9d9d9;
-            padding: 8px;
+
+
+        .timetable td {
+
+            border: 1px solid #000;
+
+            height: 38px;
+
             text-align: center;
+
+            vertical-align: middle;
+
         }
 
-        td {
-            padding: 8px;
-            text-align: center;
+
+
+        .timetable th:first-child,
+
+        .timetable td:first-child {
+
+            width: 70px;
+
         }
+
+
 
         .day {
-            background: #f2f2f2;
+
+            background: #6c757d;
+
+            color: white;
+
             font-weight: bold;
-            padding-left: 10px;
-            text-align: left;
+
         }
 
-        .lunch {
-            background: #ffe699;
+
+
+        .subject {
+
+            color: #007bff;
+
             font-weight: bold;
+
         }
+
+
 
         .extra {
+
             color: #777;
+
             font-style: italic;
+
         }
 
-        .space {
-            height: 35px;
-        }
 
-        .legend {
-            margin-top: 50px;
-        }
 
-        .legend-header {
+        .lunch {
+
+            background: #dee2e6;
+
             font-weight: bold;
-            margin-bottom: 10px;
+
+            text-align: center;
+
+            vertical-align: middle;
+
         }
 
-        .legend-row {
-            margin-bottom: 6px;
+
+
+        /* ================= SUBJECT LIST ================= */
+
+
+        .subject-area {
+
+            margin-top: 20px;
+
         }
 
-        .code {
-            display: inline-block;
-            width: 160px;
+
+
+        .subject-table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+
+        .subject-table td {
+
+            border: none;
+
+            padding: 4px;
+
+        }
+
+
+
+        .subject-table .code {
+
+            width: 120px;
+
+            color: #007bff;
+
             font-weight: bold;
+
         }
 
-        .name {
-            display: inline-block;
+
+
+        .subject-header {
+
+            font-weight: bold;
+
         }
+
+
+
+        /* ================= FOOTER ================= */
+
 
         .footer {
-            margin-top: 30px;
+
+            margin-top: 15px;
+
             text-align: right;
-            font-size: 11px;
+
+            font-size: 9px;
+
         }
     </style>
 
+
 </head>
+
 
 <body>
 
-    <h2>University Of Computer Studies (Magway)</h2>
 
-    <h3>
-        {{ $yearData->name }} |
-        Semester - {{ $semesters->name }} |
-        {{ $major->name }} |
-        Section - {{ $sections->name }} |
-        {{ $room->name }}
-    </h3>
 
-    @if ($schedules->isEmpty())
+    <!-- HEADER -->
 
-        <h3>No Schedule Found</h3>
-    @else
-        @php
-            $scheduleMap = [];
 
-            foreach ($schedules as $schedule) {
-                $scheduleMap[$schedule->day_id][$schedule->time_id] = $schedule;
-            }
+    <div class="header">
 
-            $lunchTimes = ['12:00-01:00', '01:00-02:00', '02:00-03:00'];
-        @endphp
 
-        <table>
+        <div class="university">
 
-            <thead>
-                <tr>
-                    <th>Day / Time</th>
+            ကွန်ပျူတာတက္ကသိုလ် (မကွေး)
 
-                    @foreach ($times as $time)
-                        <th>{{ $time->name }}</th>
-                    @endforeach
+        </div>
 
-                </tr>
-            </thead>
 
-            <tbody>
 
-                @foreach ($days as $day)
-                    <tr>
+        <div class="title">
 
-                        <td class="day">
-                            {{ $day->name }}
-                        </td>
 
-                        @foreach ($times as $time)
-                            @php
-                                $schedule = $scheduleMap[$day->id][$time->id] ?? null;
-                            @endphp
+            {{ $academicYear->name }} ပညာသင်နှစ်
 
-                            <td>
+            ({{ $semesters->name }})
 
-                                @if (in_array($time->name, $lunchTimes))
-                                    <span class="lunch">
-                                        Lunch Break
-                                    </span>
-                                @elseif($schedule)
-                                    {{ $schedule->subject->short_name }}
-                                @else
-                                    <span class="extra">
-                                        Extra Curriculum
-                                    </span>
-                                @endif
 
-                            </td>
-                        @endforeach
+            <br>
 
-                    </tr>
+
+            {{ $yearData->name }}
+
+            ({{ $major->name }})
+
+            - Section({{ $sections->name }})
+
+
+        </div>
+
+
+
+    </div>
+
+
+
+
+
+    <!-- INFORMATION -->
+
+
+    <table class="info-table">
+
+
+        <tr>
+
+
+            <td>
+
+                {{ $yearData->name }}
+
+                ({{ $major->name }})
+
+            </td>
+
+
+            <td style="text-align:right">
+
+                Section({{ $sections->name }})
+
+                -
+
+                အခန်း({{ $room->name }})
+
+            </td>
+
+
+        </tr>
+
+
+    </table>
+
+
+
+
+
+
+    <!-- TIMETABLE -->
+
+
+    <table class="timetable">
+
+
+        <thead>
+
+
+            <tr>
+
+
+                <th>
+
+                    Day / Time
+
+                </th>
+
+
+
+                @foreach ($times as $time)
+                    @if (str_replace(' ', '', $time->name) == '12:00-01:00')
+                        <th></th>
+                    @else
+                        <th>
+
+                            {{ $time->name }}
+
+                        </th>
+                    @endif
                 @endforeach
 
-            </tbody>
+
+
+            </tr>
+
+
+        </thead>
+
+
+
+
+
+        <tbody>
+
+
+
+            @foreach ($days as $day)
+                <tr>
+
+
+
+                    <td class="day">
+
+                        {{ $day->name }}
+
+                    </td>
+
+
+
+
+                    @foreach ($times as $time)
+                        @if (str_replace(' ', '', $time->name) == '12:00-01:00')
+                            @if ($day->id == $days->first()->id)
+                                <td rowspan="{{ $days->count() }}" class="lunch">
+
+
+                                    ထမင်းစားနားချိန်
+
+
+                                </td>
+                            @endif
+                        @else
+                            @php
+
+                                $schedule = $schedules->where('day_id', $day->id)->where('time_id', $time->id)->first();
+
+                            @endphp
+
+
+
+
+                            @if ($schedule)
+                                <td class="subject">
+
+
+                                    {{ $schedule->subject?->short_name }}
+
+
+                                </td>
+                            @else
+                                <td class="extra">
+
+
+                                    Extra Curriculum
+
+
+                                </td>
+                            @endif
+                        @endif
+                    @endforeach
+
+
+
+                </tr>
+            @endforeach
+
+
+
+        </tbody>
+
+
+    </table>
+
+
+
+
+
+
+
+    <!-- SUBJECT CODE / NAME -->
+
+
+    <div class="subject-area">
+
+
+
+        <table class="subject-table">
+
+
+            <tr>
+
+
+                <td class="code">
+
+                    Subject Code
+
+                </td>
+
+
+
+                <td>
+
+                    Subject Name
+
+                </td>
+
+
+            </tr>
+
+
+
+
+            @foreach ($schedules->unique('subject_id') as $schedule)
+                <tr>
+
+
+                    <td class="code">
+
+
+                        {{ $schedule->subject?->short_name }}
+
+
+                    </td>
+
+
+
+                    <td>
+
+
+                        {{ $schedule->subject?->long_name }}
+
+
+                        ({{ $schedule->teacher?->name }})
+                    </td>
+
+
+                </tr>
+            @endforeach
+
+
 
         </table>
 
-        <!-- GAP -->
-        <div class="space"></div>
 
-        <!-- SUBJECT LIST -->
-        <div class="legend">
 
-            <div class="legend-header">
-                <span class="code">Subject Code</span>
-                <span class="name">Subject Name</span>
-            </div>
+    </div>
 
-            @foreach ($schedules->unique('subject_id') as $item)
-                <div class="legend-row">
-                    <span class="code">
-                        {{ $item->subject->short_name }}
-                    </span>
 
-                    <span class="name">
-                        {{ $item->subject->long_name }}
 
-                        @if ($item->teacher)
-                            ({{ $item->teacher->name }})
-                        @endif
-                    </span>
-                </div>
-            @endforeach
 
-        </div>
 
-        <!-- FOOTER -->
-        <div class="footer">
-            Generated on :
-            {{ now()->timezone('Asia/Yangon')->format('d-m-Y h:i A') }}
-        </div>
 
-    @endif
+
+    <!-- FOOTER -->
+
+
+    <!--
+
+<div class="footer">
+
+Generated Date :
+
+{{ now()->format('d-m-Y h:i A') }}
+
+</div>
+
+-->
+
+
 
 </body>
+
 
 </html>

@@ -91,9 +91,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
     //majors
     Route::group(['prefix' => 'major'], function () {
-        Route::get('create', [MajorController::class, 'create'])->name('major.create');
-        Route::post('create', [MajorController::class, 'createMajor'])->name('major.createMajor');
         Route::get('list', [MajorController::class, 'list'])->name('major.list');
+        Route::post('create', [MajorController::class, 'create'])->name('major.create');
         Route::get('update/{id}', [MajorController::class, 'updatePage'])->name('major.updatePage');
         Route::post('update/{id}', [MajorController::class, 'update'])->name('major.update');
         Route::get('delete/{id}', [MajorController::class, 'delete'])->name('major.delete');
@@ -196,19 +195,22 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
         // Auto Generate Result
         Route::post('result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
-        // Route::match(['get','post'],'result/{year}',[ScheduleController::class,'result'])->name('schedule.result');
 
         // PDF
-        Route::get('pdf/{year}/{room}/{major}', [ScheduleController::class, 'downloadPDF'])
+        Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
             ->name('schedule.pdf');
 
         // Teacher timetable
         Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])
             ->name('schedule.teacherTimeTable');
 
-        //auto generate
-        // Route::post('/schedule/auto-generate', [ScheduleController::class, 'autoGenerate'])->name('schedule.autoGenerate');
-        // Route::get('auto-result/{academic_year}/{semester}',[ScheduleController::class,'autoResult'])->name('schedule.autoResult');
+        //generate
+        Route::post('schedule/generate', [ScheduleController::class, 'generate'])->name('schedule.generate');
+
+        // Shift / Edit Schedule
+        Route::get('shift/{id}', [ScheduleController::class, 'shiftPage'])->name('schedule.shiftPage');
+
+        Route::post('shift/{id}', [ScheduleController::class, 'shift'])->name('schedule.shift');
 
     });
 

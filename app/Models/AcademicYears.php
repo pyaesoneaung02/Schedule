@@ -1,6 +1,7 @@
 <?php
 namespace App\Models;
 
+use App\Models\Subject;
 use Illuminate\Database\Eloquent\Model;
 
 class AcademicYears extends Model
@@ -12,5 +13,11 @@ class AcademicYears extends Model
         'end_date',
         'status',
     ];
+
+    //to delete subject only
+      public function subjects()
+    {
+        return $this->hasMany(Subject::class, 'academic_year_id');
+    }
 
 }

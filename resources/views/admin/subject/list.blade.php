@@ -89,7 +89,9 @@
                             <tr class="text-center">
 
 
-                                <th width="60">ID</th>
+                                {{-- <th width="60">ID</th> --}}
+
+                                <th>Image</th>
 
                                 <th>Long Name</th>
 
@@ -127,8 +129,21 @@
                                 <tr>
 
 
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
                                         {{ $item->id }}
+                                    </td> --}}
+
+                                    <td class="text-center">
+
+                                        @if ($item->image)
+                                            <img src="{{ asset($item->image) }}" width="50" height="50"
+                                                class="rounded">
+                                        @else
+                                            <span class="text-muted">
+                                                No Image
+                                            </span>
+                                        @endif
+
                                     </td>
 
 
@@ -188,9 +203,6 @@
 
 
                                         </a>
-
-
-
 
 
                                         <a href="{{ route('subject.delete', $item->id) }}"

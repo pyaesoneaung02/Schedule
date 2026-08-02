@@ -29,6 +29,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // dd(
+        //     $request->user()->role,
+        //     $request->user()
+        // );
+
+
         // return redirect()->intended(route('dashboard', absolute: false));
 
         // admin route
@@ -37,10 +43,14 @@ class AuthenticatedSessionController extends Controller
                 return to_route('adminHome');
             }
 
-        // user route
-        if ($request->user()->role == 'user') {
+        // User & Teacher Route
+        if(  $request->user()->role == 'user' || $request->user()->role == 'teacher')
+        {
             return to_route('userHome');
         }
+
+        // default
+        return to_route('login');
 
     }
 

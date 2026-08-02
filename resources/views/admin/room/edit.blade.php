@@ -20,7 +20,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="col-lg-5">
+        <div class="col-lg-8 col-xl-7">
 
 
             <div class="border-0 shadow-sm card">
@@ -184,7 +184,7 @@
 
 
                                         <option value="">
-                                            Choose Major
+                                            Choose Section
                                         </option>
 
 
@@ -193,7 +193,7 @@
 
 
                                             <option value="{{ $item->id }}"
-                                                @if(old('sectionID', $room->major_id) == $item->id) selected @endif>
+                                                @if(old('sectionID', $room->section_id) == $item->id) selected @endif>
 
                                                 {{ $item->name }}
 

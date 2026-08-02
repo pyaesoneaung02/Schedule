@@ -92,6 +92,8 @@
 
                                 <th>Name</th>
 
+                                <th>Email</th>
+
                                 <th>Position</th>
 
                                 <th>Department</th>
@@ -105,10 +107,6 @@
 
 
                         </thead>
-
-
-
-
 
                         <tbody>
 
@@ -132,6 +130,9 @@
                                     </td>
 
 
+                                    <td>
+                                        {{ $item->email }}
+                                    </td>
 
 
                                     <td>

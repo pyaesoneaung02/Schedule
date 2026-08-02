@@ -151,7 +151,7 @@
 
                                 <thead class="thead-light">
                                     <tr class="text-center">
-                                        {{-- <th width="70">ID</th> --}}
+                                        <th width="70">ID</th>
                                         <th>Section Name</th>
                                         <th>Years</th>
                                         <th>Majors</th>
@@ -165,9 +165,9 @@
                                     @forelse ($sections as $item)
                                         <tr>
 
-                                            {{-- <td class="text-center">
+                                            <td class="text-center">
                                                 {{ $item->id }}
-                                            </td> --}}
+                                            </td>
 
                                             <td>
                                                 {{ $item->name }}

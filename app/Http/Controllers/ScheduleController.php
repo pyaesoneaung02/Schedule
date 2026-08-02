@@ -15,6 +15,7 @@ use App\Models\Time;
 use App\Models\Year;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ScheduleController extends Controller
@@ -586,6 +587,7 @@ class ScheduleController extends Controller
             'time',
             'teacher',
             'academicYear',
+            'semester',
         ])
             ->where('year_id', $year)
             ->where('room_id', $request->roomID)
@@ -622,11 +624,14 @@ class ScheduleController extends Controller
     }
 
     //create PDF
-    public function downloadPDF($yearId, $roomId, $majorId)
+    public function downloadPDF($yearId, $roomId, $majorId, $academicYearID)
     {
-        $yearData  = Year::findOrFail($yearId);
-        $room      = Room::findOrFail($roomId);
-        $major     = Major::findOrFail($majorId);
+        $yearData = Year::findOrFail($yearId);
+        $room     = Room::findOrFail($roomId);
+        $major    = Major::findOrFail($majorId);
+
+        $academicYear = AcademicYears::findOrFail($academicYearID);
+
         $semesters = Semesters::findOrFail(request('semesterID'));
         $sections  = Sections::findOrFail(request('sectionID'));
 
@@ -634,200 +639,275 @@ class ScheduleController extends Controller
         $times = Time::all();
 
         $schedules = Schedule::with(['subject', 'teacher'])
+            ->where('academic_year_id', $academicYearID)
             ->where('year_id', $yearId)
             ->where('room_id', $roomId)
             ->where('major_id', $majorId)
-            ->where('semester_id', request('semesterID'))
-            ->where('section_id', request('sectionID'))
+            ->where('semester_id', $semesters->id)
+            ->where('section_id', $sections->id)
             ->get();
 
         $pdf = Pdf::loadView('admin.schedule.pdf', compact(
             'yearData',
             'room',
             'major',
+            'academicYear',
+            'semesters',
+            'sections',
             'days',
             'times',
-            'schedules',
-            'semesters',
-            'sections'
+            'schedules'
         ));
 
-        $pdf->setPaper('a4', 'landscape');
-
-        return $pdf->download('TimeTable.pdf');
+        return $pdf->setPaper('a4', 'landscape')
+            ->download('TimeTable.pdf');
     }
 
-    //auto generate
+    // generate
 
-    // public function autoGenerate(Request $request)
-    // {
+    public function generate(Request $request)
+    {
 
-    //     $request->validate([
+        // dd('Generate');
 
-    //         'academic_year_id' => 'required',
+        $year = Teaching::value('year_id');
 
-    //         'semester_id'      => 'required',
+        DB::transaction(function () {
 
-    //     ]);
+            /*
+        |--------------------------------------------------------------------------
+        | Clear Old Generate Data
+        |--------------------------------------------------------------------------
+        */
 
-    //     $teachings = Teaching::with('subject')
-    //         ->where(
-    //             'academic_year_id',
-    //             $request->academic_year_id
-    //         )
-    //         ->where(
-    //             'semester_id',
-    //             $request->semester_id
-    //         )
-    //         ->get();
+            Teaching::query()
+                ->update([
 
-    //     if ($teachings->count() == 0) {
+                    'day_id'  => null,
 
-    //         Alert::error(
-    //             'No Data',
-    //             'No Teaching Data Found'
-    //         );
+                    'time_id' => null,
 
-    //         return back();
+                ]);
 
-    //     }
+            /*
+        |--------------------------------------------------------------------------
+        | Get Teaching Data
+        |--------------------------------------------------------------------------
+        */
 
-    //     $days = Day::all();
+            $teachings = Teaching::all()
+                ->shuffle();
 
-    //     $times = Time::where(
-    //         'name',
-    //         '!=',
-    //         '12:00-01:00'
-    //     )
-    //         ->get();
+            /*
+        |--------------------------------------------------------------------------
+        | Days
+        |--------------------------------------------------------------------------
+        */
 
-    //     foreach ($teachings as $teaching) {
+            $days = Day::pluck('id')
+                ->toArray();
 
-    //         $period = $teaching->subject->time_number;
+            /*
+        |--------------------------------------------------------------------------
+        | Times
+        | Remove Lunch
+        |--------------------------------------------------------------------------
+        */
 
-    //         $count = 0;
+            $times = Time::where(
+                'name',
+                '!=',
+                '12:00-01:00'
+            )
+                ->pluck('id')
+                ->toArray();
 
-    //         $attempt = 0;
+            foreach ($teachings as $teaching) {
 
-    //         while ($count < $period && $attempt < 100) {
+                $assigned = false;
 
-    //             $attempt++;
+                /*
+            |--------------------------------------------------------------------------
+            | Random Slot
+            |--------------------------------------------------------------------------
+            */
 
-    //             $day = $days->random();
+                $slots = collect($days)
 
-    //             $time = $times->random();
+                    ->crossJoin($times)
 
-    //             // Teacher conflict
+                    ->shuffle();
 
-    //             $teacherExist = Schedule::where([
-    //                 'teacher_id' => $teaching->teacher_id,
-    //                 'day_id'     => $day->id,
-    //                 'time_id'    => $time->id,
-    //             ])->exists();
+                foreach ($slots as $slot) {
 
-    //             // Room conflict
+                    $dayID = $slot[0];
 
-    //             $roomExist = Schedule::where([
-    //                 'room_id' => $teaching->room_id,
-    //                 'day_id'  => $day->id,
-    //                 'time_id' => $time->id,
-    //             ])->exists();
+                    $timeID = $slot[1];
 
-    //             // Class conflict
+                    /*
+                |--------------------------------------------------------------------------
+                | Teacher Conflict
+                |--------------------------------------------------------------------------
+                */
 
-    //             $classExist = Schedule::where([
-    //                 'year_id'  => $teaching->year_id,
-    //                 'major_id' => $teaching->major_id,
-    //                 'room_id'  => $teaching->room_id,
-    //                 'day_id'   => $day->id,
-    //                 'time_id'  => $time->id,
-    //             ])->exists();
+                    $teacherBusy = Teaching::where(
+                        'teacher_id',
+                        $teaching->teacher_id
+                    )
+                        ->where(
+                            'day_id',
+                            $dayID
+                        )
+                        ->where(
+                            'time_id',
+                            $timeID
+                        )
+                        ->exists();
 
-    //             if (
-    //                 ! $teacherExist &&
-    //                 ! $roomExist &&
-    //                 ! $classExist
-    //             ) {
+                    /*
+                |--------------------------------------------------------------------------
+                | Room Conflict
+                |--------------------------------------------------------------------------
+                */
 
-    //                 Schedule::create([
+                    $roomBusy = Teaching::where(
+                        'room_id',
+                        $teaching->room_id
+                    )
+                        ->where(
+                            'day_id',
+                            $dayID
+                        )
+                        ->where(
+                            'time_id',
+                            $timeID
+                        )
+                        ->exists();
 
-    //                     'academic_year_id' => $teaching->academic_year_id,
+                    /*
+                |--------------------------------------------------------------------------
+                | Class Conflict
+                |--------------------------------------------------------------------------
+                */
 
-    //                     'semester_id'      => $teaching->semester_id,
+                    $classBusy = Teaching::where(
+                        'year_id',
+                        $teaching->year_id
+                    )
+                        ->where(
+                            'major_id',
+                            $teaching->major_id
+                        )
+                        ->where(
+                            'section_id',
+                            $teaching->section_id
+                        )
+                        ->where(
+                            'day_id',
+                            $dayID
+                        )
+                        ->where(
+                            'time_id',
+                            $timeID
+                        )
+                        ->exists();
 
-    //                     'year_id'          => $teaching->year_id,
+                    if (
+                        ! $teacherBusy &&
+                        ! $roomBusy &&
+                        ! $classBusy
+                    ) {
 
-    //                     'major_id'         => $teaching->major_id,
+                        $teaching->update([
 
-    //                     'room_id'          => $teaching->room_id,
+                            'day_id'  => $dayID,
 
-    //                     'teacher_id'       => $teaching->teacher_id,
+                            'time_id' => $timeID,
 
-    //                     'subject_id'       => $teaching->subject_id,
+                        ]);
 
-    //                     'section_id'       => $teaching->section_id,
+                        $assigned = true;
 
-    //                     'day_id'           => $day->id,
+                        break;
 
-    //                     'time_id'          => $time->id,
+                    }
 
-    //                 ]);
+                }
 
-    //                 $count++;
+            }
 
-    //             }
+        });
 
-    //         }
+        return redirect()->route('schedule.result', [
+            'year' => $year,
+        ]);
 
-    //     }
+    }
 
-    //     Alert::success(
-    //         'Success',
-    //         'Schedule Generated Successfully'
-    //     );
+    // shift page
+    public function shiftPage($id)
+    {
+        $schedule = Schedule::with([
+            'subject',
+            'teacher',
+            'room',
+            'day',
+            'time',
+        ])->findOrFail($id);
 
-    //     return redirect()->route(
-    //         'schedule.result',
-    //         [
-    //             'year' => $teachings->first()->year_id,
-    //         ]
-    //     );
+        $days = Day::get();
 
-    // }
+        $times = Time::get();
 
-    //‌auto result
-    // public function autoResult($academic_year, $semester)
-    // {
+        $teachers = Teacher::get();
 
-    //     $days = Day::all();
+        $rooms = Room::get();
 
-    //     $times = Time::all();
+        return view('admin.schedule.shift', compact(
+            'schedule',
+            'days',
+            'times',
+            'teachers',
+            'rooms'
+        ));
+    }
 
-    //     $schedules = Schedule::with([
-    //         'day',
-    //         'subject',
-    //         'teacher',
-    //         'room',
-    //         'major',
-    //         'section',
-    //         'semester',
-    //     ])
-    //         ->where('academic_year_id', $academic_year)
-    //         ->where('semester_id', $semester)
-    //         ->get();
+    // shift update page
 
-    //     $academicYear = AcademicYears::findOrFail($academic_year);
+    public function shift(Request $request, $id)
+    {
 
-    //     return view(
-    //         'admin.schedule.result',
-    //         compact(
-    //             'schedules',
-    //             'days',
-    //             'times',
-    //             'academicYear'
-    //         )
-    //     );
+        $request->validate([
 
-    // }
+            'dayID'     => 'required',
+
+            'timeID'    => 'required',
+
+            'teacherID' => 'required',
+
+            'roomID'    => 'required',
+
+        ]);
+
+        Schedule::where('id', $id)->update([
+
+            'day_id'     => $request->dayID,
+
+            'time_id'    => $request->timeID,
+
+            'teacher_id' => $request->teacherID,
+
+            'room_id'    => $request->roomID,
+
+        ]);
+
+        Alert::success(
+            'Success',
+            'Schedule Shift Successfully'
+        );
+
+        return to_route('schedule.list');
+
+    }
 
 }

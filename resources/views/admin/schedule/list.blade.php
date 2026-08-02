@@ -120,9 +120,9 @@
 
                                 <th>Teacher</th>
 
-                                <th width="150">Created Date</th>
+                                {{-- <th width="150">Created Date</th> --}}
 
-                                <th width="100">Action</th>
+                                <th width="150">Action</th>
 
 
                             </tr>
@@ -220,17 +220,17 @@
 
 
 
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
 
                                         {{ $item->created_at->format('d M Y') }}
 
-                                    </td>
+                                    </td> --}}
 
 
 
                                     <td class="text-center">
 
-
+                                        {{-- update --}}
                                         <a href="{{ route('schedule.updatePage', $item->id) }}"
                                             class="btn btn-sm btn-outline-primary">
 
@@ -238,8 +238,16 @@
 
                                         </a>
 
+                                        {{-- shift --}}
+                                        <a href="{{ route('schedule.shiftPage', $item->id) }}"
+                                            class="btn btn-sm btn-outline-warning">
+
+                                            <i class="fa-solid fa-arrows-up-down-left-right"></i>
+
+                                        </a>
 
 
+                                        {{-- delete --}}
                                         <a href="{{ route('schedule.delete', $item->id) }}"
                                             class="btn btn-sm btn-outline-danger">
 

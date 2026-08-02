@@ -75,7 +75,9 @@ class SectionsController extends Controller
     public function updatePage($id)
     {
         $section = Sections::where('id', $id)->first();
-        return view('admin.section.update', compact('section'));
+        $years = Year::get();
+        $majors = Major::get();
+        return view('admin.section.update', compact('section','years','majors'));
     }
 
     //update
