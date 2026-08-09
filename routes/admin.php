@@ -2,6 +2,7 @@
 use App\Http\Controllers\AcademicYearsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DayController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\MajorController;
@@ -212,6 +213,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
         Route::post('shift/{id}', [ScheduleController::class, 'shift'])->name('schedule.shift');
 
+    });
+
+    // comments
+    Route::group(['prefix' => 'comment'], function () {
+        Route::get('list', [CommentController::class, 'commentList'])->name('comment.list');
     });
 
 });

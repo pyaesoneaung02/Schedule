@@ -44,8 +44,8 @@ class AdminMiddleware
             return $next($request);
         }
 
-        // User / Teacher cannot access admin
-        return redirect()->route('userHome');
+        //Admin cannot access  User / Teacher
+        return redirect()->route('adminHome');
 
     }
 }

@@ -98,9 +98,6 @@
             </div>
 
 
-
-
-
             <!-- Departments -->
             <div class="mb-4 col-xl-3 col-md-6">
 
@@ -193,9 +190,6 @@
         </div>
 
 
-
-
-
         <!-- Quick Menu -->
 
         <div class="mt-4 row">
@@ -254,8 +248,6 @@
             </div>
 
 
-
-
             <div class="mb-4 col-md-4">
 
 
@@ -272,7 +264,7 @@
 
 
                             <h5 class="mb-0">
-                                Create Schedule
+                                Manage Schedule
                             </h5>
 
 

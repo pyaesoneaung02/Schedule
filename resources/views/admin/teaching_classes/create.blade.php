@@ -105,9 +105,6 @@
 
                                     </div>
 
-
-
-
                                     <!-- Semester -->
 
                                     <div class="mb-3">
@@ -148,10 +145,6 @@
 
                                     </div>
 
-
-
-
-
                                     <!-- Teacher -->
 
                                     <div class="mb-3">
@@ -191,10 +184,6 @@
 
 
                                     </div>
-
-
-
-
 
                                     <!-- Year -->
 
@@ -238,11 +227,6 @@
 
 
                                 </div>
-
-
-
-
-
 
                                 <!-- Right Column -->
 
@@ -290,10 +274,6 @@
 
                                     </div>
 
-
-
-
-
                                     <!-- Room -->
 
                                     <div class="mb-3">
@@ -333,11 +313,6 @@
 
                                     </div>
 
-
-
-
-
-
                                     <!-- Subject -->
 
 
@@ -357,11 +332,20 @@
                                             </option>
 
 
-                                            @foreach ($subjects as $item)
+                                            {{-- @foreach ($subjects as $item)
                                                 <option value="{{ $item->id }}"
                                                     {{ old('subjectID') == $item->id ? 'selected' : '' }}>
 
                                                     {{ $item->short_name }}
+
+                                                </option>
+                                            @endforeach --}}
+
+                                            @foreach ($subjects as $item)
+                                                <option value="{{ $item->id }}"
+                                                    {{ old('subjectID') == $item->id ? 'selected' : '' }}>
+
+                                                    {{ $item->long_name }}
 
                                                 </option>
                                             @endforeach
@@ -378,11 +362,6 @@
 
 
                                     </div>
-
-
-
-
-
 
                                     <!-- Section -->
 
@@ -431,10 +410,6 @@
 
 
                             </div>
-
-
-
-
 
                             <button type="submit" class="btn btn-primary w-100 mb-3">
 

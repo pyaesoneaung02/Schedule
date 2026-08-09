@@ -1,217 +1,196 @@
 @extends('admin.layouts.master')
 
 @section('content')
+    <div class="mt-3 container-fluid">
 
-<div class="mt-3 container-fluid">
 
+        <!-- Page Heading -->
+        <div class="mb-4">
 
-    <!-- Page Heading -->
-    <div class="mb-4">
+            <h2 class="text-primary font-weight-bold">
 
-        <h2 class="text-primary font-weight-bold">
+                <i class="mr-2 fa-solid fa-user-plus"></i>
 
-            <i class="mr-2 fa-solid fa-user-plus"></i>
+                New Admin Account
 
-            New Admin Account
+            </h2>
 
-        </h2>
 
+            <p class="mb-0 text-muted">
 
-        <p class="mb-0 text-muted">
+                Create a new administrator account.
 
-            Create a new administrator account.
+            </p>
 
-        </p>
+        </div>
 
-    </div>
 
 
 
 
+        <div class="row justify-content-center">
 
-    <div class="row justify-content-center">
 
+            <div class="col-lg-6">
 
-        <div class="col-lg-6">
 
+                <div class="border-0 shadow-sm card">
 
-            <div class="border-0 shadow-sm card">
 
+                    <div class="text-white card-header bg-primary">
 
-                <div class="text-white card-header bg-primary">
 
+                        <h5 class="mb-0">
 
-                    <h5 class="mb-0">
+                            <i class="mr-2 fa-solid fa-user-shield"></i>
 
-                        <i class="mr-2 fa-solid fa-user-shield"></i>
+                            Create Admin
 
-                        Create Admin
 
+                        </h5>
 
-                    </h5>
 
+                    </div>
 
-                </div>
+                    <div class="card-body">
 
 
+                        <form action="{{ route('profile#createAdminAccount') }}" method="POST">
 
+                            @csrf
 
 
-                <div class="card-body">
 
+                            <div class="mb-3">
 
-                    <form action="{{ route('profile#createAdminAccount') }}"
-                        method="POST">
+                                <label class="form-label">
+                                    Name
+                                </label>
 
-                        @csrf
 
+                                <input type="text" name="name" value="{{ old('name') }}"
+                                    class="form-control @error('name') is-invalid @enderror" placeholder="Enter Name...">
 
 
-                        <div class="mb-3">
+                                @error('name')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
-                            <label class="form-label">
-                                Name
-                            </label>
 
+                            </div>
 
-                            <input type="text"
-                                name="name"
-                                value="{{ old('name') }}"
-                                class="form-control @error('name') is-invalid @enderror"
-                                placeholder="Enter Name...">
 
 
-                            @error('name')
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
 
-                            @enderror
+                            <div class="mb-3">
 
+                                <label class="form-label">
+                                    Email
+                                </label>
 
-                        </div>
 
+                                <input type="email" name="email" value="{{ old('email') }}"
+                                    class="form-control @error('email') is-invalid @enderror" placeholder="Enter Email...">
 
 
+                                @error('email')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
 
-                        <div class="mb-3">
+                            </div>
 
-                            <label class="form-label">
-                                Email
-                            </label>
 
 
-                            <input type="email"
-                                name="email"
-                                value="{{ old('email') }}"
-                                class="form-control @error('email') is-invalid @enderror"
-                                placeholder="Enter Email...">
 
 
-                            @error('email')
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
+                            <div class="mb-3">
 
-                            @enderror
+                                <label class="form-label">
+                                    Password
+                                </label>
 
 
-                        </div>
+                                <input type="password" name="password"
+                                    class="form-control @error('password') is-invalid @enderror"
+                                    placeholder="Enter Password...">
 
 
+                                @error('password')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
 
+                            </div>
 
 
-                        <div class="mb-3">
 
-                            <label class="form-label">
-                                Password
-                            </label>
 
 
-                            <input type="password"
-                                name="password"
-                                class="form-control @error('password') is-invalid @enderror"
-                                placeholder="Enter Password...">
 
+                            <div class="mb-3">
 
-                            @error('password')
+                                <label class="form-label">
+                                    Confirm Password
+                                </label>
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
 
-                            @enderror
+                                <input type="password" name="confirmPassword"
+                                    class="form-control @error('confirmPassword') is-invalid @enderror"
+                                    placeholder="Enter Confirm Password...">
 
 
-                        </div>
+                                @error('confirmPassword')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
 
+                            </div>
 
 
 
 
-                        <div class="mb-3">
 
-                            <label class="form-label">
-                                Confirm Password
-                            </label>
 
+                            <button type="submit" class="mb-3 btn btn-primary w-100">
 
-                            <input type="password"
-                                name="confirmPassword"
-                                class="form-control @error('confirmPassword') is-invalid @enderror"
-                                placeholder="Enter Confirm Password...">
+                                <i class="mr-2 fa-solid fa-floppy-disk"></i>
 
+                                Create Account
 
-                            @error('confirmPassword')
+                            </button>
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
 
-                            @enderror
 
 
-                        </div>
 
+                            <a href="{{ route('profile.adminList') }}" class="btn btn-outline-primary w-100">
 
 
+                                <i class="mr-2 fa-solid fa-list"></i>
 
+                                Admin Account List
 
 
-                        <button type="submit"
-                            class="mb-3 btn btn-primary w-100">
+                            </a>
 
-                            <i class="mr-2 fa-solid fa-floppy-disk"></i>
 
-                            Create Account
 
-                        </button>
+                        </form>
 
 
 
-
-
-                        <a href="{{ route('profile.adminList') }}"
-                            class="btn btn-outline-primary w-100">
-
-
-                            <i class="mr-2 fa-solid fa-list"></i>
-
-                            Admin Account List
-
-
-                        </a>
-
-
-
-                    </form>
-
+                    </div>
 
 
                 </div>
@@ -223,10 +202,6 @@
         </div>
 
 
+
     </div>
-
-
-
-</div>
-
 @endsection

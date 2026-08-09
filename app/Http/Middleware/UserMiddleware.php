@@ -23,28 +23,27 @@ class UserMiddleware
 
         // return back();
 
-        if (!Auth::check()) {
-                return redirect()->route('login');
-            }
-
-            if (Auth::user()->role == 'user' || Auth::user()->role == 'teacher') {
-
-                if (str_contains($request->path(), 'admin')) {
-                    return back();
-                }
-
-                if (
-                    $request->route()->getName() == 'login' ||
-                    $request->route()->getName() == 'register'
-                ) {
-                    return back();
-                }
-
-                return $next($request);
-            }
-
-            // return back();
+        if (! Auth::check()) {
             return redirect()->route('login');
         }
-    }
 
+        if (Auth::user()->role == 'user' || Auth::user()->role == 'teacher') {
+
+            if (str_contains($request->path(), 'admin')) {
+                return back();
+            }
+
+            if (
+                $request->route()->getName() == 'login' ||
+                $request->route()->getName() == 'register'
+            ) {
+                return back();
+            }
+
+            return $next($request);
+        }
+
+        // return back();
+        return redirect()->route('login');
+    }
+}

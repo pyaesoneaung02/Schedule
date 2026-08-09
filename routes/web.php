@@ -41,10 +41,16 @@ Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'callback
 // Route::get('/landingPage', [UserController::class, 'landingPage'])->name('landingPage');
 
 //show subjects by year
-Route::get('/subjects/year/{id}', [UserController::class, 'filterByYear'])->name('subjects.byYear');
+Route::get('/subjects/year/{id}',[UserController::class, 'filterByYear'])->name('subject.filter.year');
 
 //detail subject page
 Route::get('/subject/detail/{id}',[UserController::class, 'subjectDetail'])->name('subject.detail');
+
+//delete subject
+Route::delete('/subjects/{id}', [UserController::class, 'delete'])->name('subject.delete');
+
+//about page
+Route::get('/about', [UserController::class, 'about'])->name('about');
 
 
 

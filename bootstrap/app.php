@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
+use App\Http\Middleware\TeacherMiddleware;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,7 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => AdminMiddleware::class,
             'user'  => UserMiddleware::class,
-            'superadmin' => SuperAdminMiddleware::class
+            'superadmin' => SuperAdminMiddleware::class,
+            'teacher' => TeacherMiddleware::class
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

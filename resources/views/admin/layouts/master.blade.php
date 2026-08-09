@@ -135,7 +135,7 @@
 
             <!-- Nav Item - Dashboard -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('adminHome') }}"><i class="fa-solid fa-gauge-high mr-3"></i><span>Dashboard</span></a>
+                <a class="nav-link" href="{{ route('adminHome') }}"><i class="mr-3 fa-solid fa-gauge-high"></i><span>Dashboard</span></a>
             </li>
 
             <li class="nav-item">
@@ -148,13 +148,13 @@
                     aria-controls="componentMenu">
 
                     <span>
-                        <i class="fa-solid fa-puzzle-piece mr-2"></i>
+                        <i class="mr-2 fa-solid fa-puzzle-piece"></i>
                         Academic Setup
                     </span>
 
                     <span>
                         {{-- <span class="badge badge-danger">6</span> --}}
-                        <i class="fas fa-chevron-down small ml-2"></i>
+                        <i class="ml-2 fas fa-chevron-down small"></i>
                     </span>
 
                 </a>
@@ -166,48 +166,48 @@
                     data-parent="#accordionSidebar">
 
                      <li>
-                        <a class="nav-link text-white small" href="{{(route('academicYear.list'))}}">
-                            <i class="fa-solid fa-calendar mr-3"></i>
+                        <a class="text-white nav-link small" href="{{(route('academicYear.list'))}}">
+                            <i class="mr-3 fa-solid fa-calendar"></i>
                             Academic Years
                         </a>
                     </li>
 
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('year#list') }}">
-                            <i class="fa-solid fa-calendar mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('year#list') }}">
+                            <i class="mr-3 fa-solid fa-calendar"></i>
                             Class Years
                         </a>
                     </li>
 
                      <li>
-                        <a class="nav-link text-white small" href="{{ route('semester.list') }}">
-                            <i class="fa-solid fa-table-columns mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('semester.list') }}">
+                            <i class="mr-3 fa-solid fa-table-columns"></i>
                             Semesters
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="{{{ route('major.list')}}}"><i class="fa-solid fa-building-columns mr-3"></i><span>Majors</span></a>
+                        <a class="nav-link" href="{{{ route('major.list')}}}"><i class="mr-3 fa-solid fa-building-columns"></i><span>Majors</span></a>
                     </li>
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('section.list') }}">
-                            <i class="fa-solid fa-layer-group mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('section.list') }}">
+                            <i class="mr-3 fa-solid fa-layer-group"></i>
                             Sections
                         </a>
                     </li>
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('day.list') }}">
-                            <i class="fa-solid fa-calendar-days mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('day.list') }}">
+                            <i class="mr-3 fa-solid fa-calendar-days"></i>
                             Days
                         </a>
                     </li>
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('time.list') }}">
-                            <i class="fa-solid fa-clock mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('time.list') }}">
+                            <i class="mr-3 fa-solid fa-clock"></i>
                             Time Slots
                         </a>
                     </li>
@@ -226,13 +226,13 @@
                     aria-controls="accessoriesMenu">
 
                     <span class="mr-3">
-                        <i class="fa-solid fa-toolbox mr-2"></i>
+                        <i class="mr-2 fa-solid fa-toolbox"></i>
                         Configuration
                     </span>
 
                     <span>
                         {{-- <span class="badge badge-danger">3</span> --}}
-                        <i class="fas fa-chevron-down small ml-2"></i>
+                        <i class="ml-2 fas fa-chevron-down small"></i>
                     </span>
 
                 </a>
@@ -244,22 +244,22 @@
                     data-parent="#accordionSidebar">
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('department.list') }}">
-                            <i class="fa-solid fa-graduation-cap mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('department.list') }}">
+                            <i class="mr-3 fa-solid fa-graduation-cap"></i>
                             Departments
                         </a>
                     </li>
 
                     <li>
-                        <a class="nav-link text-white small" href="{{ route('position.list') }}">
-                            <i class="fa-solid fa-user-tie mr-3"></i>
+                        <a class="text-white nav-link small" href="{{ route('position.list') }}">
+                            <i class="mr-3 fa-solid fa-user-tie"></i>
                             Positions
                         </a>
                     </li>
 
                     <li>
-                        <a class="nav-link text-white small" href="{{{ route('room.create')}}}">
-                            <i class="fa-solid fa-door-open mr-3"></i>
+                        <a class="text-white nav-link small" href="{{{ route('room.create')}}}">
+                            <i class="mr-3 fa-solid fa-door-open"></i>
                             Rooms
                         </a>
                     </li>
@@ -279,7 +279,7 @@
             </li> --}}
 
             {{-- <li class="nav-item">
-                <a class="nav-link" href="{{{ route('room.create')}}}"><i class="fa-solid fa-door-open mr-3"></i><span>Room</span></a>
+                <a class="nav-link" href="{{{ route('room.create')}}}"><i class="mr-3 fa-solid fa-door-open"></i><span>Room</span></a>
             </li> --}}
 
             {{-- <li class="nav-item">
@@ -291,11 +291,11 @@
             </li> --}}
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('teacher.create') }}"><i class="fa-solid fa-chalkboard-user mr-3"></i><span>Teachers</span></a>
+                <a class="nav-link" href="{{ route('teacher.create') }}"><i class="mr-3 fa-solid fa-chalkboard-user"></i><span>Teachers</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('subject.create') }}"><i class="fa-solid fa-book mr-3"></i><span>Subjects</span></a>
+                <a class="nav-link" href="{{ route('subject.create') }}"><i class="mr-3 fa-solid fa-book"></i><span>Subjects</span></a>
             </li>
 
             {{-- <li class="nav-item">
@@ -303,18 +303,22 @@
             </li> --}}
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('teaching.create') }}"><i class="fa-solid fa-chalkboard mr-3"></i><span>Teaching Assignments</span></a>
+                <a class="nav-link" href="{{ route('teaching.create') }}"><i class="mr-3 fa-solid fa-chalkboard"></i><span>Teaching Assignments</span></a>
             </li>
 
             @if (auth()->check() && auth()->user()->role == 'superadmin')
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('schedule.create') }}"><i class="fa-solid fa-calendar-days mr-3"></i><span>Schedule Management</span></a>
+                <a class="nav-link" href="{{ route('schedule.create') }}"><i class="mr-3 fa-solid fa-calendar-days"></i><span>Schedule Management</span></a>
             </li>
 
              <li class="nav-item">
-                <a class="nav-link" href="{{ route('schedule.timeTable') }}"><i class="fa-solid fa-calendar-days mr-3"></i>Timetables</span></a>
+                <a class="nav-link" href="{{ route('schedule.timeTable') }}"><i class="mr-3 fa-solid fa-calendar-days"></i>Timetables</span></a>
             </li>
             @endif
+
+             <li class="nav-item">
+                <a class="nav-link" href="{{ route('comment.list') }}"><i class="mr-3 fa-solid fa-comment"></i><span>Comments</span></a>
+            </li>
 
             <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST">

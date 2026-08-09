@@ -4,7 +4,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Major;
 use App\Models\Subject;
+use App\Models\Teacher;
 use App\Models\Year;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -19,17 +21,34 @@ class UserController extends Controller
     public function landingPage()
     {
 
-        $subjects = Subject::with('year')->get();
+        $subjects = Subject::with([
+            'year',
+            'major',
+        ])->get();
 
-        $years = $subjects->pluck('year')->unique('id');
+        $years = Year::all();
 
         $majors = Major::all();
+
+        $teachers = Teacher::all();
+
+        $selectedYear = null;
 
         return view('admin.home.landingPage', compact(
             'subjects',
             'years',
-            'majors'
+            'majors',
+            'teachers',
+            'selectedYear'
         ));
+
+    }
+
+    // about page route
+    public function about()
+    {
+
+        return view('admin.home.about');
 
     }
 
@@ -37,23 +56,27 @@ class UserController extends Controller
     public function filterByYear($id)
     {
 
-        $years = Year::get();
-
-
-        $selectedYear = Year::find($id);
-
-
-        $subjects = Subject::with('year')
-            ->where('year_id',$id)
+        $subjects = Subject::with([
+            'year',
+            'major',
+        ])
+            ->where('year_id', $id)
             ->get();
 
+        $years = Year::all();
 
+        $selectedYear = Year::findOrFail($id);
 
-        return view('admin.home.landingPage',
-        compact(
+        $majors = Major::all();
+
+        $teachers = Teacher::all();
+
+        return view('admin.home.landingPage', compact(
             'subjects',
             'years',
-            'selectedYear'
+            'majors',
+            'selectedYear',
+            'teachers'
         ));
 
     }
@@ -69,6 +92,21 @@ class UserController extends Controller
         ])->findOrFail($id);
 
         return view('admin.home.detail', compact('subject'));
+    }
+
+    public function delete($id)
+    {
+
+        $subject = Subject::findOrFail($id);
+
+        if ($subject->image) {
+            Storage::disk('public')->delete($subject->image);
+        }
+
+        $subject->delete();
+
+        return redirect()->route('landingPage')->with('success', 'Subject removed successfully');
+
     }
 
 }

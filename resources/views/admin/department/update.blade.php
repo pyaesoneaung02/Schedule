@@ -1,124 +1,121 @@
 @extends('admin.layouts.master')
 
 @section('content')
+    <div class="container-fluid">
 
-<div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="mb-4">
 
-    <!-- Page Heading -->
-    <div class="mb-4">
+            <h2 class="text-primary font-weight-bold">
+                <i class="mr-2 fa-solid fa-graduation-cap"></i>
+                Update Department
+            </h2>
 
-        <h2 class="text-primary font-weight-bold">
-            <i class="mr-2 fa-solid fa-graduation-cap"></i>
-            Update Department
-        </h2>
+            <p class="mb-0 text-muted">
+                Edit the selected department information.
+            </p>
 
-        <p class="mb-0 text-muted">
-            Edit the selected department information.
-        </p>
+        </div>
 
-    </div>
 
 
+        <div class="row justify-content-center">
 
-    <div class="row justify-content-center">
 
+            <div class="col-lg-5">
 
-        <div class="col-lg-5">
 
+                <a href="{{ route('department.list') }}" class="mb-3 btn btn-outline-secondary btn-sm">
 
-            <a href="{{ route('department.list') }}"
-                class="mb-3 btn btn-outline-secondary btn-sm">
+                    <i class="mr-1 fa-solid fa-arrow-left"></i>
+                    Back
 
-                <i class="mr-1 fa-solid fa-arrow-left"></i>
-                Back
+                </a>
 
-            </a>
 
 
 
+                <div class="border-0 shadow-sm card">
 
-            <div class="border-0 shadow-sm card">
 
 
+                    <div class="text-white card-header bg-primary">
 
-                <div class="text-white card-header bg-primary">
+                        <h5 class="mb-0">
 
-                    <h5 class="mb-0">
+                            <i class="mr-2 fa-solid fa-pen-to-square"></i>
+                            Update Department
 
-                        <i class="mr-2 fa-solid fa-pen-to-square"></i>
-                        Update Department
+                        </h5>
 
-                    </h5>
 
+                    </div>
 
-                </div>
 
 
 
 
+                    <div class="card-body">
 
-                <div class="card-body">
 
 
+                        <form action="{{ route('department.update', $department->id) }}" method="POST">
 
-                    <form action="{{ route('department.update', $department->id) }}"
-                        method="POST">
+                            @csrf
 
-                        @csrf
 
 
 
+                            <div class="mb-3">
 
-                        <div class="mb-3">
 
+                                <label class="form-label">
+                                    Department Name
+                                </label>
 
-                            <label class="form-label">
-                                Department Name
-                            </label>
 
 
+                                <input type="text" name="departmentName"
+                                    value="{{ old('departmentName', $department->name) }}"
+                                    class="form-control @error('departmentName') is-invalid @enderror"
+                                    placeholder="Department Name...">
 
-                            <input type="text"
-                                name="departmentName"
-                                value="{{ old('departmentName', $department->name) }}"
-                                class="form-control @error('departmentName') is-invalid @enderror"
-                                placeholder="Department Name...">
 
 
+                                @error('departmentName')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
 
-                            @error('departmentName')
 
-                                <span class="invalid-feedback">
-                                    {{ $message }}
-                                </span>
+                            </div>
 
-                            @enderror
 
 
-                        </div>
 
 
+                            <button type="submit" class="btn btn-primary w-100">
 
 
+                                <i class="mr-2 fa-solid fa-floppy-disk"></i>
+                                Update
 
-                        <button type="submit" class="btn btn-primary w-100">
 
+                            </button>
 
-                            <i class="mr-2 fa-solid fa-floppy-disk"></i>
-                            Update
 
 
-                        </button>
 
+                        </form>
 
 
 
-                    </form>
+                    </div>
 
 
 
                 </div>
-
 
 
             </div>
@@ -128,9 +125,4 @@
 
 
     </div>
-
-
-</div>
-
-
 @endsection

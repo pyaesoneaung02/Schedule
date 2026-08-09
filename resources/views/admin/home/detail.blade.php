@@ -1,31 +1,49 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-    <title>
-        {{ $subject->long_name }}
-    </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ $subject->long_name }} - Subject Detail</title>
 
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
 
     <style>
         body {
 
-            background: #f5f7fb;
+            background: #f4f6fb;
+            font-family: 'Segoe UI', sans-serif;
 
         }
 
 
-        .detail-card {
+        .navbar {
 
-            border-radius: 30px;
+            background: linear-gradient(90deg, #4b5cff, #7a3cff);
 
+        }
+
+
+        .navbar-brand,
+        .nav-link {
+
+            color: white !important;
+
+        }
+
+
+        .subject-detail-card {
+
+            border: none;
+            border-radius: 20px;
             overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .1);
 
         }
 
@@ -33,24 +51,34 @@
 
         .subject-image {
 
-            height: 400px;
-
-            object-fit: cover;
-
             width: 100%;
+            height: 400px;
+            object-fit: cover;
 
         }
 
 
-        .info-box {
 
-            background: #f8f9fa;
+        .info-card {
 
-            padding: 15px;
-
+            border: none;
             border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
 
-            margin-bottom: 15px;
+        }
+
+
+        .info-title {
+
+            color: #4b5cff;
+            font-weight: bold;
+
+        }
+
+
+        footer a {
+
+            text-decoration: none;
 
         }
     </style>
@@ -62,182 +90,256 @@
 <body>
 
 
-    <nav class="navbar navbar-dark bg-primary">
+
+    <!-- Navbar -->
+
+    <nav class="navbar navbar-expand-lg">
+
 
         <div class="container">
 
-            <a href="{{ route('landingPage') }}" class="navbar-brand fw-bold">
 
+            <a class="navbar-brand fw-bold" href="{{ route('landingPage') }}">
 
-                🎓 UCSMGY
-
+                🎓 University Subject Portal
 
             </a>
 
+
+            <div>
+
+                {{-- <a href="{{ route('landingPage') }}" class="px-4 btn btn-light rounded-pill">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Back
+
+                </a> --}}
+
+                <a href="{{ route('login') }}" class="px-4 btn btn-light rounded-pill">
+
+                    <i class="bi bi-box-arrow-in-right"></i>
+
+                    Login
+
+                </a>
+
+            </div>
+
+
         </div>
 
+
     </nav>
-
-
-
 
     <div class="container py-5">
 
 
 
-        <div class="card shadow border-0 detail-card">
+        <div class="row g-4 align-items-center">
 
 
 
-            @if ($subject->image)
-                <img src="{{ asset($subject->image) }}" class="subject-image">
-            @else
-                <img src="https://picsum.photos/1200/500" class="subject-image">
-            @endif
+            <!-- Image -->
+
+
+            <div class="col-lg-5">
+
+
+                <div class="card subject-detail-card">
+
+
+                    @if ($subject->image)
+                        <img src="{{ asset($subject->image) }}" class="subject-image">
+                    @else
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3" class="subject-image">
+                    @endif
+
+
+                </div>
+
+
+            </div>
+
+            <!-- Detail -->
+
+
+            <div class="col-lg-7">
+
+
+                <div class="p-4 card info-card">
 
 
 
+                    <h2 class="mb-3 fw-bold">
 
-            <div class="card-body p-5">
+                        {{ $subject->long_name }}
 
-
-
-                <span class="badge bg-primary rounded-pill px-4 py-2">
-
-
-                    {{ $subject->year->name ?? '' }}
-
-
-                </span>
+                    </h2>
 
 
 
+                    <h6 class="mb-4 text-muted">
 
-                <h1 class="fw-bold mt-3">
+                        {{ $subject->short_name }}
 
+                    </h6>
 
-                    {{ $subject->long_name }}
-
-
-                </h1>
-
-
-
-                <p class="text-muted fs-5">
-
-
-                    {!! $subject->description !!}
-
-
-                </p>
+                    <div class="row g-3">
 
 
 
-
-                <div class="row mt-4">
-
+                        <div class="col-md-6">
 
 
-                    <div class="col-md-6">
+                            <div class="p-3 border rounded">
 
 
-                        <div class="info-box">
+                                <h6 class="info-title">
+
+                                    <i class="bi bi-mortarboard"></i>
+
+                                    Year
+
+                                </h6>
 
 
-                            <i class="fa-solid fa-code text-primary"></i>
+                                <p class="mb-0">
+
+                                    {{ $subject->year->name ?? 'N/A' }}
+
+                                </p>
 
 
-                            <b>Subject Code</b>
-
-
-                            <br>
-
-
-                            {{ $subject->short_name }}
+                            </div>
 
 
                         </div>
+
+                        <div class="col-md-6">
+
+
+                            <div class="p-3 border rounded">
+
+
+                                <h6 class="info-title">
+
+                                    <i class="bi bi-diagram-3"></i>
+
+                                    Major
+
+                                </h6>
+
+
+                                <p class="mb-0">
+
+                                    {{ $subject->major->name ?? 'N/A' }}
+
+                                </p>
+
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-md-6">
+
+
+                            <div class="p-3 border rounded">
+
+
+                                <h6 class="info-title">
+
+                                    <i class="bi bi-clock"></i>
+
+                                    Credit Hours
+
+                                </h6>
+
+
+                                <p class="mb-0">
+
+                                    {{ $subject->time_number }}
+
+                                </p>
+
+
+                            </div>
+
+
+                        </div>
+
+                        <div class="col-md-6">
+
+
+                            <div class="p-3 border rounded">
+
+
+                                <h6 class="info-title">
+
+                                    <i class="bi bi-calendar"></i>
+
+                                    Academic Year
+
+                                </h6>
+
+
+                                <p class="mb-0">
+
+                                    {{ $subject->academicYear->name ?? 'N/A' }}
+
+                                </p>
+
+
+                            </div>
+
+
+                        </div>
+
 
 
                     </div>
 
+                    <hr>
+
+                    <h5 class="fw-bold">
+
+                        Description
+
+                    </h5>
 
 
 
+                    <p class="text-muted">
 
-                    <div class="col-md-6">
+                        {{-- {{ $subject->description ?? 'No description available.' }} --}}
+                        {!! $subject->description !!}
 
+                    </p>
 
-                        <div class="info-box">
-
-
-                            <i class="fa-solid fa-clock text-primary"></i>
-
-
-                            <b>Weekly Period</b>
+                    <div class="gap-2 mt-4 d-flex">
 
 
-                            <br>
+                        <a href="{{ route('landingPage') }}" class="px-4 btn btn-secondary rounded-pill">
 
 
-                            {{ $subject->time_number }}
+                            <i class="bi bi-arrow-left"></i>
+
+                            Back
 
 
-                        </div>
+                        </a>
+
+                        {{-- <a href="#" class="px-4 btn btn-primary rounded-pill">
 
 
-                    </div>
+                            <i class="bi bi-book"></i>
+
+                            Enroll Subject
 
 
-
-
-
-                    <div class="col-md-6">
-
-
-                        <div class="info-box">
-
-
-                            <i class="fa-solid fa-building-columns text-primary"></i>
-
-
-                            <b>Major</b>
-
-
-                            <br>
-
-
-                            {{ $subject->major->name ?? '' }}
-
-
-                        </div>
-
-
-                    </div>
-
-
-
-
-
-                    <div class="col-md-6">
-
-
-                        <div class="info-box">
-
-
-                            <i class="fa-solid fa-calendar text-primary"></i>
-
-
-                            <b>Semester</b>
-
-
-                            <br>
-
-
-                            {{ $subject->semester->name ?? '' }}
-
-
-                        </div>
+                        </a> --}}
 
 
                     </div>
@@ -248,20 +350,8 @@
 
 
 
-
-                <a href="{{ route('landingPage') }}" class="btn btn-outline-primary rounded-pill px-5 mt-4">
-
-
-                    <i class="fa-solid fa-arrow-left"></i>
-
-                    Back
-
-
-                </a>
-
-
-
             </div>
+
 
 
         </div>
@@ -270,6 +360,45 @@
 
     </div>
 
+
+    <!-- Footer -->
+
+    <footer class="py-4 mt-5 text-white" style="background:linear-gradient(90deg,#4b5cff,#7a3cff);">
+
+
+        <div class="container text-center">
+
+
+            <h5 class="fw-bold">
+
+                🎓 University Subject Portal
+
+            </h5>
+
+
+            <p>
+
+                University of Computer Studies (Magway)
+
+            </p>
+
+
+            <hr class="border-light">
+
+
+            <small>
+
+                © {{ date('Y') }} University Subject Portal. All Rights Reserved.
+
+            </small>
+
+
+        </div>
+
+
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
 
 </body>

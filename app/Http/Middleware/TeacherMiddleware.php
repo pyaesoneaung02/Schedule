@@ -3,10 +3,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class SuperAdminMiddleware
+class TeacherMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,16 +14,19 @@ class SuperAdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! Auth::check()) {
+        if (! auth()->check()) {
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role == 'superadmin') {
-            return $next($request);
-        } else {
-            return back();
+        if (auth()->user()->role !== 'teacher') {
+            if (auth()->user()->role == 'superadmin') {
+                return redirect()->route('adminHome');
+            }
+
+            // User / Teacher cannot access admin
+            return redirect()->route('userHome');
         }
 
-        // return Auth::user()->role == 'superadmin' ? $next($request) : back();
+        return $next($request);
     }
 }
