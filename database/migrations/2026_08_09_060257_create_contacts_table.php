@@ -11,13 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('contacts', function (Blueprint $table) {
             $table->id();
-            $table->integer('teacher_id')->unsigned();
-            $table->integer('user_id')->unsigned();
-            $table->longText('message');
+            $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('department')->nullable();
+            $table->string('subject')->nullable();
+            $table->text('message');
             $table->string('status')->default('pending');
             $table->timestamps();
+
         });
     }
 
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('contacts');
     }
 };

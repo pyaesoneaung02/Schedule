@@ -57,34 +57,792 @@ class ScheduleController extends Controller
         return back();
     }
 
-    //updatePage
+    // ============================================================
+    // UPDATE PAGE
+    // ============================================================
+
     public function updatePage($id)
     {
-        $academicYears = AcademicYears::all();
-        $years         = Year::get();
-        $majors        = Major::get();
-        $rooms         = Room::get();
-        $subjects      = Subject::get();
-        $days          = Day::get();
-        $times         = Time::get();
-        $teachers      = Teacher::get();
-        $semesters     = Semesters::get();
-        $sections      = Sections::get();
-        $schedule      = Schedule::where('id', $id)->first();
-        return view('admin.schedule.edit', compact('schedule', 'rooms', 'subjects', 'years', 'majors', 'days', 'times', 'teachers', 'semesters', 'sections', 'academicYears'));
+        $academicYears = AcademicYears::orderBy('id')->get();
+        $years         = Year::orderBy('id')->get();
+        $majors        = Major::orderBy('id')->get();
+        $rooms         = Room::orderBy('id')->get();
+        $subjects      = Subject::orderBy('id')->get();
+        $days          = Day::orderBy('id')->get();
+        $times         = Time::orderBy('id')->get();
+        $teachers      = Teacher::orderBy('id')->get();
+        $semesters     = Semesters::orderBy('id')->get();
+        $sections      = Sections::orderBy('id')->get();
+
+        $schedule = Schedule::findOrFail($id);
+
+        return view(
+            'admin.schedule.edit',
+            compact(
+                'schedule',
+                'rooms',
+                'subjects',
+                'years',
+                'majors',
+                'days',
+                'times',
+                'teachers',
+                'semesters',
+                'sections',
+                'academicYears'
+            )
+        );
     }
 
-    //update process
+    // ============================================================
+    // UPDATE
+    // ============================================================
+
     public function update(Request $request, $id)
     {
-        $this->checkValidationSchedule($request);
-        $schedule = $this->getScheduleData($request);
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Find existing schedule
+        |--------------------------------------------------------------------------
+        */
 
-        Schedule::where('id', $id)->update($schedule);
+        $schedule = Schedule::findOrFail($id);
 
-        Alert::success('Success Schedule', 'Schedule Updated Successfully');
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Validate
+        |--------------------------------------------------------------------------
+        */
 
-        return to_route('schedule.list');
+        $this->checkValidationSchedule(
+            $request,
+            $schedule->id
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Prepare data
+        |--------------------------------------------------------------------------
+        */
+
+        $data = $this->getScheduleData($request);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Update
+        |--------------------------------------------------------------------------
+        */
+
+        $schedule->update($data);
+
+        Alert::success(
+            'Success Schedule',
+            'Schedule Updated Successfully'
+        );
+
+        return redirect()->route(
+            'schedule.list'
+        );
+    }
+
+    // ============================================================
+    // MAP REQUEST DATA
+    // ============================================================
+
+    private function getScheduleData(Request $request)
+    {
+        return [
+
+            'academic_year_id' =>
+            (int) $request->academicYearID,
+
+            'year_id'          =>
+            (int) $request->yearID,
+
+            'major_id'         =>
+            (int) $request->majorID,
+
+            'room_id'          =>
+            (int) $request->roomID,
+
+            'subject_id'       =>
+            (int) $request->subjectID,
+
+            'day_id'           =>
+            (int) $request->dayID,
+
+            'time_id'          =>
+            (int) $request->timeID,
+
+            'teacher_id'       =>
+            (int) $request->teacherID,
+
+            'semester_id'      =>
+            (int) $request->semesterID,
+
+            'section_id'       =>
+            (int) $request->sectionID,
+        ];
+    }
+
+    // ============================================================
+    // VALIDATION
+    // ============================================================
+
+    public function checkValidationSchedule(
+        Request $request,
+        $ignoreScheduleId = null
+    ) {
+
+        /*
+        |--------------------------------------------------------------------------
+        | 1. Required
+        |--------------------------------------------------------------------------
+        */
+
+        $request->validate([
+
+            'academicYearID' => 'required|integer',
+            'yearID'         => 'required|integer',
+            'majorID'        => 'required|integer',
+            'roomID'         => 'required|integer',
+            'subjectID'      => 'required|integer',
+            'teacherID'      => 'required|integer',
+            'dayID'          => 'required|integer',
+            'timeID'         => 'required|integer',
+            'semesterID'     => 'required|integer',
+            'sectionID'      => 'required|integer',
+
+        ], [
+
+            'academicYearID.required' =>
+            'Please select Academic Year.',
+
+            'yearID.required'         =>
+            'Please select Year.',
+
+            'majorID.required'        =>
+            'Please select Major.',
+
+            'roomID.required'         =>
+            'Please select Room.',
+
+            'subjectID.required'      =>
+            'Please select Subject.',
+
+            'teacherID.required'      =>
+            'Please select Teacher.',
+
+            'dayID.required'          =>
+            'Please select Day.',
+
+            'timeID.required'         =>
+            'Please select Time.',
+
+            'semesterID.required'     =>
+            'Please select Semester.',
+
+            'sectionID.required'      =>
+            'Please select Section.',
+        ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | 2. Get data
+        |--------------------------------------------------------------------------
+        */
+
+        $subject = Subject::find(
+            $request->subjectID
+        );
+
+        $year = Year::find(
+            $request->yearID
+        );
+
+        $major = Major::find(
+            $request->majorID
+        );
+
+        $time = Time::find(
+            $request->timeID
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. First Year Major
+        |--------------------------------------------------------------------------
+        */
+
+        if ($year && $major) {
+
+            if (
+                $year->name === 'First Year'
+                &&
+                $major->name !== 'CST'
+            ) {
+
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'majorID' =>
+                        'First Year must have CST major.',
+                    ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Lunch Break
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $time
+            &&
+            $time->name === '12:00-01:00'
+        ) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'timeID' =>
+                    'Lunch Break cannot be scheduled.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Helper
+        |
+        | Ignore current schedule while checking conflicts.
+        |--------------------------------------------------------------------------
+        */
+
+        $withoutCurrent = function ($query) use (
+            $ignoreScheduleId
+        ) {
+
+            if ($ignoreScheduleId) {
+
+                $query->where(
+                    'id',
+                    '!=',
+                    $ignoreScheduleId
+                );
+            }
+
+            return $query;
+        };
+
+        /*
+        |--------------------------------------------------------------------------
+        | 5. CLASS / SECTION CONFLICT
+        |
+        | Same:
+        | Academic Year
+        | Semester
+        | Year
+        | Major
+        | Section
+        | Day
+        | Time
+        |--------------------------------------------------------------------------
+        */
+
+        $classConflict = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'year_id',
+                $request->yearID
+            )
+            ->where(
+                'major_id',
+                $request->majorID
+            )
+            ->where(
+                'section_id',
+                $request->sectionID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            )
+            ->where(
+                'time_id',
+                $request->timeID
+            );
+
+        $withoutCurrent($classConflict);
+
+        if ($classConflict->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'timeID' =>
+                    'This section already has another subject at this time.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 6. TEACHER CONFLICT
+        |
+        | Same Teacher + Day + Time
+        |--------------------------------------------------------------------------
+        */
+
+        $teacherConflict = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'teacher_id',
+                $request->teacherID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            )
+            ->where(
+                'time_id',
+                $request->timeID
+            );
+
+        $withoutCurrent($teacherConflict);
+
+        if ($teacherConflict->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'teacherID' =>
+                    'Teacher already has another class at this time.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 7. ROOM CONFLICT
+        |
+        | Same Room + Day + Time
+        |--------------------------------------------------------------------------
+        */
+
+        $roomConflict = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'room_id',
+                $request->roomID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            )
+            ->where(
+                'time_id',
+                $request->timeID
+            );
+
+        $withoutCurrent($roomConflict);
+
+        if ($roomConflict->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'roomID' =>
+                    'Room is already occupied at this time.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 8. SAME SUBJECT SAME DAY
+        |
+        | One subject cannot appear twice on same day
+        |--------------------------------------------------------------------------
+        */
+
+        $subjectSameDay = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'year_id',
+                $request->yearID
+            )
+            ->where(
+                'major_id',
+                $request->majorID
+            )
+            ->where(
+                'section_id',
+                $request->sectionID
+            )
+            ->where(
+                'subject_id',
+                $request->subjectID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            );
+
+        $withoutCurrent($subjectSameDay);
+
+        if ($subjectSameDay->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'subjectID' =>
+                    'This subject already exists on this day.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 9. SUBJECT WEEKLY LIMIT
+        |
+        | IMPORTANT:
+        |
+        | time_number = number of times this subject is taught
+        | for ONE SECTION per week.
+        |
+        | It is NOT multiplied by number of sections.
+        |--------------------------------------------------------------------------
+        */
+
+        if ($subject) {
+
+            $subjectWeekly = Schedule::query()
+                ->where(
+                    'academic_year_id',
+                    $request->academicYearID
+                )
+                ->where(
+                    'semester_id',
+                    $request->semesterID
+                )
+                ->where(
+                    'year_id',
+                    $request->yearID
+                )
+                ->where(
+                    'major_id',
+                    $request->majorID
+                )
+                ->where(
+                    'section_id',
+                    $request->sectionID
+                )
+                ->where(
+                    'subject_id',
+                    $request->subjectID
+                );
+
+            $withoutCurrent($subjectWeekly);
+
+            $count = $subjectWeekly->count();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Example:
+            |
+            | time_number = 3
+            |
+            | Monday = 1
+            | Wednesday = 1
+            | Friday = 1
+            |
+            | Total = 3
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $count >=
+                (int) $subject->time_number
+            ) {
+
+                return back()
+                    ->withInput()
+                    ->withErrors([
+                        'subjectID' =>
+                        'This subject has already reached its weekly limit of '
+                        . $subject->time_number
+                        . ' periods for this section.',
+                    ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 10. SUBJECT DAILY MAXIMUM
+        |
+        | One subject = maximum 1 period per day
+        |--------------------------------------------------------------------------
+        */
+
+        $subjectDaily = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'year_id',
+                $request->yearID
+            )
+            ->where(
+                'major_id',
+                $request->majorID
+            )
+            ->where(
+                'section_id',
+                $request->sectionID
+            )
+            ->where(
+                'subject_id',
+                $request->subjectID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            );
+
+        $withoutCurrent($subjectDaily);
+
+        if ($subjectDaily->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'subjectID' =>
+                    'This subject can only be scheduled once per day.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 11. TEACHER DAILY MAXIMUM
+        |
+        | Maximum 4 periods per day
+        |--------------------------------------------------------------------------
+        */
+
+        $teacherDaily = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'teacher_id',
+                $request->teacherID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            );
+
+        $withoutCurrent($teacherDaily);
+
+        if (
+            $teacherDaily->count() >= 4
+        ) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'teacherID' =>
+                    'Teacher daily maximum of 4 periods has been reached.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 12. TEACHER WEEKLY MAXIMUM
+        |
+        | Maximum 20 periods per week
+        |--------------------------------------------------------------------------
+        */
+
+        $teacherWeekly = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'teacher_id',
+                $request->teacherID
+            );
+
+        $withoutCurrent($teacherWeekly);
+
+        if (
+            $teacherWeekly->count() >= 20
+        ) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'teacherID' =>
+                    'Teacher weekly maximum of 20 periods has been reached.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 13. CLASS DAILY MAXIMUM
+        |
+        | Maximum 4 usable periods per day
+        |
+        | Because timetable:
+        |
+        | 09:00 - 10:30
+        | 10:30 - 12:00
+        | Lunch
+        | 01:00 - 02:30
+        | 02:30 - 04:00
+        |
+        | = 4 usable periods
+        |--------------------------------------------------------------------------
+        */
+
+        $classDaily = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'year_id',
+                $request->yearID
+            )
+            ->where(
+                'major_id',
+                $request->majorID
+            )
+            ->where(
+                'section_id',
+                $request->sectionID
+            )
+            ->where(
+                'day_id',
+                $request->dayID
+            );
+
+        $withoutCurrent($classDaily);
+
+        if (
+            $classDaily->count() >= 4
+        ) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'dayID' =>
+                    'This section already has 4 periods on this day.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 14. SUBJECT + TEACHER CONSISTENCY
+        |
+        | Same subject in same section should use same teacher.
+        |--------------------------------------------------------------------------
+        */
+
+        $differentTeacher = Schedule::query()
+            ->where(
+                'academic_year_id',
+                $request->academicYearID
+            )
+            ->where(
+                'semester_id',
+                $request->semesterID
+            )
+            ->where(
+                'year_id',
+                $request->yearID
+            )
+            ->where(
+                'major_id',
+                $request->majorID
+            )
+            ->where(
+                'section_id',
+                $request->sectionID
+            )
+            ->where(
+                'subject_id',
+                $request->subjectID
+            )
+            ->where(
+                'teacher_id',
+                '!=',
+                $request->teacherID
+            );
+
+        $withoutCurrent($differentTeacher);
+
+        if ($differentTeacher->exists()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'teacherID' =>
+                    'This subject is already assigned to another teacher for this section.',
+                ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUCCESS
+        |--------------------------------------------------------------------------
+        */
+
+        return null;
     }
 
     //delete
@@ -93,329 +851,6 @@ class ScheduleController extends Controller
         Schedule::find($id)->delete();
         Alert::success('Success Schedule', 'Schedule Deleted Successfully');
         return back();
-    }
-
-    // map request data
-    private function getScheduleData($request)
-    {
-        return [
-            'academic_year_id' => $request->academicYearID,
-            'year_id'          => $request->yearID,
-            'major_id'         => $request->majorID,
-            'room_id'          => $request->roomID,
-            'subject_id'       => $request->subjectID,
-            'day_id'           => $request->dayID,
-            'time_id'          => $request->timeID,
-            'teacher_id'       => $request->teacherID,
-            'semester_id'      => $request->semesterID,
-            'section_id'       => $request->sectionID,
-        ];
-    }
-
-    // Validation
-    public function checkValidationSchedule($request)
-    {
-
-        /*
-        |--------------------------------------------------------------------------
-        | 1. Required Validation
-        |--------------------------------------------------------------------------
-        */
-
-        $request->validate([
-
-            'academicYearID' => 'required',
-            'yearID'         => 'required',
-            'majorID'        => 'required',
-            'roomID'         => 'required',
-            'subjectID'      => 'required',
-            'teacherID'      => 'required',
-            'dayID'          => 'required',
-            'timeID'         => 'required',
-            'semesterID'     => 'required',
-            'sectionID'      => 'required',
-
-        ], [
-
-            'academicYearID.required' => 'Please select Academic Year.',
-            'yearID.required'         => 'Please select Year.',
-            'majorID.required'        => 'Please select Major.',
-            'roomID.required'         => 'Please select Room.',
-            'subjectID.required'      => 'Please select Subject.',
-            'teacherID.required'      => 'Please select Teacher.',
-            'dayID.required'          => 'Please select Day.',
-            'timeID.required'         => 'Please select Time.',
-            'semesterID.required'     => 'Please select Semester.',
-            'sectionID.required'      => 'Please select Section.',
-
-        ]);
-
-        $subject = Subject::find($request->subjectID);
-
-        /*
-        |--------------------------------------------------------------------------
-        | First Year Major Validation
-        |--------------------------------------------------------------------------
-        */
-
-        $year  = Year::find($request->yearID);
-        $major = Major::find($request->majorID);
-
-        if ($year && $major) {
-
-            if ($year->name == 'First Year' && $major->name != 'CST') {
-                return back()
-                    ->withErrors([
-                        'majorID' => 'First Year must have CST major.',
-                    ])
-                    ->withInput();
-            }
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 2. Lunch Break Validation
-        |--------------------------------------------------------------------------
-        */
-
-        $time = Time::find($request->timeID);
-
-        if ($time && $time->name == '12:00-01:00') {
-
-            return back()->withErrors([
-                'timeID' => 'Lunch Break cannot be scheduled.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 3. Class Conflict
-        |
-        | Same Year + Major + Room + Day + Time
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $classConflict = Schedule::where('year_id', $request->yearID)
-            ->where('major_id', $request->majorID)
-            ->where('room_id', $request->roomID)
-            ->where('day_id', $request->dayID)
-            ->where('time_id', $request->timeID)
-            ->exists();
-
-        if ($classConflict) {
-
-            return back()->withErrors([
-                'timeID' => 'This class already has another subject at this time.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 4. Teacher Conflict
-        |
-        | Same Teacher + Day + Time
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $teacherConflict = Schedule::where('teacher_id', $request->teacherID)
-            ->where('day_id', $request->dayID)
-            ->where('time_id', $request->timeID)
-            ->exists();
-
-        if ($teacherConflict) {
-
-            return back()->withErrors([
-                'teacherID' => 'Teacher already has another class at this time.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 5. Room Conflict
-        |
-        | Same Room + Day + Time
-        |
-        | Different Day / Different Time = Allowed
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $roomConflict = Schedule::where('room_id', $request->roomID)
-            ->where('day_id', $request->dayID)
-            ->where('time_id', $request->timeID)
-            ->exists();
-
-        if ($roomConflict) {
-
-            return back()->withErrors([
-                'roomID' => 'Room already occupied at this time.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 6. Same Subject Same Day
-        |--------------------------------------------------------------------------
-        */
-
-        $subjectSameDay = Schedule::where('year_id', $request->yearID)
-            ->where('major_id', $request->majorID)
-            ->where('room_id', $request->roomID)
-            ->where('subject_id', $request->subjectID)
-            ->where('day_id', $request->dayID)
-            ->exists();
-
-        if ($subjectSameDay) {
-
-            return back()->withErrors([
-                'subjectID' => 'This subject already exists today.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 7. Subject Weekly Period Limit
-        |--------------------------------------------------------------------------
-        */
-
-        if ($subject) {
-
-            $subjectWeekly = Schedule::where('year_id', $request->yearID)
-                ->where('major_id', $request->majorID)
-                ->where('room_id', $request->roomID)
-                ->where('subject_id', $request->subjectID)
-                ->count();
-
-            if ($subjectWeekly >= $subject->time_number) {
-
-                return back()->withErrors([
-                    'subjectID' => 'Subject weekly period limit reached.',
-                ])->withInput();
-
-            }
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 8. Subject Daily Maximum
-        |
-        | Same subject max 1 period/day
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $subjectDaily = Schedule::where('subject_id', $request->subjectID)
-            ->where('year_id', $request->yearID)
-            ->where('major_id', $request->majorID)
-            ->where('day_id', $request->dayID)
-            ->count();
-
-        if ($subjectDaily >= 1) {
-
-            return back()->withErrors([
-                'subjectID' => 'This subject cannot repeat more than once per day.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 9. Teacher Daily Maximum
-        |
-        | Maximum 4 periods/day
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $teacherDaily = Schedule::where('teacher_id', $request->teacherID)
-            ->where('day_id', $request->dayID)
-            ->count();
-
-        if ($teacherDaily >= 4) {
-
-            return back()->withErrors([
-                'teacherID' => 'Teacher daily maximum reached.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 10. Teacher Weekly Maximum
-        |
-        | Maximum 20 periods/week
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $teacherWeekly = Schedule::where('teacher_id', $request->teacherID)
-            ->count();
-
-        if ($teacherWeekly >= 20) {
-
-            return back()->withErrors([
-                'teacherID' => 'Teacher weekly maximum reached.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 11. Class Daily Maximum
-        |
-        | Maximum 5 periods/day
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $classDaily = Schedule::where('year_id', $request->yearID)
-            ->where('major_id', $request->majorID)
-            ->where('room_id', $request->roomID)
-            ->where('day_id', $request->dayID)
-            ->count();
-
-        if ($classDaily >= 5) {
-
-            return back()->withErrors([
-                'dayID' => 'Class daily maximum reached.',
-            ])->withInput();
-
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | 12. Subject Teacher Consistency
-        |
-        | One subject = One teacher
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $differentTeacher = Schedule::where('year_id', $request->yearID)
-            ->where('major_id', $request->majorID)
-            ->where('subject_id', $request->subjectID)
-            ->where('teacher_id', '!=', $request->teacherID)
-            ->exists();
-
-        if ($differentTeacher) {
-
-            return back()->withErrors([
-                'teacherID' => 'This subject already assigned to another teacher.',
-            ])->withInput();
-
-        }
-
-        return null;
-
     }
 
     //teacher time table lists
@@ -547,16 +982,37 @@ class ScheduleController extends Controller
     }
 
     // view schedule
+    // public function viewSchedule($id)
+    // {
+    //     $years = Year::findOrFail($id);
+
+    //     $majors    = Major::all();
+    //     $rooms     = Room::all();
+    //     $semesters = Semesters::all();
+    //     $sections  = Sections::all();
+
+    //     return view('admin.schedule.viewSchedule', compact('years', 'majors', 'rooms', 'semesters', 'sections'));
+    // }
+
     public function viewSchedule($id)
     {
         $years = Year::findOrFail($id);
 
-        $majors    = Major::all();
-        $rooms     = Room::all();
-        $semesters = Semesters::all();
-        $sections  = Sections::all();
+        $academicYears = AcademicYears::all();
+        $majors        = Major::all();
+        $rooms         = Room::all();
+        $semesters     = Semesters::all();
+        $sections      = Sections::all();
 
-        return view('admin.schedule.viewSchedule', compact('years', 'majors', 'rooms', 'semesters', 'sections'));
+        return view('admin.schedule.viewSchedule', compact(
+            'years',
+            'academicYears',
+            'majors',
+            'rooms',
+            'semesters',
+            'sections'
+        )
+        );
     }
 
     // result schedule
@@ -663,7 +1119,7 @@ class ScheduleController extends Controller
             ->download('TimeTable.pdf');
     }
 
-    // generate
+    // generate schedule
 
     public function generate(Request $request)
     {
@@ -873,41 +1329,130 @@ class ScheduleController extends Controller
     }
 
     // shift update page
-
     public function shift(Request $request, $id)
     {
-
         $request->validate([
-
-            'dayID'     => 'required',
-
-            'timeID'    => 'required',
-
-            'teacherID' => 'required',
-
-            'roomID'    => 'required',
-
+            'dayID'  => 'required|integer',
+            'timeID' => 'required|integer',
         ]);
 
-        Schedule::where('id', $id)->update([
+        DB::beginTransaction();
 
-            'day_id'     => $request->dayID,
+        try {
 
-            'time_id'    => $request->timeID,
+            // =============================================
+            // Current Schedule
+            // =============================================
 
-            'teacher_id' => $request->teacherID,
+            $schedule = Schedule::findOrFail($id);
 
-            'room_id'    => $request->roomID,
+            // =============================================
+            // Target Schedule
+            // =============================================
 
-        ]);
+            $targetSchedule = Schedule::where(
+                'academic_year_id',
+                $schedule->academic_year_id
+            )
+                ->where('semester_id', $schedule->semester_id)
+                ->where('year_id', $schedule->year_id)
+                ->where('major_id', $schedule->major_id)
+                ->where('section_id', $schedule->section_id)
+                ->where('day_id', $request->dayID)
+                ->where('time_id', $request->timeID)
+                ->where('id', '!=', $schedule->id)
+                ->first();
 
-        Alert::success(
-            'Success',
-            'Schedule Shift Successfully'
-        );
+            // =============================================
+            // Same Slot
+            // =============================================
 
-        return to_route('schedule.list');
+            if (
+                $schedule->day_id == $request->dayID &&
+                $schedule->time_id == $request->timeID
+            ) {
 
+                DB::rollBack();
+
+                Alert::warning(
+                    'Warning',
+                    'This schedule is already in this time slot.'
+                );
+
+                return back();
+            }
+
+            // =============================================
+            // Target has Schedule → SWAP
+            // =============================================
+
+            if ($targetSchedule) {
+
+                // Save current position
+                $oldDayID  = $schedule->day_id;
+                $oldTimeID = $schedule->time_id;
+
+                // -----------------------------------------
+                // Target → Current position
+                // -----------------------------------------
+
+                $targetSchedule->update([
+                    'day_id'     => $oldDayID,
+                    'time_id'    => $oldTimeID,
+
+                    'is_shifted' => true,
+                ]);
+
+                // -----------------------------------------
+                // Current → Target position
+                // -----------------------------------------
+
+                $schedule->update([
+                    'day_id'     => $request->dayID,
+                    'time_id'    => $request->timeID,
+
+                    'is_shifted' => true,
+                ]);
+            }
+
+            // =============================================
+            // Target Empty → Normal Shift
+            // =============================================
+
+            else {
+
+                $schedule->update([
+                    'day_id'     => $request->dayID,
+                    'time_id'    => $request->timeID,
+
+                    'is_shifted' => true,
+                ]);
+            }
+
+            // =============================================
+            // Commit
+            // =============================================
+
+            DB::commit();
+
+            Alert::success(
+                'Success',
+                'Schedule shifted successfully.'
+            );
+
+            return to_route('schedule.list');
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+
+            Alert::error(
+                'Error',
+                $e->getMessage()
+            );
+
+            return back();
+        }
     }
 
 }

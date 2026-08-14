@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreignId('time_id');
             $table->foreignId('semester_id');
             $table->foreignId('section_id');
+            $table->boolean('is_shifted')->default(false);
             $table->timestamps();
         });
     }

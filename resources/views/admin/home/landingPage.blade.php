@@ -474,7 +474,7 @@
 
 
 
-                                    <button type="submit" class="btn btn-danger btn-sm w-100"
+                                    {{-- <button type="submit" class="btn btn-danger btn-sm w-100"
                                         onclick="return confirm('Delete this subject?')">
 
 
@@ -483,7 +483,7 @@
                                         Remove
 
 
-                                    </button>
+                                    </button> --}}
 
 
 

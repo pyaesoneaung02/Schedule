@@ -143,8 +143,7 @@
                                 </label>
 
 
-                                <select name="semesterID"
-                                    class="form-control @error('semesterID') is-invalid @enderror">
+                                <select name="semesterID" class="form-control @error('semesterID') is-invalid @enderror">
 
 
                                     <option value="">
@@ -153,14 +152,12 @@
 
 
                                     @foreach ($semesters as $item)
-
                                         <option value="{{ $item->id }}"
-                                            @if(old('semesterID') == $item->id) selected @endif>
+                                            @if (old('semesterID') == $item->id) selected @endif>
 
                                             {{ $item->name }}
 
                                         </option>
-
                                     @endforeach
 
 
@@ -168,11 +165,9 @@
 
 
                                 @error('semesterID')
-
                                     <span class="invalid-feedback">
                                         {{ $message }}
                                     </span>
-
                                 @enderror
 
 
@@ -186,8 +181,7 @@
                                 </label>
 
 
-                                <select name="sectionID"
-                                    class="form-control @error('sectionID') is-invalid @enderror">
+                                <select name="sectionID" class="form-control @error('sectionID') is-invalid @enderror">
 
 
                                     <option value="">
@@ -196,14 +190,12 @@
 
 
                                     @foreach ($sections as $item)
-
                                         <option value="{{ $item->id }}"
-                                            @if(old('sectionID') == $item->id) selected @endif>
+                                            @if (old('sectionID') == $item->id) selected @endif>
 
                                             {{ $item->name }}
 
                                         </option>
-
                                     @endforeach
 
 
@@ -211,11 +203,9 @@
 
 
                                 @error('sectionID')
-
                                     <span class="invalid-feedback">
                                         {{ $message }}
                                     </span>
-
                                 @enderror
 
 
@@ -231,6 +221,20 @@
 
 
                             </button>
+
+                            {{-- <a href="{{ route('schedule.autoGenerate', [
+                                'academicYearID' => $academicYearID,
+                                'semesterID' => $semesterID,
+                                'yearID' => $yearID,
+                                'majorID' => $majorID,
+                                'sectionID' => $sectionID,
+                            ]) }}"
+                                class="btn btn-success">
+
+                                <i class="fas fa-magic me-1"></i>
+                                Auto Generate Schedule
+
+                            </a> --}}
 
 
                             <a href="{{ route('schedule.teacherTimeTable', $years->id) }}"

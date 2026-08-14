@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SocialLoginController;
 use App\Http\Controllers\User\UserController;
@@ -10,14 +11,12 @@ require_once __DIR__ . '/admin.php';
 require_once __DIR__ . '/user.php';
 require __DIR__ . '/auth.php';
 
-
 // Route::get('/', function () {
 //     return view('welcome');
 // });
 // Route::redirect('/', '/login');
 
 Route::get('/', [UserController::class, 'landingPage'])->name('landingPage');
-
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -36,15 +35,14 @@ Route::get('/auth/{provider}/redirect', [SocialLoginController::class, 'redirect
 
 Route::get('/auth/{provider}/callback', [SocialLoginController::class, 'callback'])->name('socialCallback');
 
-
 //landing page
 // Route::get('/landingPage', [UserController::class, 'landingPage'])->name('landingPage');
 
 //show subjects by year
-Route::get('/subjects/year/{id}',[UserController::class, 'filterByYear'])->name('subject.filter.year');
+Route::get('/subjects/year/{id}', [UserController::class, 'filterByYear'])->name('subject.filter.year');
 
 //detail subject page
-Route::get('/subject/detail/{id}',[UserController::class, 'subjectDetail'])->name('subject.detail');
+Route::get('/subject/detail/{id}', [UserController::class, 'subjectDetail'])->name('subject.detail');
 
 //delete subject
 Route::delete('/subjects/{id}', [UserController::class, 'delete'])->name('subject.delete');
@@ -52,5 +50,23 @@ Route::delete('/subjects/{id}', [UserController::class, 'delete'])->name('subjec
 //about page
 Route::get('/about', [UserController::class, 'about'])->name('about');
 
+// ======================================================
+// AUTO GENERATE TIMETABLE - ContactController
+// ======================================================
 
+
+Route::get(
+    '/schedule/auto-generate',
+    [ContactController::class, 'autoGenerate']
+)->name('schedule.autoGenerate');
+
+Route::post(
+    '/schedule/auto-generate',
+    [ContactController::class, 'createSchedule']
+)->name('schedule.createSchedule');
+
+Route::get(
+    '/schedule/show',
+    [ContactController::class, 'result']
+)->name('schedule.show');
 

@@ -2,7 +2,7 @@
 use App\Http\Controllers\AcademicYearsController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DayController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\MajorController;
@@ -216,8 +216,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
     });
 
     // comments
-    Route::group(['prefix' => 'comment'], function () {
-        Route::get('list', [CommentController::class, 'commentList'])->name('comment.list');
+    Route::group(['prefix' => 'contact'], function () {
+        Route::get('list', [ContactController::class, 'contactList'])->name('contact.list');
+        Route::get('delete/{id}', [ContactController::class, 'delete'])->name('contact.delete');
+        Route::put('accept/{id}', [ContactController::class, 'accept'])->name('contact.accept');
+        Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject');
+        Route::get('show/{id}',[ContactController::class, 'show'])->name('contact.show');
     });
 
 });

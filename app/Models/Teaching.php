@@ -2,10 +2,11 @@
 namespace App\Models;
 
 use App\Models\AcademicYears;
+use App\Models\Day;
 use App\Models\Major;
 use App\Models\Room;
-use App\Models\Section;
-use App\Models\Semester;
+use App\Models\Sections;
+use App\Models\Semesters;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Year;
@@ -40,7 +41,7 @@ class Teaching extends Model
     public function semester()
     {
         return $this->belongsTo(
-            Semester::class,
+            Semesters::class,
             'semester_id'
         );
     }
@@ -94,7 +95,7 @@ class Teaching extends Model
     public function section()
     {
         return $this->belongsTo(
-            Section::class,
+            Sections::class,
             'section_id'
         );
     }
@@ -103,8 +104,8 @@ class Teaching extends Model
     public function day()
     {
         return $this->belongsTo(
-            Year::class,
-            'year_id'
+            Day::class,
+            'day_id'
         );
     }
 

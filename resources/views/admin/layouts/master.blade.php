@@ -306,6 +306,10 @@
                 <a class="nav-link" href="{{ route('teaching.create') }}"><i class="mr-3 fa-solid fa-chalkboard"></i><span>Teaching Assignments</span></a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('schedule.autoGenerate') }}"><i class="mr-3 fa-solid fa-calendar-days"></i><span>Auto Generate Timetable</span></a>
+            </li>
+
             @if (auth()->check() && auth()->user()->role == 'superadmin')
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('schedule.create') }}"><i class="mr-3 fa-solid fa-calendar-days"></i><span>Schedule Management</span></a>
@@ -317,7 +321,7 @@
             @endif
 
              <li class="nav-item">
-                <a class="nav-link" href="{{ route('comment.list') }}"><i class="mr-3 fa-solid fa-comment"></i><span>Comments</span></a>
+                <a class="nav-link" href="{{ route('contact.list') }}"><i class="mr-3 fa-solid fa-comment"></i><span>Contact Messages</span></a>
             </li>
 
             <li class="nav-item">
@@ -338,11 +342,104 @@
             <!-- Main Content -->
             <div id="content">
 
-                <!-- Topbar -->
+                <!-- ================= TOPBAR ================= -->
                 <nav class="mb-4 bg-white shadow navbar navbar-expand navbar-light topbar static-top">
 
                     <!-- Topbar Navbar -->
                     <ul class="ml-auto navbar-nav">
+
+
+                        <!-- notification start-->
+                        @php
+                            $unreadContacts = \App\Models\Contact::where('status', 'pending')
+                                ->latest()
+                                ->take(5)
+                                ->get();
+
+                            $unreadCount = \App\Models\Contact::where('status', 'pending')
+                                ->count();
+                        @endphp
+
+                        <li class="nav-item dropdown no-arrow mx-2">
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="notificationDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
+                                <i class="fas fa-bell fa-fw"></i>
+
+                                @if($unreadCount > 0)
+                                    <span class="badge badge-danger badge-counter">
+                                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                                    </span>
+                                @endif
+
+                            </a>
+
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="notificationDropdown">
+
+                                <h6 class="dropdown-header bg-primary text-white">
+                                    <i class="fas fa-bell mr-2"></i>
+                                    Notifications
+                                </h6>
+
+                                @forelse($unreadContacts as $contact)
+
+                                    <a class="dropdown-item d-flex align-items-center"
+                                       href="{{ route('contact.read', $contact->id) }}">
+
+                                        <div class="mr-3">
+                                            <div class="icon-circle bg-primary">
+                                                <i class="fas fa-comment text-white"></i>
+                                            </div>
+                                        </div>
+
+                                        <div>
+
+                                            <div class="small text-gray-500">
+                                                {{ $contact->created_at->format('d M Y, h:i A') }}
+                                            </div>
+
+                                            <span class="font-weight-bold">
+                                                {{ $contact->name }}
+                                            </span>
+
+                                            <div class="small text-gray-600">
+                                                {{ \Illuminate\Support\Str::limit($contact->message, 40) }}
+                                            </div>
+
+                                        </div>
+
+                                    </a>
+
+                                @empty
+
+                                    <div class="text-center dropdown-item">
+                                        <span class="text-muted">
+                                            No new notifications
+                                        </span>
+                                    </div>
+
+                                @endforelse
+
+                                <a href="{{ route('contact.list') }}"
+                                   class="text-center dropdown-item small text-primary">
+
+                                    View All Messages
+
+                                </a>
+
+                            </div>
+
+                        </li>
+
+                        <!-- notification end-->
+
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
@@ -392,7 +489,7 @@
                     </ul>
 
                 </nav>
-                <!-- End of Topbar -->
+                <!-- ================= END TOPBAR ================= -->
 
                 <!-- Page Content -->
                 @yield('content')

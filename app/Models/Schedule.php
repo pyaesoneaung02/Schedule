@@ -28,6 +28,7 @@ class Schedule extends Model
         'time_id',
         'semester_id',
         'section_id',
+        'is_shifted',
     ];
 
      //to delete schedule only
@@ -81,7 +82,7 @@ class Schedule extends Model
     //to delete semester only
     public function semester()
     {
-        return $this->belongsTo(Semesters::class);
+        return $this->belongsTo(Semesters::class, 'semester_id');
     }
 
     //to delete academic years only
@@ -89,4 +90,8 @@ class Schedule extends Model
     {
         return $this->belongsTo(AcademicYears::class);
     }
+
+    protected $casts = [
+        'is_shifted' => 'boolean',
+    ];
 }
