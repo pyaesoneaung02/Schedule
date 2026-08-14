@@ -56,7 +56,7 @@
 
 
                                     <option value="">
-                                        Choose Year
+                                        -- Choose Year --
                                     </option>
 
 
@@ -92,7 +92,7 @@
 
 
                                     <option value="">
-                                        Choose Major
+                                        -- Choose Major --
                                     </option>
 
 

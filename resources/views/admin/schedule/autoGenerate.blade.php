@@ -13,7 +13,7 @@
                     <div class="card-header bg-primary text-white">
 
                         <h5 class="mb-0">
-                            <i class="fas fa-magic mr-2"></i>
+                            <i class="fa-solid fa-bolt mr-2"></i>
                             Auto Generate Timetable
                         </h5>
 
@@ -228,7 +228,7 @@
 
                                         <button type="submit" class="mb-3 btn btn-primary w-100">
 
-                                            <i class="mr-2 fa-solid fa-floppy-disk"></i>
+                                            <i class="mr-2 fa-solid fa-bolt"></i>
 
                                             Auto Generate Schedule
 

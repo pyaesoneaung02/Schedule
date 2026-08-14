@@ -303,11 +303,11 @@
             </li> --}}
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('teaching.create') }}"><i class="mr-3 fa-solid fa-chalkboard"></i><span>Teaching Assignments</span></a>
+                <a class="nav-link" href="{{ route('teaching.create') }}"><i class="mr-3 fa-solid fa-chalkboard"></i><span>Teaching Classes</span></a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('schedule.autoGenerate') }}"><i class="mr-3 fa-solid fa-calendar-days"></i><span>Auto Generate Timetable</span></a>
+                <a class="nav-link" href="{{ route('schedule.autoGenerate') }}"><i class="mr-3 fa-solid fa-bolt"></i><span>Auto Generate Timetable</span></a>
             </li>
 
             @if (auth()->check() && auth()->user()->role == 'superadmin')
@@ -348,9 +348,12 @@
                     <!-- Topbar Navbar -->
                     <ul class="ml-auto navbar-nav">
 
+                        <!-- ===================================================== -->
+                        <!-- NOTIFICATION -->
+                        <!-- ===================================================== -->
 
-                        <!-- notification start-->
                         @php
+
                             $unreadContacts = \App\Models\Contact::where('status', 'pending')
                                 ->latest()
                                 ->take(5)
@@ -358,6 +361,7 @@
 
                             $unreadCount = \App\Models\Contact::where('status', 'pending')
                                 ->count();
+
                         @endphp
 
                         <li class="nav-item dropdown no-arrow mx-2">
@@ -372,45 +376,74 @@
 
                                 <i class="fas fa-bell fa-fw"></i>
 
-                                @if($unreadCount > 0)
+                                @if ($unreadCount > 0)
+
                                     <span class="badge badge-danger badge-counter">
+
                                         {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+
                                     </span>
+
                                 @endif
 
                             </a>
 
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                                 aria-labelledby="notificationDropdown">
 
+                            <!-- Notification Dropdown -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="notificationDropdown"
+                                 style="min-width: 350px;">
+
+                                <!-- Header -->
                                 <h6 class="dropdown-header bg-primary text-white">
+
                                     <i class="fas fa-bell mr-2"></i>
+
                                     Notifications
+
                                 </h6>
 
-                                @forelse($unreadContacts as $contact)
 
-                                    <a class="dropdown-item d-flex align-items-center"
-                                       href="{{ route('contact.read', $contact->id) }}">
+                                <!-- Notification List -->
 
+                                @forelse ($unreadContacts as $contact)
+
+                                    <a href="{{ route('contact.show', $contact->id) }}"
+                                       class="dropdown-item d-flex align-items-center">
+
+                                        <!-- Icon -->
                                         <div class="mr-3">
+
                                             <div class="icon-circle bg-primary">
+
                                                 <i class="fas fa-comment text-white"></i>
+
                                             </div>
+
                                         </div>
 
+
+                                        <!-- Message -->
                                         <div>
 
                                             <div class="small text-gray-500">
+
                                                 {{ $contact->created_at->format('d M Y, h:i A') }}
+
                                             </div>
 
+
                                             <span class="font-weight-bold">
+
                                                 {{ $contact->name }}
+
                                             </span>
 
+
                                             <div class="small text-gray-600">
+
                                                 {{ \Illuminate\Support\Str::limit($contact->message, 40) }}
+
                                             </div>
 
                                         </div>
@@ -420,13 +453,19 @@
                                 @empty
 
                                     <div class="text-center dropdown-item">
+
                                         <span class="text-muted">
+
                                             No new notifications
+
                                         </span>
+
                                     </div>
 
                                 @endforelse
 
+
+                                <!-- View All -->
                                 <a href="{{ route('contact.list') }}"
                                    class="text-center dropdown-item small text-primary">
 
@@ -438,57 +477,137 @@
 
                         </li>
 
-                        <!-- notification end-->
 
-                        <!-- Nav Item - User Information -->
+                        <!-- ===================================================== -->
+                        <!-- USER INFORMATION -->
+                        <!-- ===================================================== -->
+
                         <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 text-gray-600 d-none d-lg-inline small">{{ Auth::user()->name }}</span>
-                                <img class="img-profile rounded-circle" src="{{ asset(Auth::user()->profile != null ? 'profile/' . Auth::user()->profile : 'admin/img/default-profile.jpg') }}">
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="shadow dropdown-menu dropdown-menu-right animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="{{ route('profile.accountProfile') }}">
-                                    <i class="mr-2 text-dark fas fa-user fa-sm fa-fw"></i>
-                                    Profile
-                                </a>
-                                @if (auth()->check() && auth()->user()->role == 'superadmin')
-                                    <a class="dropdown-item" href="{{ route('profile#createNewAdminAccount') }}">
-                                        <i class="mr-2 text-dark fa-solid fa-graduation-cap fa-sm fa-fw"></i>
-                                        Create Administrator
-                                    </a>
-                                    <a class="dropdown-item" href="{{ route('profile.adminList') }}">
-                                        <i class="mr-2 text-dark fa-solid fa-graduation-cap fa-sm fa-fw"></i>
-                                        Administrators
-                                    </a>
-                                @endif
-                                   <a class="dropdown-item" href="{{ route('profile.userList')}}">
-                                    {{-- <i class="mr-2 text-dark fa-solid fa-user-graduate fa-sm fa-fw"></i> --}}
-                                    <i class="mr-2 text-dark fa-solid fa-users fa-sm fa-fw"></i>
-                                    Users
-                                </a>
-                                <a class="dropdown-item" href="{{ route('profile.changePassword.page') }}">
-                                    <i class="mr-2 text-dark fa-solid fa-lock fa-sm fa-fw"></i>
-                                    Change Password
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <span class="dropdown-item" data-toggle="modal" data-target="#logoutModal">
-                                    <form action="{{ route('logout') }}" method="POST">
-                                        @csrf
-                                        <span class="nav-link">
-                                            <button type="submit" class="text-white btn bg-dark w-100"><i
-                                                    class="fa-solid fa-right-from-bracket"></i>Logout</button>
-                                        </span>
-                                    </form>
+
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="userDropdown"
+                               role="button"
+                               data-toggle="dropdown"
+                               aria-haspopup="true"
+                               aria-expanded="false">
+
+
+                                <!-- Username -->
+                                <span class="mr-2 text-gray-600 d-none d-lg-inline small">
+
+                                    {{ Auth::user()->name }}
+
                                 </span>
+
+
+                                <!-- Profile Image -->
+                                <img
+                                    class="img-profile rounded-circle"
+                                    src="{{ asset(
+                                        Auth::user()->profile != null
+                                            ? 'profile/' . Auth::user()->profile
+                                            : 'admin/img/default-profile.jpg'
+                                    ) }}"
+                                >
+
+                            </a>
+
+
+                            <!-- User Dropdown -->
+                            <div class="shadow dropdown-menu dropdown-menu-right animated--grow-in"
+                                 aria-labelledby="userDropdown">
+
+
+                                <!-- Profile -->
+                                <a class="dropdown-item"
+                                   href="{{ route('profile.accountProfile') }}">
+
+                                    <i class="mr-2 text-dark fas fa-user fa-sm fa-fw"></i>
+
+                                    Profile
+
+                                </a>
+
+
+                                <!-- Super Admin -->
+                                @if (auth()->check() && auth()->user()->role == 'superadmin')
+
+                                    <a class="dropdown-item"
+                                       href="{{ route('profile#createNewAdminAccount') }}">
+
+                                        <i class="mr-2 text-dark fa-solid fa-graduation-cap fa-sm fa-fw"></i>
+
+                                        Create Administrator
+
+                                    </a>
+
+
+                                    <a class="dropdown-item"
+                                       href="{{ route('profile.adminList') }}">
+
+                                        <i class="mr-2 text-dark fa-solid fa-graduation-cap fa-sm fa-fw"></i>
+
+                                        Administrators
+
+                                    </a>
+
+                                @endif
+
+
+                                <!-- Users -->
+                                <a class="dropdown-item"
+                                   href="{{ route('profile.userList') }}">
+
+                                    <i class="mr-2 text-dark fa-solid fa-users fa-sm fa-fw"></i>
+
+                                    Users
+
+                                </a>
+
+
+                                <!-- Change Password -->
+                                <a class="dropdown-item"
+                                   href="{{ route('profile.changePassword.page') }}">
+
+                                    <i class="mr-2 text-dark fa-solid fa-lock fa-sm fa-fw"></i>
+
+                                    Change Password
+
+                                </a>
+
+
+                                <!-- Divider -->
+                                <div class="dropdown-divider"></div>
+
+
+                                <!-- Logout -->
+                                <form action="{{ route('logout') }}"
+                                      method="POST"
+                                      class="px-3 py-2">
+
+                                    @csrf
+
+                                    <button type="submit"
+                                            class="text-white btn bg-dark w-100">
+
+                                        <i class="mr-2 fa-solid fa-right-from-bracket"></i>
+
+                                        Logout
+
+                                    </button>
+
+                                </form>
+
+
                             </div>
+
                         </li>
 
                     </ul>
 
                 </nav>
+
                 <!-- ================= END TOPBAR ================= -->
 
                 <!-- Page Content -->

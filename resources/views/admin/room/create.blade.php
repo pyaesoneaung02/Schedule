@@ -80,7 +80,7 @@
 
 
                                             <option value="">
-                                                Choose Year
+                                                -- Choose Year --
                                             </option>
 
 
@@ -119,7 +119,7 @@
 
 
                                             <option value="">
-                                                Choose Major
+                                                -- Choose Major --
                                             </option>
 
 
@@ -153,7 +153,9 @@
                                         <select name="sectionID"
                                             class="form-control @error('sectionID') is-invalid @enderror">
 
-                                            <option value="">Choose Section</option>
+                                            <option value="">
+                                                -- Choose Section --
+                                            </option>
 
                                             @foreach ($sections as $item)
                                                 <option value="{{ $item->id }}"

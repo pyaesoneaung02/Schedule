@@ -188,7 +188,7 @@
 
 
                                             <option value="">
-                                                Choose Academic Year
+                                                -- Choose Academic Year --
                                             </option>
 
 
@@ -227,7 +227,7 @@
 
 
                                             <option value="">
-                                                Choose Year
+                                                -- Choose Year --
                                             </option>
 
 
@@ -263,7 +263,7 @@
 
 
                                             <option value="">
-                                                Choose Major
+                                                -- Choose Major --
                                             </option>
 
 
@@ -300,7 +300,7 @@
 
 
                                             <option value="">
-                                                Choose Class
+                                                -- Choose Class --
                                             </option>
 
 
@@ -338,7 +338,7 @@
 
 
                                             <option value="">
-                                                Choose Subject
+                                                -- Choose Subject --
                                             </option>
 
 
@@ -376,7 +376,7 @@
 
 
                                             <option value="">
-                                                Choose Section
+                                                -- Choose Section --
                                             </option>
 
 
@@ -412,7 +412,7 @@
                                     <div class="mb-3">
 
                                         <label class="form-label">
-                                            Select Teacher
+                                            Select Teacher 
                                         </label>
 
 
@@ -421,7 +421,7 @@
 
 
                                             <option value="">
-                                                Choose Teacher
+                                                -- Choose Teacher --
                                             </option>
 
 
@@ -458,7 +458,7 @@
 
 
                                             <option value="">
-                                                Choose Day
+                                                -- Choose Day --
                                             </option>
 
 
@@ -495,7 +495,7 @@
 
 
                                             <option value="">
-                                                Choose Time
+                                                -- Choose Time --
                                             </option>
 
 
@@ -531,7 +531,7 @@
                                             class="form-control @error('subjectID') is-invalid @enderror">
 
                                             <option value="">
-                                                Choose Subject
+                                                -- Choose Subject --
                                             </option>
 
                                             @foreach ($subjects as $item)
@@ -565,7 +565,7 @@
 
 
                                             <option value="">
-                                                Choose Semester
+                                                -- Choose Semester --
                                             </option>
 
 

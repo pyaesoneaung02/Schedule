@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>University Subject Portal</title>
+    <title>UCSMG</title>
 
 
     <!-- Bootstrap 5 -->
@@ -169,7 +169,7 @@
 
             <a class="navbar-brand" href="#">
 
-                🎓 University Subject Portal
+                🎓 UCSMG
 
             </a>
 
@@ -424,7 +424,7 @@
 
 
 
-                            <small class="text-muted">
+                            <small class="text-muted mb-3">
 
                                 {{ $subject->year->name ?? 'Year' }}
                                 |
@@ -435,7 +435,7 @@
 
 
 
-                            <div class="my-3 text-primary">
+                            {{-- <div class="my-3 text-primary">
 
 
                                 <i class="bi bi-clock"></i>
@@ -443,7 +443,7 @@
                                 {{ $subject->time_number }} Credit Hours
 
 
-                            </div>
+                            </div> --}}
 
 
 

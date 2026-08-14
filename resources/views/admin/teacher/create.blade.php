@@ -171,10 +171,8 @@
 
 
                                             <option value="">
-                                                Choose Position
+                                                -- Choose Position --
                                             </option>
-
-
 
                                             @foreach ($positions as $item)
                                                 <option value="{{ $item->id }}"
@@ -188,8 +186,6 @@
 
                                         </select>
 
-
-
                                         @error('positionID')
                                             <span class="invalid-feedback">
                                                 {{ $message }}
@@ -199,12 +195,6 @@
 
                                     </div>
 
-
-
-
-
-
-
                                     {{-- Department --}}
                                     <div class="mb-3">
 
@@ -212,17 +202,13 @@
                                             Select Department
                                         </label>
 
-
-
                                         <select name="departmentID"
                                             class="form-control @error('departmentID') is-invalid @enderror">
 
 
                                             <option value="">
-                                                Choose Department
+                                                -- Choose Department --
                                             </option>
-
-
 
                                             @foreach ($departments as $item)
                                                 <option value="{{ $item->id }}"
@@ -236,9 +222,6 @@
 
                                         </select>
 
-
-
-
                                         @error('departmentID')
                                             <span class="invalid-feedback">
                                                 {{ $message }}
@@ -248,16 +231,10 @@
 
                                     </div>
 
-
-
                                 </div>
 
 
                             </div>
-
-
-
-
 
                             <button type="submit" class="mb-3 btn btn-primary w-100">
 
@@ -269,10 +246,6 @@
 
                             </button>
 
-
-
-
-
                             <a href="{{ route('teacher.list') }}" class="btn btn-outline-primary w-100">
 
 
@@ -283,12 +256,7 @@
 
                             </a>
 
-
-
-
                         </form>
-
-
 
                     </div>
 

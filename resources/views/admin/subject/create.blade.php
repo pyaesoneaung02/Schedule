@@ -147,7 +147,7 @@
 
 
                                             <option value="">
-                                                Choose Academic Year
+                                                -- Choose Academic Year --
                                             </option>
 
 
@@ -218,7 +218,7 @@
 
 
                                             <option value="">
-                                                Choose Year
+                                                -- Choose Year --
                                             </option>
 
 
@@ -258,7 +258,7 @@
 
 
                                             <option value="">
-                                                Choose Semester
+                                                -- Choose Semester --
                                             </option>
 
 
@@ -304,7 +304,7 @@
 
 
                                     <option value="">
-                                        Choose Major
+                                        -- Choose Major --
                                     </option>
 
                                     @foreach ($majors as $item)

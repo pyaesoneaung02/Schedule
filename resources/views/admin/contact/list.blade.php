@@ -135,7 +135,7 @@
 
                                     <!-- Phone -->
                                     <td>
-                                        {{ $contact->teacher?->user?->phone ?? 'N/A' }}
+                                        {{ $contact->teacher?->user?->phone ?? '09xxxxxxxxx' }}
                                     </td>
 
                                     <!-- Message -->

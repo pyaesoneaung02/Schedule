@@ -214,14 +214,18 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::post('shift/{id}', [ScheduleController::class, 'shift'])->name('schedule.shift');
 
     });
-
-    // comments
+    // contacts
     Route::group(['prefix' => 'contact'], function () {
+
         Route::get('list', [ContactController::class, 'contactList'])->name('contact.list');
+
+        Route::get('show/{id}', [ContactController::class, 'show'])->name('contact.show');
+
         Route::get('delete/{id}', [ContactController::class, 'delete'])->name('contact.delete');
+
         Route::put('accept/{id}', [ContactController::class, 'accept'])->name('contact.accept');
+
         Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject');
-        Route::get('show/{id}',[ContactController::class, 'show'])->name('contact.show');
     });
 
 });

@@ -69,7 +69,7 @@
 
 
                                     <option value="">
-                                        Choose Room
+                                        -- Choose Room --
                                     </option>
 
 
@@ -110,7 +110,7 @@
 
 
                                     <option value="">
-                                        Choose Major
+                                        -- Choose Major --
                                     </option>
 
 
@@ -147,7 +147,7 @@
 
 
                                     <option value="">
-                                        Choose Semester
+                                        -- Choose Semester --
                                     </option>
 
 
@@ -185,7 +185,7 @@
 
 
                                     <option value="">
-                                        Choose Section
+                                        -- Choose Section --
                                     </option>
 
 
