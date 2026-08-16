@@ -53,7 +53,7 @@ class UserController extends Controller
     //landing page route start
 
     // landing page route
-    public function landingPage()
+    public function page()
     {
 
         $subjects = Subject::with([
@@ -69,7 +69,7 @@ class UserController extends Controller
 
         $selectedYear = null;
 
-        return view('admin.home.landingPage', compact(
+        return view('admin.home.page', compact(
             'subjects',
             'years',
             'majors',
@@ -80,12 +80,12 @@ class UserController extends Controller
     }
 
     // about page route
-    public function about()
-    {
+    // public function about()
+    // {
 
-        return view('admin.home.about');
+    //     return view('admin.home.about');
 
-    }
+    // }
 
     // filter subjects by year
     public function filterByYear($id)
@@ -106,7 +106,7 @@ class UserController extends Controller
 
         $teachers = Teacher::all();
 
-        return view('admin.home.landingPage', compact(
+        return view('admin.home.page', compact(
             'subjects',
             'years',
             'majors',
@@ -126,7 +126,7 @@ class UserController extends Controller
             'semester',
         ])->findOrFail($id);
 
-        return view('admin.home.detail', compact('subject'));
+        return view('admin.home.subjectDetail', compact('subject'));
     }
 
     public function delete($id)
@@ -140,7 +140,7 @@ class UserController extends Controller
 
         $subject->delete();
 
-        return redirect()->route('landingPage')->with('success', 'Subject removed successfully');
+        return redirect()->route('page')->with('success', 'Subject removed successfully');
 
     }
 

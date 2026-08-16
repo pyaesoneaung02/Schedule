@@ -93,7 +93,7 @@
                 <i class="bi bi-github"></i> Continue with GitHub
             </a>
 
-            <a href="{{ route('landingPage')}}" class="btn btn-outline-primary">
+            <a href="{{ route('page')}}" class="btn btn-outline-primary">
                 <i class="bi bi-arrow-left-circle"></i> Back Welcome Page
             </a>
 

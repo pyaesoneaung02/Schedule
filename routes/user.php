@@ -33,10 +33,7 @@ Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
     Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
 
     //contact read
-    Route::get(
-        '/contact/read/{id}',
-        [ContactController::class, 'read']
-    )->name('contact.read');
+    Route::get('/contact/read/{id}',[ContactController::class, 'read'])->name('contact.read');
 
     // Profile Routes
     Route::get('profile', [UserController::class, 'profile'])->name('user.profile');

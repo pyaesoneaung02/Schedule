@@ -100,11 +100,11 @@
                                     <strong>
                                         <i class="mr-1 fa-solid fa-phone text-success"></i>
 
-                                        {{ $contact->teacher->user->phone ?? 'N/A' }}
+                                        {{ $contact->teacher->user->phone ?? '09-xxxxxxxxx' }}
                                     </strong>
                                 @else
                                     <strong>
-                                        N/A
+                                        09-xxxxxxxxx
                                     </strong>
                                 @endif
 

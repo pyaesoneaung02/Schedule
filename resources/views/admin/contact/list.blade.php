@@ -5,81 +5,425 @@
 @endphp
 
 @section('content')
-    <div class="container-fluid">
+    <style>
+        /* =====================================================
+           CONTACT PAGE
+        ===================================================== */
 
-        {{-- Page Heading --}}
-        <div class="mb-4 d-flex justify-content-between align-items-center">
+        .contact-page {
+            padding-bottom: 30px;
+        }
 
+        /* Header */
+        .contact-header {
+            margin-bottom: 25px;
+        }
+
+        .contact-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .contact-title i {
+            color: #4e73df;
+        }
+
+        .contact-subtitle {
+            color: #858796;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Search */
+        .contact-search {
+            width: 320px;
+        }
+
+        .contact-search .form-control {
+            height: 42px;
+            border: 1px solid #dfe3e8;
+            border-right: 0;
+            border-radius: 8px 0 0 8px;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
+        .contact-search .form-control:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, .08);
+        }
+
+        .contact-search .btn {
+            width: 48px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* Main Card */
+        .contact-card {
+            border: 0;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 5px 25px rgba(58, 59, 69, .08);
+        }
+
+        .contact-card-header {
+            padding: 18px 22px;
+            background: linear-gradient(135deg,
+                    #4e73df,
+                    #224abe);
+            color: #fff;
+        }
+
+        .contact-card-header h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .contact-card-header i {
+            margin-right: 8px;
+        }
+
+        .contact-card-body {
+            padding: 0;
+        }
+
+        /* Table */
+        .contact-table {
+            margin: 0;
+            border: 0 !important;
+        }
+
+        .contact-table thead th {
+            background: #f8f9fc;
+            color: #5a5c69;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            border-top: 0;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 15px 14px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+
+        .contact-table tbody td {
+            padding: 15px 14px;
+            font-size: 13px;
+            color: #5a5c69;
+            border-color: #edf0f5;
+            vertical-align: middle;
+        }
+
+        .contact-table tbody tr {
+            transition: all .2s ease;
+        }
+
+        .contact-table tbody tr:hover {
+            background: #f8faff;
+        }
+
+        /* Teacher */
+        .teacher-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .teacher-avatar {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,
+                    #4e73df,
+                    #224abe);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .teacher-name {
+            color: #2e3a59;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        /* Email */
+        .email-text {
+            color: #5a5c69;
+            font-size: 12px;
+        }
+
+        /* Phone */
+        .phone-text {
+            white-space: nowrap;
+            color: #6c757d;
+        }
+
+        /* Message */
+        .message-preview {
+            max-width: 250px;
+            line-height: 1.5;
+            color: #6c757d;
+        }
+
+        /* Status */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-pending {
+            color: #856404;
+            background: #fff3cd;
+        }
+
+        .status-accepted {
+            color: #155724;
+            background: #d4edda;
+        }
+
+        .status-rejected {
+            color: #721c24;
+            background: #f8d7da;
+        }
+
+        .status-default {
+            color: #495057;
+            background: #e9ecef;
+        }
+
+        /* Date */
+        .date-text {
+            white-space: nowrap;
+            font-size: 12px;
+            color: #858796;
+        }
+
+        /* Actions */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .action-btn {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 7px !important;
+            font-size: 12px;
+            transition: all .2s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Empty */
+        .empty-state {
+            padding: 70px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 18px;
+            border-radius: 50%;
+            background: #f1f4f9;
+            color: #b7becb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .empty-state h5 {
+            color: #5a5c69;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            color: #858796;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* Pagination */
+        .contact-pagination {
+            padding: 18px 22px;
+            border-top: 1px solid #edf0f5;
+            background: #fff;
+        }
+
+        .contact-pagination nav {
+            margin: 0;
+        }
+
+        .contact-pagination .pagination {
+            margin-bottom: 0;
+        }
+
+        /* Responsive */
+        @media(max-width: 991px) {
+
+            .contact-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+
+            .contact-search {
+                width: 100%;
+            }
+
+            .message-preview {
+                max-width: 180px;
+            }
+        }
+
+        @media(max-width: 576px) {
+
+            .contact-title {
+                font-size: 20px;
+            }
+
+            .contact-card-header {
+                padding: 15px;
+            }
+
+            .contact-table thead th,
+            .contact-table tbody td {
+                padding: 12px 10px;
+            }
+
+            .teacher-avatar {
+                width: 32px;
+                height: 32px;
+                min-width: 32px;
+            }
+
+            .action-btn {
+                width: 32px;
+                height: 32px;
+            }
+
+        }
+    </style>
+
+
+    <div class="container-fluid contact-page">
+
+        {{-- =====================================================
+         PAGE HEADER
+    ====================================================== --}}
+
+        <div class="contact-header d-flex justify-content-between align-items-center">
+
+            {{-- Title --}}
             <div>
-                <h2 class="text-primary font-weight-bold">
-                    <i class="mr-2 fa-solid fa-comment"></i>
-                    Contact List
+
+                <h2 class="contact-title">
+
+                    <i class="mr-2 fa-solid fa-envelope-open-text"></i>
+
+                    Contact Messages
+
                 </h2>
 
-                <p class="mb-0 text-muted">
-                    Manage contact messages.
+                <p class="contact-subtitle">
+
+                    Manage and respond to messages from teachers.
+
                 </p>
+
             </div>
+
 
             {{-- Search --}}
-            <div>
+            <form action="{{ route('contact.list') }}" method="GET" class="contact-search">
 
-                <form action="{{ route('contact.list') }}" method="GET">
+                <div class="input-group">
 
-                    <div class="input-group">
+                    <input type="text" name="searchKey" value="{{ request('searchKey') }}" class="form-control"
+                        placeholder="Search teacher, email or message...">
 
-                        <input type="text" name="searchKey" value="{{ request('searchKey') }}" class="form-control"
-                            placeholder="Search...">
+                    <button type="submit" class="btn btn-primary">
 
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </button>
+                        <i class="fa-solid fa-magnifying-glass"></i>
 
-                    </div>
+                    </button>
 
-                </form>
+                </div>
 
-            </div>
+            </form>
 
         </div>
 
 
-        {{-- Contact Card --}}
-        <div class="border-0 shadow-sm card">
 
-            <!-- Card Header -->
-            <div class="text-white card-header bg-primary">
+        {{-- =====================================================
+         CONTACT CARD
+    ====================================================== --}}
 
-                <h5 class="mb-0">
-                    <i class="mr-2 fa-solid fa-comment"></i>
+        <div class="contact-card">
+
+
+            {{-- Card Header --}}
+            <div class="contact-card-header">
+
+                <h5>
+
+                    <i class="fa-solid fa-inbox"></i>
+
                     Contact Messages
+
                 </h5>
 
             </div>
 
 
-            <!-- Card Body -->
-            <div class="card-body">
+
+            {{-- Card Body --}}
+            <div class="contact-card-body">
 
                 <div class="table-responsive">
 
-                    <table class="table align-middle table-hover table-bordered">
+                    <table class="table contact-table">
 
-                        {{-- Table Header --}}
-                        <thead class="thead-light">
+                        {{-- =================================================
+                         TABLE HEADER
+                    ================================================== --}}
 
-                            <tr class="text-center">
+                        <thead>
 
-                                {{-- <th width="70">
-                                    ID
-                                </th> --}}
+                            <tr>
 
                                 <th>
-                                    Teacher Name
+                                    Teacher
                                 </th>
 
                                 <th>
-                                    Teacher' Email
+                                    Email
                                 </th>
 
                                 <th>
@@ -90,16 +434,16 @@
                                     Message
                                 </th>
 
-                                <th width="130">
+                                <th class="text-center">
                                     Status
                                 </th>
 
-                                <th width="180">
-                                    Created Date
+                                <th>
+                                    Date
                                 </th>
 
-                                <th width="220">
-                                    Action
+                                <th class="text-center">
+                                    Actions
                                 </th>
 
                             </tr>
@@ -107,195 +451,328 @@
                         </thead>
 
 
-                        {{-- Table Body --}}
+
+                        {{-- =================================================
+                         TABLE BODY
+                    ================================================== --}}
+
                         <tbody>
 
                             @forelse ($contacts as $contact)
                                 <tr>
 
-                                    <!-- ID -->
-                                    {{-- <td class="text-center">
-                                        {{ $contact->id }}
-                                    </td> --}}
 
+                                    {{-- =====================================
+                                     TEACHER
+                                ====================================== --}}
 
-                                    <!-- Teacher Name -->
                                     <td>
 
-                                        {{ $contact->teacher?->name ?? ($contact->name ?? 'Unknown') }}
+                                        <div class="teacher-info">
+
+                                            <div class="teacher-avatar">
+
+                                                {{ strtoupper(substr($contact->teacher?->name ?? ($contact->name ?? 'U'), 0, 1)) }}
+
+                                            </div>
+
+
+                                            <div>
+
+                                                <div class="teacher-name">
+
+                                                    {{ $contact->teacher?->name ?? ($contact->name ?? 'Unknown') }}
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
 
                                     </td>
 
-                                    <!-- Teacher Email -->
+
+
+                                    {{-- =====================================
+                                     EMAIL
+                                ====================================== --}}
+
                                     <td>
 
-                                        {{ $contact->teacher?->email ?? ($contact->email ?? 'Unknown') }}
+                                        <span class="email-text">
 
-                                    </td>
+                                            {{ $contact->teacher?->email ?? ($contact->email ?? 'Unknown') }}
 
-                                    <!-- Phone -->
-                                    <td>
-                                        {{ $contact->teacher?->user?->phone ?? '09xxxxxxxxx' }}
-                                    </td>
-
-                                    <!-- Message -->
-                                    <td>
-
-                                        {{ Str::limit($contact->message, 80) }}
+                                        </span>
 
                                     </td>
 
 
-                                    <!-- Status -->
+
+                                    {{-- =====================================
+                                     PHONE
+                                ====================================== --}}
+
+                                    <td>
+
+                                        <span class="phone-text">
+
+                                            {{ $contact->teacher?->user?->phone ?? '09-xxxxxxxxx' }}
+
+                                        </span>
+
+                                    </td>
+
+
+
+                                    {{-- =====================================
+                                     MESSAGE
+                                ====================================== --}}
+
+                                    <td>
+
+                                        <div class="message-preview" title="{{ $contact->message }}">
+
+                                            {{ Str::limit($contact->message, 80) }}
+
+                                        </div>
+
+                                    </td>
+
+
+
+                                    {{-- =====================================
+                                     STATUS
+                                ====================================== --}}
+
                                     <td class="text-center">
 
                                         @if ($contact->status === 'pending')
-                                            <span class="badge badge-warning">
-                                                <i class="mr-1 fa-solid fa-clock"></i>
+                                            <span class="status-badge status-pending">
+
+                                                <i class="fa-solid fa-clock"></i>
+
                                                 Pending
+
                                             </span>
                                         @elseif ($contact->status === 'accepted')
-                                            <span class="badge badge-success">
-                                                <i class="mr-1 fa-solid fa-check"></i>
+                                            <span class="status-badge status-accepted">
+
+                                                <i class="fa-solid fa-check"></i>
+
                                                 Accepted
+
                                             </span>
                                         @elseif ($contact->status === 'rejected')
-                                            <span class="badge badge-danger">
-                                                <i class="mr-1 fa-solid fa-xmark"></i>
+                                            <span class="status-badge status-rejected">
+
+                                                <i class="fa-solid fa-xmark"></i>
+
                                                 Rejected
+
                                             </span>
                                         @else
-                                            <span class="badge badge-secondary">
+                                            <span class="status-badge status-default">
+
                                                 {{ ucfirst($contact->status) }}
+
                                             </span>
                                         @endif
 
                                     </td>
 
 
-                                    <!-- Created Date -->
+
+                                    {{-- =====================================
+                                     DATE
+                                ====================================== --}}
+
                                     <td>
 
-                                        {{ $contact->created_at->format('d M Y, h:i A') }}
+                                        <span class="date-text">
+
+                                            <i class="mr-1 fa-regular fa-calendar"></i>
+
+                                            {{ $contact->created_at->format('d M Y') }}
+
+                                            <br>
+
+                                            <small>
+
+                                                {{ $contact->created_at->format('h:i A') }}
+
+                                            </small>
+
+                                        </span>
 
                                     </td>
 
-                                    {{-- Action --}}
-                                    <td class="text-center">
 
-                                        {{-- PENDING --}}
-                                        @if ($contact->status === 'pending')
-                                            <!-- Accept -->
-                                            <form action="{{ route('contact.accept', $contact->id) }}" method="POST"
-                                                class="d-inline">
+
+                                    {{-- =====================================
+                                     ACTIONS
+                                ====================================== --}}
+
+                                    <td>
+
+                                        <div class="action-buttons">
+
+
+                                            {{-- =============================
+                                             ACCEPT
+                                        ============================== --}}
+
+                                            @if ($contact->status === 'pending')
+                                                <form action="{{ route('contact.accept', $contact->id) }}" method="POST"
+                                                    class="d-inline">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <button type="submit" class="btn btn-outline-success action-btn"
+                                                        title="Accept"
+                                                        onclick="return confirm('Accept this contact message?')">
+
+                                                        <i class="fa-solid fa-check"></i>
+
+                                                    </button>
+
+                                                </form>
+
+
+
+                                                {{-- =============================
+                                                 REJECT
+                                            ============================== --}}
+
+                                                <form action="{{ route('contact.reject', $contact->id) }}" method="POST"
+                                                    class="d-inline">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <button type="submit" class="btn btn-outline-danger action-btn"
+                                                        title="Reject"
+                                                        onclick="return confirm('Reject this contact message?')">
+
+                                                        <i class="fa-solid fa-xmark"></i>
+
+                                                    </button>
+
+                                                </form>
+                                            @elseif ($contact->status === 'accepted')
+                                                {{-- Change Accepted -> Rejected --}}
+
+                                                <form action="{{ route('contact.reject', $contact->id) }}" method="POST"
+                                                    class="d-inline">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <button type="submit" class="btn btn-outline-danger action-btn"
+                                                        title="Reject"
+                                                        onclick="return confirm('Change status from Accepted to Rejected?')">
+
+                                                        <i class="fa-solid fa-xmark"></i>
+
+                                                    </button>
+
+                                                </form>
+                                            @elseif ($contact->status === 'rejected')
+                                                {{-- Change Rejected -> Accepted --}}
+
+                                                <form action="{{ route('contact.accept', $contact->id) }}" method="POST"
+                                                    class="d-inline">
+
+                                                    @csrf
+                                                    @method('PUT')
+
+                                                    <button type="submit" class="btn btn-outline-success action-btn"
+                                                        title="Accept"
+                                                        onclick="return confirm('Change status from Rejected to Accepted?')">
+
+                                                        <i class="fa-solid fa-check"></i>
+
+                                                    </button>
+
+                                                </form>
+                                            @endif
+
+
+
+                                            {{-- =============================
+                                             VIEW
+                                        ============================== --}}
+
+                                            <a href="{{ route('contact.show', $contact->id) }}"
+                                                class="btn btn-outline-primary action-btn" title="View Message">
+
+                                                <i class="fa-regular fa-eye"></i>
+
+                                            </a>
+
+
+
+                                            {{-- =============================
+                                             DELETE
+                                        ============================== --}}
+
+                                            <form action="{{ route('contact.delete', $contact->id) }}" method="POST"
+                                                class="d-inline"
+                                                onsubmit="return confirm('Are you sure you want to delete this message?')">
 
                                                 @csrf
-                                                @method('PUT')
+                                                @method('DELETE')
 
-                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Accept"
-                                                    onclick="return confirm('Accept this contact message?')">
+                                                <button type="submit" class="btn btn-outline-danger action-btn"
+                                                    title="Delete">
 
-                                                    <i class="fa-solid fa-check"></i>
+                                                    <i class="fa-solid fa-trash"></i>
 
                                                 </button>
 
                                             </form>
 
 
-                                            <!-- Reject -->
-                                            <form action="{{ route('contact.reject', $contact->id) }}" method="POST"
-                                                class="d-inline">
-
-                                                @csrf
-                                                @method('PUT')
-
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject"
-                                                    onclick="return confirm('Reject this contact message?')">
-
-                                                    <i class="fa-solid fa-xmark"></i>
-
-                                                </button>
-
-                                            </form>
-
-
-
-                                            {{-- ACCEPTED --}}
-                                        @elseif ($contact->status === 'accepted')
-                                            <form action="{{ route('contact.reject', $contact->id) }}" method="POST"
-                                                class="d-inline">
-
-                                                @csrf
-                                                @method('PUT')
-
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Reject"
-                                                    onclick="return confirm('Change status from Accepted to Rejected?')">
-
-                                                    <i class="fa-solid fa-xmark"></i>
-
-                                                </button>
-
-                                            </form>
-
-
-
-                                            {{-- REJECTED --}}
-                                        @elseif ($contact->status === 'rejected')
-                                            <form action="{{ route('contact.accept', $contact->id) }}" method="POST"
-                                                class="d-inline">
-
-                                                @csrf
-                                                @method('PUT')
-
-                                                <button type="submit" class="btn btn-sm btn-outline-success" title="Accept"
-                                                    onclick="return confirm('Change status from Rejected to Accepted?')">
-
-                                                    <i class="fa-solid fa-check"></i>
-
-                                                </button>
-
-                                            </form>
-                                        @endif
-
-                                        {{-- View --}}
-                                        <a href="{{ route('contact.show', $contact->id) }}"
-                                            class="btn btn-sm btn-outline-primary" title="View">
-
-                                            <i class="fa-regular fa-eye"></i>
-
-                                        </a>
-
-                                        {{-- Delete --}}
-                                        <form action="{{ route('contact.delete', $contact->id) }}" method="POST"
-                                            class="d-inline"
-                                            onsubmit="return confirm('Are you sure you want to delete this message?')">
-
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
-
-                                                <i class="fa-solid fa-trash"></i>
-
-                                            </button>
-
-                                        </form>
+                                        </div>
 
                                     </td>
+
 
                                 </tr>
 
 
                             @empty
 
-                                <!-- No Data -->
+                                {{-- =================================================
+                                 EMPTY STATE
+                            ================================================== --}}
+
                                 <tr>
 
-                                    <td colspan="6" class="py-5 text-center text-muted">
+                                    <td colspan="7">
 
-                                        <i class="mb-3 fa-regular fa-folder-open fa-2x d-block"></i>
+                                        <div class="empty-state">
 
-                                        No contact messages found.
+                                            <div class="empty-icon">
+
+                                                <i class="fa-regular fa-folder-open"></i>
+
+                                            </div>
+
+                                            <h5>
+
+                                                No Contact Messages Found
+
+                                            </h5>
+
+                                            <p>
+
+                                                There are no messages to display.
+
+                                            </p>
+
+                                        </div>
 
                                     </td>
 
@@ -308,11 +785,20 @@
 
                 </div>
 
-                <div class="mt-3 d-flex justify-content-end">
 
-                    {{ $contacts->links() }}
 
-                </div>
+                {{-- =====================================================
+                 PAGINATION
+            ====================================================== --}}
+
+                @if ($contacts->hasPages())
+                    <div class="contact-pagination">
+
+                        {{ $contacts->withQueryString()->links() }}
+
+                    </div>
+                @endif
+
 
             </div>
 

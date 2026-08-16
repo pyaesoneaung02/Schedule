@@ -16,7 +16,9 @@ require __DIR__ . '/auth.php';
 // });
 // Route::redirect('/', '/login');
 
-Route::get('/', [UserController::class, 'landingPage'])->name('landingPage');
+// Route::get('/', [UserController::class, 'landingPage'])->name('landingPage');
+
+Route::get('/', [UserController::class, 'page'])->name('page');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -55,18 +57,9 @@ Route::get('/about', [UserController::class, 'about'])->name('about');
 // ======================================================
 
 
-Route::get(
-    '/schedule/auto-generate',
-    [ContactController::class, 'autoGenerate']
-)->name('schedule.autoGenerate');
+Route::get('/schedule/auto-generate', [ContactController::class, 'autoGenerate'])->name('schedule.autoGenerate');
 
-Route::post(
-    '/schedule/auto-generate',
-    [ContactController::class, 'createSchedule']
-)->name('schedule.createSchedule');
+Route::post('/schedule/auto-generate',[ContactController::class, 'createSchedule'])->name('schedule.createSchedule');
 
-Route::get(
-    '/schedule/show',
-    [ContactController::class, 'result']
-)->name('schedule.show');
+Route::get('/schedule/show',[ContactController::class, 'result'])->name('schedule.show');
 

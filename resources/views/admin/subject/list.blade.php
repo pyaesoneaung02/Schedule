@@ -206,11 +206,9 @@
 
 
                                         <a href="{{ route('subject.delete', $item->id) }}"
-                                            class="btn btn-sm btn-outline-danger">
-
+                                           class="btn btn-sm btn-outline-danger">
 
                                             <i class="fa-solid fa-trash"></i>
-
 
                                         </a>
 
@@ -222,12 +220,7 @@
 
                                 </tr>
 
-
-
-
                             @empty
-
-
 
                                 <tr>
 

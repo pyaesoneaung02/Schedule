@@ -22,7 +22,7 @@ class ContactController extends Controller
 {
     /*
     |--------------------------------------------------------------------------
-    | CONTACT
+    | CONTACT LIST
     |--------------------------------------------------------------------------
     */
 
@@ -63,6 +63,7 @@ class ContactController extends Controller
     }
 
 
+    //contact delete
     public function deleteContact($id)
     {
         $contact = Contact::findOrFail($id);
@@ -78,6 +79,7 @@ class ContactController extends Controller
     }
 
 
+    //contact accept
     public function accept($id)
     {
         Contact::findOrFail($id)->update([
@@ -91,6 +93,7 @@ class ContactController extends Controller
     }
 
 
+    //contact reject
     public function reject($id)
     {
         Contact::findOrFail($id)->update([
@@ -104,6 +107,7 @@ class ContactController extends Controller
     }
 
 
+    //contact show
     public function show($id)
     {
         $contact = Contact::with([
@@ -118,6 +122,7 @@ class ContactController extends Controller
     }
 
 
+    //contact store
     public function store(Request $request)
     {
         $request->validate([
@@ -151,7 +156,25 @@ class ContactController extends Controller
         );
     }
 
+    //notification
 
+    // public function userNotifications()
+    // {
+    //     $userId = auth()->id();
+    
+    //     // For read message
+    //     Contact::where('user_id', $userId)
+    //            ->where('status', 'success')
+    //            ->where('is_user_read', false)
+    //            ->update(['is_user_read' => true]);
+
+    //     $notifications = Contact::where('user_id', $userId)->latest()->get();
+
+    //     return view('user.component.notification', compact('notifications'));
+    // }
+
+
+    //contact read
     public function read($id)
     {
         Contact::findOrFail($id)->update([
@@ -2440,5 +2463,332 @@ class ContactController extends Controller
                 'sectionID'
             )
         );
+    }
+
+
+    // =====================================================
+    // Drag & Drop Swap
+    // =====================================================
+
+    public function swap(Request $request)
+    {
+        // =====================================================
+        // 1. Validate Request
+        // =====================================================
+
+        $request->validate([
+            'schedule1_id' => [
+                'required',
+                'integer',
+                'min:1',
+                'exists:schedules,id',
+            ],
+
+            'schedule2_id' => [
+                'required',
+                'integer',
+                'min:1',
+                'exists:schedules,id',
+            ],
+        ]);
+
+
+        $id1 = (int) $request->schedule1_id;
+        $id2 = (int) $request->schedule2_id;
+
+
+        // =====================================================
+        // 2. Same Schedule
+        // =====================================================
+
+        if ($id1 === $id2) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot swap the same subject.',
+            ], 422);
+        }
+
+
+        try {
+
+            DB::transaction(function () use ($id1, $id2) {
+
+                // =================================================
+                // 3. Get Schedule 1
+                // =================================================
+
+                $schedule1 = Schedule::lockForUpdate()
+                    ->findOrFail($id1);
+
+
+                // =================================================
+                // 4. Get Schedule 2
+                // =================================================
+
+                $schedule2 = Schedule::lockForUpdate()
+                    ->findOrFail($id2);
+
+
+                // =================================================
+                // 5. Same Timetable Check
+                // =================================================
+                //
+                // Drag & Drop Swap ကို
+                // Year + Major + Room + Semester + Section
+                // တူတဲ့ timetable ထဲမှာပဲ ခွင့်ပြုမယ်
+                //
+
+                if (
+                    (int) $schedule1->year_id !==
+                    (int) $schedule2->year_id
+
+                    ||
+
+                    (int) $schedule1->major_id !==
+                    (int) $schedule2->major_id
+
+                    ||
+
+                    (int) $schedule1->room_id !==
+                    (int) $schedule2->room_id
+
+                    ||
+
+                    (int) $schedule1->semester_id !==
+                    (int) $schedule2->semester_id
+
+                    ||
+
+                    (int) $schedule1->section_id !==
+                    (int) $schedule2->section_id
+                ) {
+
+                    throw new \Exception(
+                        'These subjects belong to different timetables.'
+                    );
+                }
+
+
+                // =================================================
+                // 6. Check Day / Time IDs
+                // =================================================
+
+                if (
+                    empty($schedule1->day_id) ||
+                    empty($schedule1->time_id) ||
+                    empty($schedule2->day_id) ||
+                    empty($schedule2->time_id)
+                ) {
+
+                    throw new \Exception(
+                        'Invalid timetable position.'
+                    );
+                }
+
+
+                $day1  = (int) $schedule1->day_id;
+                $time1 = (int) $schedule1->time_id;
+
+                $day2  = (int) $schedule2->day_id;
+                $time2 = (int) $schedule2->time_id;
+
+
+                // =================================================
+                // 7. Teacher Conflict - Subject 1
+                // =================================================
+                //
+                // Subject 1 ရဲ့ Teacher က
+                // Subject 2 ရဲ့ Day + Time မှာ
+                // အခြား Room / Section မှာ ရှိနေသလား?
+                //
+
+                if (!empty($schedule1->teacher_id)) {
+
+                    $teacherConflict1 = Schedule::query()
+
+                        ->where(
+                            'teacher_id',
+                            $schedule1->teacher_id
+                        )
+
+                        ->where('day_id', $day2)
+
+                        ->where('time_id', $time2)
+
+                        // Swap လုပ်နေတဲ့ schedule ၂ ခုကို
+                        // conflict ထဲက ဖယ်မယ်
+                        ->whereNotIn('id', [
+                            $id1,
+                            $id2,
+                        ])
+
+                        ->exists();
+
+
+                    if ($teacherConflict1) {
+
+                        $teacherName =
+                            optional($schedule1->teacher)->name
+                            ?? 'Unknown Teacher';
+
+
+                        throw new \Exception(
+                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် အခြားအခန်း သို့မဟုတ် Section တွင် ထိုနေ့၊ ထိုအချိန်၌ သင်ကြားနေပါသည်။"
+                        );
+                    }
+                }
+
+
+                // =================================================
+                // 8. Teacher Conflict - Subject 2
+                // =================================================
+                //
+                // Subject 2 ရဲ့ Teacher က
+                // Subject 1 ရဲ့ Day + Time မှာ
+                // အခြား Room / Section မှာ ရှိနေသလား?
+                //
+
+                if (!empty($schedule2->teacher_id)) {
+
+                    $teacherConflict2 = Schedule::query()
+
+                        ->where(
+                            'teacher_id',
+                            $schedule2->teacher_id
+                        )
+
+                        ->where('day_id', $day1)
+
+                        ->where('time_id', $time1)
+
+                        ->whereNotIn('id', [
+                            $id1,
+                            $id2,
+                        ])
+
+                        ->exists();
+
+
+                    if ($teacherConflict2) {
+
+                        $teacherName =
+                            optional($schedule2->teacher)->name
+                            ?? 'Unknown Teacher';
+
+
+                        throw new \Exception(
+                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် အခြားအခန်း သို့မဟုတ် Section တွင် ထိုနေ့၊ ထိုအချိန်၌ သင်ကြားနေပါသည်။"
+                        );
+                    }
+                }
+
+
+                // =================================================
+                // 9. Room Conflict
+                // =================================================
+                //
+                // Same room + same day + same time
+                // တခြား schedule ရှိမရှိစစ်
+                //
+
+                $roomConflict1 = Schedule::query()
+
+                    ->where(
+                        'room_id',
+                        $schedule1->room_id
+                    )
+
+                    ->where('day_id', $day2)
+
+                    ->where('time_id', $time2)
+
+                    ->whereNotIn('id', [
+                        $id1,
+                        $id2,
+                    ])
+
+                    ->exists();
+
+
+                if ($roomConflict1) {
+
+                    throw new \Exception(
+                        'Destination room is already occupied at this time.'
+                    );
+                }
+
+
+                // =================================================
+                // 10. Room Conflict - Subject 2
+                // =================================================
+
+                $roomConflict2 = Schedule::query()
+
+                    ->where(
+                        'room_id',
+                        $schedule2->room_id
+                    )
+
+                    ->where('day_id', $day1)
+
+                    ->where('time_id', $time1)
+
+                    ->whereNotIn('id', [
+                        $id1,
+                        $id2,
+                    ])
+
+                    ->exists();
+
+
+                if ($roomConflict2) {
+
+                    throw new \Exception(
+                        'Destination room is already occupied at this time.'
+                    );
+                }
+
+
+                // =================================================
+                // 11. Swap
+                // =================================================
+
+                $schedule1->day_id = $day2;
+                $schedule1->time_id = $time2;
+
+                $schedule1->save();
+
+
+                $schedule2->day_id = $day1;
+                $schedule2->time_id = $time1;
+
+                $schedule2->save();
+
+
+            });
+
+
+            // =====================================================
+            // 12. Success
+            // =====================================================
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Timetable swapped successfully.',
+            ]);
+
+
+        } catch (\Throwable $e) {
+
+            // =====================================================
+            // 13. Error
+            // =====================================================
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+        }
     }
 }

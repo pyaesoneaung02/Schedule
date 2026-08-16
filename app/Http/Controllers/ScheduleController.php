@@ -16,6 +16,7 @@ use App\Models\Year;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+// use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class ScheduleController extends Controller
@@ -1016,41 +1017,119 @@ class ScheduleController extends Controller
     }
 
     // result schedule
+    // public function result(Request $request, $year)
+    // {
+    //     $request->validate([
+
+    //         'roomID'     => 'required',
+    //         'majorID'    => 'required',
+    //         'semesterID' => 'required',
+    //         'sectionID'  => 'required',
+
+    //     ], [
+
+    //         'roomID.required'     => 'Please select Room.',
+    //         'majorID.required'    => 'Please select Major.',
+    //         'semesterID.required' => 'Please select Semester.',
+    //         'sectionID.required'  => 'Please select Section.',
+
+    //     ]);
+
+    //     $days  = Day::all();
+    //     $times = Time::all();
+
+    //     $schedules = Schedule::with([
+    //         'day',
+    //         'subject',
+    //         'time',
+    //         'teacher',
+    //         'academicYear',
+    //         'semester',
+    //     ])
+    //         ->where('year_id', $year)
+    //         ->where('room_id', $request->roomID)
+    //         ->where('major_id', $request->majorID)
+    //         ->where('semester_id', $request->semesterID)
+    //         ->where('section_id', $request->sectionID)
+    //         ->get();
+
+    //     $yearData = Year::findOrFail($year);
+
+    //     $room = Room::findOrFail($request->roomID);
+
+    //     $major = Major::findOrFail($request->majorID);
+
+    //     $semesters = Semesters::findOrFail($request->semesterID);
+
+    //     $sections = Sections::findOrFail($request->sectionID);
+
+    //     $academicYear = AcademicYears::where('status', 'Active')->first();
+
+    //     return view('admin.schedule.result',
+    //         compact(
+    //             'schedules',
+    //             'yearData',
+    //             'room',
+    //             'major',
+    //             'days',
+    //             'times',
+    //             'semesters',
+    //             'sections',
+    //             'academicYear'
+    //         )
+    //     );
+    // }
+
+    // =========================================================
+    // RESULT SCHEDULE
+    // =========================================================
+
     public function result(Request $request, $year)
     {
         $request->validate([
-
-            'roomID'     => 'required',
-            'majorID'    => 'required',
-            'semesterID' => 'required',
-            'sectionID'  => 'required',
-
+            'roomID'     => ['required', 'integer'],
+            'majorID'    => ['required', 'integer'],
+            'semesterID' => ['required', 'integer'],
+            'sectionID'  => ['required', 'integer'],
         ], [
-
             'roomID.required'     => 'Please select Room.',
             'majorID.required'    => 'Please select Major.',
             'semesterID.required' => 'Please select Semester.',
             'sectionID.required'  => 'Please select Section.',
-
         ]);
 
-        $days  = Day::all();
-        $times = Time::all();
+        // =====================================================
+        // Days
+        // =====================================================
+
+        $days = Day::orderBy('id')->get();
+
+        // =====================================================
+        // Times
+        // =====================================================
+
+        $times = Time::orderBy('id')->get();
+
+        // =====================================================
+        // Schedules
+        // =====================================================
 
         $schedules = Schedule::with([
-            'day',
             'subject',
-            'time',
             'teacher',
-            'academicYear',
-            'semester',
         ])
             ->where('year_id', $year)
             ->where('room_id', $request->roomID)
             ->where('major_id', $request->majorID)
             ->where('semester_id', $request->semesterID)
             ->where('section_id', $request->sectionID)
+            ->orderBy('day_id')
+            ->orderBy('time_id')
             ->get();
+
+        // =====================================================
+        // Related Data
+        // =====================================================
 
         $yearData = Year::findOrFail($year);
 
@@ -1064,7 +1143,12 @@ class ScheduleController extends Controller
 
         $academicYear = AcademicYears::where('status', 'Active')->first();
 
-        return view('admin.schedule.result',
+        // =====================================================
+        // View
+        // =====================================================
+
+        return view(
+            'admin.schedule.result',
             compact(
                 'schedules',
                 'yearData',
@@ -1077,6 +1161,387 @@ class ScheduleController extends Controller
                 'academicYear'
             )
         );
+    }
+
+    // =========================================================
+    // DRAG & DROP SWAP
+    // =========================================================
+
+    public function swap(Request $request)
+    {
+        // =====================================================
+        // 1. VALIDATE
+        // =====================================================
+
+        $validated = $request->validate([
+            'schedule1_id' => [
+                'required',
+                'integer',
+                'exists:schedules,id',
+            ],
+
+            'schedule2_id' => [
+                'required',
+                'integer',
+                'exists:schedules,id',
+            ],
+        ]);
+
+        $id1 = (int) $validated['schedule1_id'];
+        $id2 = (int) $validated['schedule2_id'];
+
+
+        // =====================================================
+        // 2. SAME SCHEDULE CHECK
+        // =====================================================
+
+        if ($id1 === $id2) {
+
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot swap the same subject.',
+            ], 422);
+
+        }
+
+
+        try {
+
+            // =================================================
+            // 3. TRANSACTION
+            // =================================================
+
+            DB::transaction(function () use ($id1, $id2) {
+
+                // =============================================
+                // Get schedules and lock rows
+                // =============================================
+
+                $schedule1 = Schedule::lockForUpdate()
+                    ->with(['teacher', 'subject', 'room'])
+                    ->findOrFail($id1);
+
+                $schedule2 = Schedule::lockForUpdate()
+                    ->with(['teacher', 'subject', 'room'])
+                    ->findOrFail($id2);
+
+
+                // =============================================
+                // 4. SAME TIMETABLE CHECK
+                // =============================================
+
+                if (
+                    (int) $schedule1->academic_year_id !==
+                    (int) $schedule2->academic_year_id
+
+                    ||
+
+                    (int) $schedule1->semester_id !==
+                    (int) $schedule2->semester_id
+
+                    ||
+
+                    (int) $schedule1->year_id !==
+                    (int) $schedule2->year_id
+
+                    ||
+
+                    (int) $schedule1->major_id !==
+                    (int) $schedule2->major_id
+
+                    ||
+
+                    (int) $schedule1->section_id !==
+                    (int) $schedule2->section_id
+
+                    ||
+
+                    (int) $schedule1->room_id !==
+                    (int) $schedule2->room_id
+                ) {
+
+                    throw new \Exception(
+                        'These subjects belong to different timetables.'
+                    );
+
+                }
+
+
+                // =============================================
+                // 5. ORIGINAL POSITIONS
+                // =============================================
+
+                $day1 = (int) $schedule1->day_id;
+                $time1 = (int) $schedule1->time_id;
+
+                $day2 = (int) $schedule2->day_id;
+                $time2 = (int) $schedule2->time_id;
+
+
+                // =============================================
+                // 6. INVALID POSITION CHECK
+                // =============================================
+
+                if (
+                    $day1 <= 0 ||
+                    $time1 <= 0 ||
+                    $day2 <= 0 ||
+                    $time2 <= 0
+                ) {
+
+                    throw new \Exception(
+                        'Invalid timetable position.'
+                    );
+
+                }
+
+
+                // =================================================
+                // 7. TEACHER 1 CONFLICT
+                //
+                // Teacher of Subject 1 will move:
+                //
+                // day1/time1
+                //
+                // TO
+                //
+                // day2/time2
+                //
+                // Check the WHOLE schedules table.
+                // Do NOT limit by room/section.
+                // =================================================
+
+                if (!empty($schedule1->teacher_id)) {
+
+                    $teacher1Conflict = Schedule::query()
+
+                        ->where(
+                            'teacher_id',
+                            $schedule1->teacher_id
+                        )
+
+                        ->where(
+                            'day_id',
+                            $day2
+                        )
+
+                        ->where(
+                            'time_id',
+                            $time2
+                        )
+
+                        ->whereNotIn(
+                            'id',
+                            [$id1, $id2]
+                        )
+
+                        ->exists();
+
+
+                    if ($teacher1Conflict) {
+
+                        $teacherName =
+                            optional($schedule1->teacher)->name
+                            ?? 'Teacher';
+
+
+                        $subjectName =
+                            optional($schedule1->subject)->short_name
+                            ?? 'Subject';
+
+
+                        throw new \Exception(
+                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် {$day2} / {$time2} အချိန်တွင် အခြားအခန်း/Section၌ သင်ကြားနေပါသည်။"
+                        );
+
+                    }
+
+                }
+
+
+                // =================================================
+                // 8. TEACHER 2 CONFLICT
+                //
+                // Teacher of Subject 2 will move:
+                //
+                // day2/time2
+                //
+                // TO
+                //
+                // day1/time1
+                // =================================================
+
+                if (!empty($schedule2->teacher_id)) {
+
+                    $teacher2Conflict = Schedule::query()
+
+                        ->where(
+                            'teacher_id',
+                            $schedule2->teacher_id
+                        )
+
+                        ->where(
+                            'day_id',
+                            $day1
+                        )
+
+                        ->where(
+                            'time_id',
+                            $time1
+                        )
+
+                        ->whereNotIn(
+                            'id',
+                            [$id1, $id2]
+                        )
+
+                        ->exists();
+
+
+                    if ($teacher2Conflict) {
+
+                        $teacherName =
+                            optional($schedule2->teacher)->name
+                            ?? 'Teacher';
+
+
+                        throw new \Exception(
+                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် {$day1} / {$time1} အချိန်တွင် အခြားအခန်း/Section၌ သင်ကြားနေပါသည်။"
+                        );
+
+                    }
+
+                }
+
+
+                // =================================================
+                // 9. ROOM 1 CONFLICT
+                //
+                // Subject 1 moves to Room 1 + day2/time2
+                // =================================================
+
+                $room1Conflict = Schedule::query()
+
+                    ->where(
+                        'room_id',
+                        $schedule1->room_id
+                    )
+
+                    ->where(
+                        'day_id',
+                        $day2
+                    )
+
+                    ->where(
+                        'time_id',
+                        $time2
+                    )
+
+                    ->whereNotIn(
+                        'id',
+                        [$id1, $id2]
+                    )
+
+                    ->exists();
+
+
+                if ($room1Conflict) {
+
+                    throw new \Exception(
+                        'Swap မလုပ်နိုင်ပါ။ Destination အခန်းသည် ထိုအချိန်တွင် အသုံးပြုနေပါသည်။'
+                    );
+
+                }
+
+
+                // =================================================
+                // 10. ROOM 2 CONFLICT
+                //
+                // Subject 2 moves to Room 2 + day1/time1
+                // =================================================
+
+                $room2Conflict = Schedule::query()
+
+                    ->where(
+                        'room_id',
+                        $schedule2->room_id
+                    )
+
+                    ->where(
+                        'day_id',
+                        $day1
+                    )
+
+                    ->where(
+                        'time_id',
+                        $time1
+                    )
+
+                    ->whereNotIn(
+                        'id',
+                        [$id1, $id2]
+                    )
+
+                    ->exists();
+
+
+                if ($room2Conflict) {
+
+                    throw new \Exception(
+                        'Swap မလုပ်နိုင်ပါ။ Destination အခန်းသည် ထိုအချိန်တွင် အသုံးပြုနေပါသည်။'
+                    );
+
+                }
+
+
+                // =================================================
+                // 11. SWAP
+                // =================================================
+
+                $schedule1->day_id = $day2;
+                $schedule1->time_id = $time2;
+
+                $schedule2->day_id = $day1;
+                $schedule2->time_id = $time1;
+
+
+                // =================================================
+                // 12. SAVE
+                // =================================================
+
+                $schedule1->save();
+                $schedule2->save();
+
+            });
+
+
+            // =====================================================
+            // 13. SUCCESS RESPONSE
+            // =====================================================
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Timetable swapped successfully.',
+            ]);
+
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+
+            throw $e;
+
+
+        } catch (\Throwable $e) {
+
+            // =====================================================
+            // ERROR RESPONSE
+            // =====================================================
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 422);
+
+        }
     }
 
     //create PDF
@@ -1454,5 +1919,43 @@ class ScheduleController extends Controller
             return back();
         }
     }
+
+    //sawp
+    // public function swap(Request $request)
+    // {
+    //     $request->validate([
+    //         'schedule1_id' => 'required|integer',
+    //         'schedule2_id' => 'required|integer',
+    //     ]);
+
+    //     $schedule1 = Schedule::findOrFail($request->schedule1_id);
+    //     $schedule2 = Schedule::findOrFail($request->schedule2_id);
+
+    //     // Same schedule ကို သူ့နေရာသူ ပြန်ချတာ
+    //     if ($schedule1->id === $schedule2->id) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Same timetable slot cannot be swapped.'
+    //         ], 422);
+    //     }
+
+    //     // Time / Day ကို swap
+    //     $day1  = $schedule1->day_id;
+    //     $time1 = $schedule1->time_id;
+
+    //     $schedule1->day_id  = $schedule2->day_id;
+    //     $schedule1->time_id = $schedule2->time_id;
+
+    //     $schedule2->day_id  = $day1;
+    //     $schedule2->time_id = $time1;
+
+    //     $schedule1->save();
+    //     $schedule2->save();
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'message' => 'Timetable swapped successfully.'
+    //     ]);
+    // }
 
 }

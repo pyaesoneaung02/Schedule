@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('schedules', function (Blueprint $table) {
-            $table->boolean('is_shifted')
-            ->default(false)
-            ->after('section_id');
-        });
+        if (! Schema::hasColumn('schedules', 'is_shifted')) {
+            Schema::table('schedules', function (Blueprint $table) {
+                $table->boolean('is_shifted')
+                    ->default(false)
+                    ->after('section_id');
+            });
+        }
     }
 
     /**
@@ -23,8 +25,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('schedules', function (Blueprint $table) {
-            $table->dropColumn('is_shifted');
-        });
+        if (Schema::hasColumn('schedules', 'is_shifted')) {
+            Schema::table('schedules', function (Blueprint $table) {
+                $table->dropColumn('is_shifted');
+            });
+        }
     }
 };

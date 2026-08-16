@@ -7,6 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Schedule Admin</title>
     <link rel="icon" type="image/jfif" href="{{ asset('admin/img/icon.jfif') }}">
 
@@ -321,7 +323,7 @@
             @endif
 
              <li class="nav-item">
-                <a class="nav-link" href="{{ route('contact.list') }}"><i class="mr-3 fa-solid fa-comment"></i><span>Contact Messages</span></a>
+                <a class="nav-link" href="{{ route('contact.list') }}"><i class="mr-3 fa-solid fa-envelope-open-text"></i><span>Contact Messages</span></a>
             </li>
 
             <li class="nav-item">
@@ -364,7 +366,7 @@
 
                         @endphp
 
-                        <li class="nav-item dropdown no-arrow mx-2">
+                        <li class="mx-2 nav-item dropdown no-arrow">
 
                             <a class="nav-link dropdown-toggle"
                                href="#"
@@ -390,14 +392,14 @@
 
 
                             <!-- Notification Dropdown -->
-                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                            <div class="shadow dropdown-list dropdown-menu dropdown-menu-right animated--grow-in"
                                  aria-labelledby="notificationDropdown"
                                  style="min-width: 350px;">
 
                                 <!-- Header -->
-                                <h6 class="dropdown-header bg-primary text-white">
+                                <h6 class="text-white dropdown-header bg-primary">
 
-                                    <i class="fas fa-bell mr-2"></i>
+                                    <i class="mr-2 fas fa-bell"></i>
 
                                     Notifications
 
@@ -416,7 +418,7 @@
 
                                             <div class="icon-circle bg-primary">
 
-                                                <i class="fas fa-comment text-white"></i>
+                                                <i class="text-white fas fa-comment"></i>
 
                                             </div>
 
@@ -426,7 +428,7 @@
                                         <!-- Message -->
                                         <div>
 
-                                            <div class="small text-gray-500">
+                                            <div class="text-gray-500 small">
 
                                                 {{ $contact->created_at->format('d M Y, h:i A') }}
 
@@ -440,7 +442,7 @@
                                             </span>
 
 
-                                            <div class="small text-gray-600">
+                                            <div class="text-gray-600 small">
 
                                                 {{ \Illuminate\Support\Str::limit($contact->message, 40) }}
 

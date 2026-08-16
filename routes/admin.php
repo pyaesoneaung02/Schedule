@@ -197,6 +197,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         // Auto Generate Result
         Route::post('result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
 
+
+        // Drag & Drop Swap
+        Route::post('schedule/swap', [ScheduleController::class, 'swap'])->name('schedule.swap');
+
         // PDF
         Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
             ->name('schedule.pdf');
@@ -220,6 +224,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::get('list', [ContactController::class, 'contactList'])->name('contact.list');
 
         Route::get('show/{id}', [ContactController::class, 'show'])->name('contact.show');
+
+        Route::post('swap', [ScheduleController::class, 'swap'])->name('schedule.swap');
 
         Route::get('delete/{id}', [ContactController::class, 'delete'])->name('contact.delete');
 

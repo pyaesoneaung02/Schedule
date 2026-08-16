@@ -17,7 +17,12 @@ class Contact extends Model
         'subject',
         'message',
         'status',
+        // 'is_user_read',
     ];
+
+    //   protected $casts = [
+    //     'is_user_read' => 'boolean',
+    // ];
 
     // to delete contact
     public function teacher()
