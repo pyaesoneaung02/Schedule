@@ -533,7 +533,7 @@
 
 
                                 <!-- Super Admin -->
-                                @if (auth()->check() && auth()->user()->role == 'superadmin')
+                                {{-- @if (auth()->check() && auth()->user()->role == 'superadmin')
 
                                     <a class="dropdown-item"
                                        href="{{ route('profile#createNewAdminAccount') }}">
@@ -554,7 +554,7 @@
 
                                     </a>
 
-                                @endif
+                                @endif --}}
 
 
                                 <!-- Users -->
@@ -563,7 +563,7 @@
 
                                     <i class="mr-2 text-dark fa-solid fa-users fa-sm fa-fw"></i>
 
-                                    Users
+                                    Students
 
                                 </a>
 

@@ -66,7 +66,7 @@ class TimeController extends Controller
     private function checkValidation($request)
     {
         $request->validate([
-            'timeName' => 'required',
+            'timeName' => 'required|unique:times,name',
         ]);
     }
 }

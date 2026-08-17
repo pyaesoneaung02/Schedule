@@ -78,7 +78,7 @@ class RoomController extends Controller
     public function checkValidationRoom($request)
     {
         $rules = [
-            'name'      => 'required',
+            'name'      => 'required|unique:rooms,name',
             'yearID'    => 'required',
             'majorID'   => 'required',
             'sectionID' => 'required',

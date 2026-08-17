@@ -213,6 +213,45 @@
 
 
                                     </div>
+
+                                     <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Subject Name And Code
+                                        </label>
+
+
+                                        <select name="subjectID"
+                                            class="form-control @error('subjectID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                -- Choose Subject Name And Code --
+                                            </option>
+
+
+                                            @foreach ($subjects as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('subjectID') == $item->id) selected @endif>
+
+                                                    {{ $item->long_name }} - {{ $item->short_name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+
+                                        @error('subjectID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
                                 </div>
 
                                 <div class="col-md-6">
@@ -326,7 +365,7 @@
 
                                     </div>
 
-                                    <div class="mb-3">
+                                    {{-- <div class="mb-3">
 
                                         <label class="form-label">
                                             Select Subject Name
@@ -362,7 +401,7 @@
                                         @enderror
 
 
-                                    </div>
+                                    </div> --}}
 
                                     <div class="mb-3">
 
@@ -412,7 +451,7 @@
                                     <div class="mb-3">
 
                                         <label class="form-label">
-                                            Select Teacher 
+                                            Select Teacher
                                         </label>
 
 
@@ -521,7 +560,7 @@
 
                                     </div>
 
-                                    <div class="mb-3">
+                                    {{-- <div class="mb-3">
 
                                         <label class="form-label">
                                             Select Subject Code
@@ -551,7 +590,7 @@
                                             </span>
                                         @enderror
 
-                                    </div>
+                                    </div> --}}
 
                                     <div class="mb-3">
 

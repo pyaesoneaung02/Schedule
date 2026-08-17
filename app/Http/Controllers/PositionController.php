@@ -66,7 +66,7 @@ class PositionController extends Controller
     private function checkValidation($request)
     {
         $request->validate([
-            'positionName' => 'required',
+            'positionName' => 'required|unique:positions,name',
         ]);
     }
 }

@@ -102,7 +102,8 @@ class SectionsController extends Controller
     private function checkValidation($request)
     {
         $request->validate([
-            'sectionName' => 'required|unique:sections,name',
+            // 'sectionName' => 'required|unique:sections,name',
+            'sectionName' => 'required',
             'yearID'     => 'required',
             'majorID'    => 'required',
         ]);

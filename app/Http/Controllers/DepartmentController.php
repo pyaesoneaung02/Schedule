@@ -61,7 +61,7 @@ class DepartmentController extends Controller
     //check year validation
     private function checkValidation($request){
         $request->validate([
-            'departmentName' => 'required'
+            'departmentName' => 'required|unique:departments,name'
         ]);
     }
 }

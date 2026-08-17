@@ -345,7 +345,7 @@
                                                 <option value="{{ $item->id }}"
                                                     {{ old('subjectID') == $item->id ? 'selected' : '' }}>
 
-                                                    {{ $item->long_name }}
+                                                    {{ $item->long_name }} - {{ $item->short_name }}
 
                                                 </option>
                                             @endforeach

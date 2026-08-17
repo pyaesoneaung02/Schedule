@@ -121,9 +121,7 @@ class TeacherController extends Controller
 
         }
 
-        Alert::success(
-            'Success Teacher',
-            'Teacher Updated Successfully'
+        Alert::success('Success Teacher','Teacher Updated Successfully'
         );
 
         return to_route('teacher.list');
@@ -156,13 +154,9 @@ class TeacherController extends Controller
         $rules = [
 
             'name'         => 'required',
-
             'email'        => 'required|email|unique:users,email',
-
             'password'     => 'required|min:8|confirmed',
-
             'positionID'   => 'required',
-
             'departmentID' => 'required',
 
         ];
@@ -170,7 +164,6 @@ class TeacherController extends Controller
         $messages = [
 
             'email.unique'       => 'Email already exists.',
-
             'password.confirmed' =>
             'Password confirmation does not match.',
 

@@ -174,17 +174,13 @@
 
                         </button>
 
-
-
-
-
-                        <a href="{{ route('profile.adminList') }}"
+                        <a href="{{ route('profile.userList') }}"
                             class="btn btn-success w-100">
 
 
                             <i class="mr-2 fa-solid fa-users"></i>
 
-                            Admin Account List
+                            Student Account List
 
 
                         </a>

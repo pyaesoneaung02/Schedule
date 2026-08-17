@@ -15,7 +15,7 @@
 
                 <i class="mr-2 fa-solid fa-users"></i>
 
-                User Account List
+                Student Account List
 
             </h2>
 
@@ -80,7 +80,7 @@
 
                 <i class="mr-2 fa-solid fa-user-gear"></i>
 
-                Users
+                Students
 
 
             </h5>
