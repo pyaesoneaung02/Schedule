@@ -3,7 +3,9 @@
 @section('content')
     <div class="container-fluid">
 
-        <!-- Page Heading -->
+        {{-- =========================================================
+            PAGE HEADER
+        ========================================================== --}}
         <div class="mb-4">
 
             <h2 class="text-primary font-weight-bold">
@@ -12,41 +14,44 @@
             </h2>
 
             <p class="mb-0 text-muted">
-                View contact message details.
+                View and manage contact message details.
             </p>
 
         </div>
 
 
-        <!-- Contact Details Card -->
+        {{-- =========================================================
+            CONTACT DETAILS CARD
+        ========================================================== --}}
         <div class="border-0 shadow-sm card">
 
-            <!-- Card Header -->
+            {{-- =====================================================
+                CARD HEADER
+            ====================================================== --}}
             <div class="text-white card-header bg-primary">
 
                 <div class="d-flex justify-content-between align-items-center">
-
-                    {{-- <h5 class="mb-0">
-                        <i class="mr-2 fa-solid fa-comment"></i>
-                        Contact Message #{{ $contact->id }}
-                    </h5> --}}
 
                     <h5 class="mb-0">
                         <i class="mr-2 fa-solid fa-comment"></i>
                         Contact Message
                     </h5>
 
-                    <!-- Status -->
+
+                    {{-- STATUS --}}
                     @if ($contact->status === 'pending')
-                        <span class="badge badge-warning">
+                        <span class="px-3 py-2 badge badge-warning">
+                            <i class="mr-1 fa-solid fa-clock"></i>
                             Pending
                         </span>
                     @elseif ($contact->status === 'accepted')
-                        <span class="badge badge-success">
+                        <span class="px-3 py-2 badge badge-success">
+                            <i class="mr-1 fa-solid fa-check"></i>
                             Accepted
                         </span>
                     @elseif ($contact->status === 'rejected')
-                        <span class="badge badge-danger">
+                        <span class="px-3 py-2 badge badge-danger">
+                            <i class="mr-1 fa-solid fa-xmark"></i>
                             Rejected
                         </span>
                     @endif
@@ -56,30 +61,40 @@
             </div>
 
 
-            <!-- Card Body -->
+            {{-- =====================================================
+                CARD BODY
+            ====================================================== --}}
             <div class="card-body">
 
-                <!-- Teacher Information -->
+                {{-- =================================================
+                    TEACHER INFORMATION
+                ================================================== --}}
                 <div class="mb-4">
 
-                    <h5 class="mb-3 text-primary font-weight-bold">
+                    <h5 class="mb-4 text-primary font-weight-bold">
+
                         <i class="mr-2 fa-solid fa-user-tie"></i>
                         Teacher Information
+
                     </h5>
+
 
                     <div class="row">
 
-                        <!-- Teacher Name -->
+                        {{-- TEACHER NAME --}}
                         <div class="mb-3 col-md-6">
 
-                            <div class="p-3 border rounded bg-light">
+                            <div class="p-3 border rounded bg-light h-100">
 
-                                <small class="text-muted d-block">
+                                <small class="mb-1 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-user"></i>
                                     Teacher Name
                                 </small>
 
-                                <strong>
+                                <strong class="text-dark">
+
                                     {{ $contact->teacher?->name ?? ($contact->name ?? 'N/A') }}
+
                                 </strong>
 
                             </div>
@@ -87,43 +102,24 @@
                         </div>
 
 
-                        <!-- Phone -->
+                        {{-- PHONE NUMBER --}}
                         <div class="mb-3 col-md-6">
 
-                            <div class="p-3 border rounded bg-light">
+                            <div class="p-3 border rounded bg-light h-100">
 
-                                <small class="text-muted d-block">
+                                <small class="mb-1 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-phone"></i>
                                     Phone Number
                                 </small>
 
-                                @if ($contact->teacher?->user?->role === 'teacher')
-                                    <strong>
-                                        <i class="mr-1 fa-solid fa-phone text-success"></i>
+                                <strong class="text-dark">
 
-                                        {{ $contact->teacher->user->phone ?? '09-xxxxxxxxx' }}
-                                    </strong>
-                                @else
-                                    <strong>
-                                        09-xxxxxxxxx
-                                    </strong>
-                                @endif
+                                    @if ($contact->teacher?->user)
+                                        {{ $contact->teacher->user->phone ?? 'N/A' }}
+                                    @else
+                                        {{ $contact->phone ?? 'N/A' }}
+                                    @endif
 
-                            </div>
-
-                        </div>
-
-
-                        <!-- Email -->
-                        <div class="mb-3 col-md-6">
-
-                            <div class="p-3 border rounded bg-light">
-
-                                <small class="text-muted d-block">
-                                    Email
-                                </small>
-
-                                <strong>
-                                    {{ $contact->email ?? ($contact->teacher?->user?->email ?? 'N/A') }}
                                 </strong>
 
                             </div>
@@ -131,17 +127,41 @@
                         </div>
 
 
-                        <!-- Department -->
+                        {{-- EMAIL --}}
                         <div class="mb-3 col-md-6">
 
-                            <div class="p-3 border rounded bg-light">
+                            <div class="p-3 border rounded bg-light h-100">
 
-                                <small class="text-muted d-block">
+                                <small class="mb-1 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-envelope"></i>
+                                    Email Address
+                                </small>
+
+                                <strong class="text-dark">
+
+                                    {{ $contact->email ?? ($contact->teacher?->user?->email ?? 'N/A') }}
+
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- DEPARTMENT --}}
+                        <div class="mb-3 col-md-6">
+
+                            <div class="p-3 border rounded bg-light h-100">
+
+                                <small class="mb-1 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-building"></i>
                                     Department
                                 </small>
 
-                                <strong>
+                                <strong class="text-dark">
+
                                     {{ $contact->department ?? 'N/A' }}
+
                                 </strong>
 
                             </div>
@@ -156,27 +176,35 @@
                 <hr>
 
 
-                <!-- Contact Information -->
+                {{-- =================================================
+                    CONTACT INFORMATION
+                ================================================== --}}
                 <div class="my-4">
 
-                    <h5 class="mb-3 text-primary font-weight-bold">
+                    <h5 class="mb-4 text-primary font-weight-bold">
+
                         <i class="mr-2 fa-solid fa-envelope"></i>
                         Contact Information
+
                     </h5>
+
 
                     <div class="row">
 
-                        <!-- Subject -->
-                        <div class="mb-3 col-md-12">
+                        {{-- SUBJECT --}}
+                        <div class="mb-3 col-12">
 
                             <div class="p-3 border rounded bg-light">
 
-                                <small class="text-muted d-block">
+                                <small class="mb-1 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-heading"></i>
                                     Subject
                                 </small>
 
-                                <strong>
+                                <strong class="text-dark">
+
                                     {{ $contact->subject ?? 'No Subject' }}
+
                                 </strong>
 
                             </div>
@@ -184,17 +212,21 @@
                         </div>
 
 
-                        <!-- Message -->
-                        <div class="mb-3 col-md-12">
+                        {{-- MESSAGE --}}
+                        <div class="mb-3 col-12">
 
                             <div class="p-3 border rounded bg-light">
 
                                 <small class="mb-2 text-muted d-block">
+                                    <i class="mr-1 fa-solid fa-message"></i>
                                     Message
                                 </small>
 
-                                <div style="white-space: pre-line;">
-                                    {{ $contact->message }}
+                                <div class="p-3 bg-white border rounded text-dark"
+                                    style="white-space: pre-line; min-height: 120px;">
+
+                                    {{ $contact->message ?? 'No message available.' }}
+
                                 </div>
 
                             </div>
@@ -209,25 +241,45 @@
                 <hr>
 
 
-                <!-- Actions -->
-                <div class="pt-3 mt-4 border-top">
+                {{-- =================================================
+                    ACTION BUTTONS
+                ================================================== --}}
+                <div class="pt-3 mt-4">
 
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-wrap d-flex justify-content-between align-items-center">
 
-                        <!-- Back -->
-                        <a href="{{ route('contact.list') }}" class="btn btn-secondary">
+                        {{-- BACK BUTTON --}}
+                        <div class="mb-2">
 
-                            <i class="mr-1 fa-solid fa-arrow-left"></i>
-                            Back to Contact List
+                            <a href="{{ route('contact.list') }}" class="btn btn-secondary">
 
-                        </a>
+                                <i class="mr-1 fa-solid fa-arrow-left"></i>
+                                Back to Contact List
+
+                            </a>
+
+                        </div>
 
 
-                        <!-- Status Actions -->
-                        <div>
+                        {{-- ACTION BUTTONS --}}
+                        <div class="mb-2">
 
+                            {{-- =====================================
+                                REPLY BUTTON
+                            ====================================== --}}
+                            <a href="{{ route('contact.reply', $contact->id) }}" class="btn btn-primary">
+
+                                <i class="mr-1 fa-solid fa-reply"></i>
+                                Reply
+
+                            </a>
+
+
+                            {{-- =====================================
+                                PENDING STATUS
+                            ====================================== --}}
                             @if ($contact->status === 'pending')
-                                <!-- Accept -->
+                                {{-- ACCEPT --}}
                                 <form action="{{ route('contact.accept', $contact->id) }}" method="POST" class="d-inline">
 
                                     @csrf
@@ -244,7 +296,7 @@
                                 </form>
 
 
-                                <!-- Reject -->
+                                {{-- REJECT --}}
                                 <form action="{{ route('contact.reject', $contact->id) }}" method="POST" class="d-inline">
 
                                     @csrf
@@ -259,8 +311,13 @@
                                     </button>
 
                                 </form>
+
+
+                                {{-- =====================================
+                                ACCEPTED STATUS
+                            ====================================== --}}
                             @elseif ($contact->status === 'accepted')
-                                <!-- Change to Rejected -->
+                                {{-- CHANGE TO REJECTED --}}
                                 <form action="{{ route('contact.reject', $contact->id) }}" method="POST" class="d-inline">
 
                                     @csrf
@@ -275,8 +332,13 @@
                                     </button>
 
                                 </form>
+
+
+                                {{-- =====================================
+                                REJECTED STATUS
+                            ====================================== --}}
                             @elseif ($contact->status === 'rejected')
-                                <!-- Change to Accepted -->
+                                {{-- CHANGE TO ACCEPTED --}}
                                 <form action="{{ route('contact.accept', $contact->id) }}" method="POST" class="d-inline">
 
                                     @csrf
@@ -294,9 +356,11 @@
                             @endif
 
 
-                            <!-- Delete -->
+                            {{-- =====================================
+                                DELETE BUTTON
+                            ====================================== --}}
                             <form action="{{ route('contact.delete', $contact->id) }}" method="POST" class="d-inline"
-                                onsubmit="return confirm('Delete this contact message?')">
+                                onsubmit="return confirm('Are you sure you want to delete this contact message?')">
 
                                 @csrf
                                 @method('DELETE')

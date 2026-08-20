@@ -3,30 +3,36 @@
 
 <head>
 
-    <meta charset="utf-8" />
+    <meta charset="utf-8">
 
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <title>
         UCSMGY Portal - University of Computer Studies, Magway
     </title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
 
     {{-- =========================================================
         CSS
     ========================================================== --}}
 
-    <link rel="stylesheet" href="{{ asset('user/css/bootstrap-5.0.0-beta1.min.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('user/css/bootstrap-5.0.0-beta1.min.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('user/css/LineIcons.2.0.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('user/css/LineIcons.2.0.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('user/css/tiny-slider.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('user/css/tiny-slider.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('user/css/animate.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('user/css/animate.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('user/css/lindy-uikit.css') }}" />
+    <link rel="stylesheet"
+        href="{{ asset('user/css/lindy-uikit.css') }}">
+
 
 
     {{-- =========================================================
@@ -34,6 +40,7 @@
     ========================================================== --}}
 
     <style>
+
         /* =====================================================
            RESET
         ===================================================== */
@@ -42,7 +49,6 @@
         body {
 
             margin: 0 !important;
-
             padding: 0 !important;
 
             width: 100%;
@@ -59,6 +65,7 @@
         }
 
 
+
         /* =====================================================
            NAVBAR
         ===================================================== */
@@ -70,7 +77,6 @@
             height: 78px;
 
             margin: 0 !important;
-
             padding: 0 !important;
 
             background: #ffffff;
@@ -92,7 +98,6 @@
             height: 100%;
 
             margin: 0 !important;
-
             padding: 0 !important;
 
         }
@@ -103,10 +108,10 @@
             min-height: 78px;
 
             margin: 0 !important;
-
             padding: 0 !important;
 
         }
+
 
 
         /* =====================================================
@@ -129,13 +134,11 @@
         .ucsm-brand-logo {
 
             width: 42px;
-
             height: 42px;
 
             display: flex;
 
             align-items: center;
-
             justify-content: center;
 
             border-radius: 12px;
@@ -143,9 +146,11 @@
             color: #ffffff;
 
             background:
-                linear-gradient(135deg,
+                linear-gradient(
+                    135deg,
                     #1769e0,
-                    #0b4ca8);
+                    #0b4ca8
+                );
 
             box-shadow:
                 0 7px 18px rgba(23, 105, 224, .20);
@@ -199,6 +204,7 @@
         }
 
 
+
         /* =====================================================
            NAV LINKS
         ===================================================== */
@@ -213,8 +219,7 @@
 
             min-height: 78px;
 
-            padding:
-                0 15px !important;
+            padding: 0 15px !important;
 
             margin: 0 2px;
 
@@ -239,7 +244,6 @@
             position: absolute;
 
             left: 15px;
-
             right: 15px;
 
             bottom: 0;
@@ -250,8 +254,7 @@
 
             background: #1769e0;
 
-            transform:
-                scaleX(0);
+            transform: scaleX(0);
 
             transition:
                 transform .25s ease;
@@ -268,10 +271,10 @@
 
         .ucsm-navbar .nav-link:hover::after {
 
-            transform:
-                scaleX(1);
+            transform: scaleX(1);
 
         }
+
 
 
         /* =====================================================
@@ -292,20 +295,19 @@
         }
 
 
+
         /* =====================================================
-           NOTIFICATION
+           NOTIFICATION BUTTON
         ===================================================== */
 
         .ucsm-notification {
 
             width: 38px;
-
             height: 38px;
 
             display: flex !important;
 
             align-items: center;
-
             justify-content: center;
 
             min-height: 38px !important;
@@ -317,6 +319,8 @@
             border-radius: 50%;
 
             background: #f5f8fc;
+
+            position: relative;
 
         }
 
@@ -335,15 +339,300 @@
         }
 
 
+        .ucsm-notification i {
+
+            font-size: 18px;
+
+            color: #1769e0;
+
+        }
+
+
+
+        /* =====================================================
+           NOTIFICATION BADGE
+        ===================================================== */
+
+        .ucsm-notification-badge {
+
+            position: absolute;
+
+            top: -3px;
+
+            right: -3px;
+
+            min-width: 17px;
+
+            height: 17px;
+
+            padding: 0 4px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50px;
+
+            background: #dc3545;
+
+            color: #ffffff;
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+            border: 2px solid #ffffff;
+
+        }
+
+
+
+        /* =====================================================
+           NOTIFICATION DROPDOWN
+        ===================================================== */
+
+        .ucsm-notification-dropdown {
+
+            width: 340px;
+
+            margin-top: 10px !important;
+
+            padding: 0 !important;
+
+            overflow: hidden;
+
+            border: 1px solid #edf1f6 !important;
+
+            border-radius: 14px !important;
+
+            box-shadow:
+                0 18px 45px rgba(20, 50, 90, .12) !important;
+
+        }
+
+
+        .ucsm-notification-header {
+
+            padding: 15px 17px;
+
+            background: #ffffff;
+
+            border-bottom: 1px solid #edf1f6;
+
+        }
+
+
+        .ucsm-notification-header h6 {
+
+            margin: 0;
+
+            color: #17253a;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+        }
+
+
+        .ucsm-notification-header small {
+
+            color: #8a96a6;
+
+            font-size: 10px;
+
+        }
+
+
+
+        /* =====================================================
+           NOTIFICATION ITEM
+        ===================================================== */
+
+        .ucsm-notification-item {
+
+            display: block;
+
+            padding: 13px 15px;
+
+            text-decoration: none !important;
+
+            border-bottom: 1px solid #f0f2f5;
+
+            background: #ffffff;
+
+            transition:
+                background .2s ease;
+
+        }
+
+
+        .ucsm-notification-item:hover {
+
+            background: #f7faff;
+
+        }
+
+
+        .ucsm-notification-item.unread {
+
+            background: #f3f8ff;
+
+        }
+
+
+        .ucsm-notification-title {
+
+            color: #26364d;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+        }
+
+
+        .ucsm-notification-message {
+
+            margin-top: 4px;
+
+            color: #64748b;
+
+            font-size: 10px;
+
+            line-height: 1.5;
+
+        }
+
+
+        .ucsm-notification-date {
+
+            margin-top: 5px;
+
+            color: #9aa5b4;
+
+            font-size: 9px;
+
+        }
+
+
+
+        /* =====================================================
+           STATUS BADGES
+        ===================================================== */
+
+        .ucsm-status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            padding: 4px 8px;
+
+            border-radius: 50px;
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+        }
+
+
+        .ucsm-status-pending {
+
+            color: #856404;
+
+            background: #fff3cd;
+
+        }
+
+
+        .ucsm-status-accepted {
+
+            color: #155724;
+
+            background: #d4edda;
+
+        }
+
+
+        .ucsm-status-rejected {
+
+            color: #721c24;
+
+            background: #f8d7da;
+
+        }
+
+
+
+        /* =====================================================
+           REPLY LABEL
+        ===================================================== */
+
+        .ucsm-reply-label {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 4px;
+
+            margin-top: 5px;
+
+            color: #198754;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+        }
+
+
+
+        /* =====================================================
+           VIEW ALL
+        ===================================================== */
+
+        .ucsm-notification-footer {
+
+            padding: 12px;
+
+            text-align: center;
+
+            background: #ffffff;
+
+        }
+
+
+        .ucsm-notification-footer a {
+
+            color: #1769e0;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-decoration: none;
+
+        }
+
+
+        .ucsm-notification-footer a:hover {
+
+            color: #0b4ca8;
+
+        }
+
+
+
         /* =====================================================
            DROPDOWN
         ===================================================== */
 
         .ucsm-navbar .dropdown-menu {
-
-            margin-top: 10px !important;
-
-            padding: 7px;
 
             border: 1px solid #edf1f6 !important;
 
@@ -378,6 +667,7 @@
         }
 
 
+
         /* =====================================================
            MAIN
         ===================================================== */
@@ -391,8 +681,9 @@
         }
 
 
+
         /* =====================================================
-           HERO DIRECTLY UNDER NAVBAR
+           HERO
         ===================================================== */
 
         .ucsm-portal-hero {
@@ -404,6 +695,7 @@
         }
 
 
+
         /* =====================================================
            FOOTER
         ===================================================== */
@@ -412,8 +704,7 @@
 
             margin: 0 !important;
 
-            padding:
-                30px 0;
+            padding: 30px 0;
 
             background: #101c2d;
 
@@ -431,8 +722,9 @@
         }
 
 
+
         /* =====================================================
-           MOBILE NAVBAR
+           MOBILE
         ===================================================== */
 
         @media (max-width: 991px) {
@@ -457,8 +749,7 @@
 
                 min-height: 48px;
 
-                padding:
-                    0 15px !important;
+                padding: 0 15px !important;
 
             }
 
@@ -472,8 +763,7 @@
 
             .ucsm-navbar .navbar-collapse {
 
-                padding:
-                    12px 0 15px;
+                padding: 12px 0 15px;
 
             }
 
@@ -491,10 +781,28 @@
 
             }
 
+
+            .ucsm-notification {
+
+                margin-left: 0;
+
+            }
+
+
+            .ucsm-notification-dropdown {
+
+                width: 100%;
+
+                max-width: 340px;
+
+            }
+
         }
+
     </style>
 
 </head>
+
 
 
 <body>
@@ -517,13 +825,15 @@
                         BRAND
                     ================================================== --}}
 
-                    <a class="ucsm-brand" href="{{ route('userHome') }}">
+                    <a class="ucsm-brand"
+                       href="{{ route('userHome') }}">
 
                         <div class="ucsm-brand-logo">
 
                             <i class="lni lni-graduation"></i>
 
                         </div>
+
 
                         <div class="ucsm-brand-text">
 
@@ -540,13 +850,19 @@
                     </a>
 
 
+
                     {{-- =================================================
                         MOBILE TOGGLE
                     ================================================== --}}
 
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent6" aria-controls="navbarSupportedContent6"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                    <button
+                        class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent6"
+                        aria-controls="navbarSupportedContent6"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
 
                         <span class="toggler-icon"></span>
 
@@ -557,20 +873,26 @@
                     </button>
 
 
+
                     {{-- =================================================
                         NAVIGATION
                     ================================================== --}}
 
-                    <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent6">
+                    <div
+                        class="collapse navbar-collapse sub-menu-bar"
+                        id="navbarSupportedContent6">
 
                         <ul class="navbar-nav ms-auto align-items-center">
 
 
-                            {{-- HOME --}}
+                            {{-- =================================================
+                                HOME
+                            ================================================== --}}
 
                             <li class="nav-item">
 
-                                <a class="nav-link" href="{{ route('userHome') }}">
+                                <a class="nav-link"
+                                   href="{{ route('userHome') }}">
 
                                     Home
 
@@ -579,11 +901,15 @@
                             </li>
 
 
-                            {{-- SCHEDULE --}}
+
+                            {{-- =================================================
+                                SCHEDULE
+                            ================================================== --}}
 
                             <li class="nav-item">
 
-                                <a class="nav-link" href="{{ route('user.schedule') }}">
+                                <a class="nav-link"
+                                   href="{{ route('user.schedule') }}">
 
                                     Schedule
 
@@ -592,17 +918,22 @@
                             </li>
 
 
-                            {{-- SUBJECT --}}
+
+                            {{-- =================================================
+                                SUBJECT
+                            ================================================== --}}
 
                             <li class="nav-item">
 
-                                <a class="nav-link" href="{{ route('user.subject') }}">
+                                <a class="nav-link"
+                                   href="{{ route('user.subject') }}">
 
                                     Subject
 
                                 </a>
 
                             </li>
+
 
 
                             {{-- =================================================
@@ -612,11 +943,14 @@
                             @if (auth()->check() && auth()->user()->role === 'teacher')
 
 
-                                {{-- CONTACT --}}
+                                {{-- =================================================
+                                    CONTACT
+                                ================================================== --}}
 
                                 <li class="nav-item">
 
-                                    <a class="nav-link" href="{{ route('user.contact') }}">
+                                    <a class="nav-link"
+                                       href="{{ route('user.contact') }}">
 
                                         Contact
 
@@ -625,96 +959,246 @@
                                 </li>
 
 
+
                                 {{-- =================================================
                                     NOTIFICATION
                                 ================================================== --}}
 
+                                @php
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | Unread Notification Count
+                                    |--------------------------------------------------------------------------
+                                    |
+                                    | Do NOT check status = success.
+                                    | Your actual statuses are:
+                                    |
+                                    | pending
+                                    | accepted
+                                    | rejected
+                                    |
+                                    */
+
+                                    $unreadCount = \App\Models\Contact::where(
+                                            'user_id',
+                                            auth()->id()
+                                        )
+                                        ->where(
+                                            'is_user_read',
+                                            false
+                                        )
+                                        ->count();
+
+
+                                    /*
+                                    |--------------------------------------------------------------------------
+                                    | Recent Notifications
+                                    |--------------------------------------------------------------------------
+                                    */
+
+                                    $recentNotis = \App\Models\Contact::where(
+                                            'user_id',
+                                            auth()->id()
+                                        )
+                                        ->latest()
+                                        ->take(5)
+                                        ->get();
+
+                                @endphp
+
+
                                 <li class="nav-item dropdown">
 
-                                    <a class="nav-link ucsm-notification position-relative" href="#"
-                                        id="notificationDropdown" role="button" data-bs-toggle="dropdown"
+
+                                    {{-- =================================================
+                                        BELL BUTTON
+                                    ================================================== --}}
+
+                                    <a
+                                        class="nav-link ucsm-notification position-relative"
+                                        href="#"
+                                        id="notificationDropdown"
+                                        role="button"
+                                        data-bs-toggle="dropdown"
                                         aria-expanded="false">
 
                                         <i class="lni lni-alarm"></i>
 
 
-                                        @php
-
-                                            $unreadCount = \App\Models\Contact::where('user_id', auth()->id())
-                                                ->where('status', 'success')
-                                                ->where('is_user_read', false)
-                                                ->count();
-
-                                        @endphp
-
+                                        {{-- UNREAD BADGE --}}
 
                                         @if ($unreadCount > 0)
-                                            <span
-                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                                                style="font-size:8px;">
 
-                                                {{ $unreadCount }}
+                                            <span class="ucsm-notification-badge">
+
+                                                @if ($unreadCount > 99)
+                                                    99+
+                                                @else
+                                                    {{ $unreadCount }}
+                                                @endif
 
                                             </span>
+
                                         @endif
 
                                     </a>
 
 
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown"
-                                        style="width:300px;">
 
+                                    {{-- =================================================
+                                        NOTIFICATION DROPDOWN
+                                    ================================================== --}}
+
+                                    <ul
+                                        class="dropdown-menu dropdown-menu-end ucsm-notification-dropdown"
+                                        aria-labelledby="notificationDropdown">
+
+
+                                        {{-- HEADER --}}
 
                                         <li>
 
-                                            <h6 class="dropdown-header fw-bold">
+                                            <div class="ucsm-notification-header">
 
-                                                Notifications
+                                                <div class="d-flex justify-content-between align-items-center">
 
-                                            </h6>
+                                                    <h6>
+
+                                                        <i class="lni lni-alarm me-1"></i>
+
+                                                        Notifications
+
+                                                    </h6>
+
+
+                                                    @if ($unreadCount > 0)
+
+                                                        <small>
+
+                                                            {{ $unreadCount }}
+                                                            unread
+
+                                                        </small>
+
+                                                    @endif
+
+                                                </div>
+
+                                            </div>
 
                                         </li>
 
 
-                                        @php
 
-                                            $recentNotis = \App\Models\Contact::where('user_id', auth()->id())
-                                                ->latest()
-                                                ->take(5)
-                                                ->get();
-
-                                        @endphp
-
+                                        {{-- =================================================
+                                            NOTIFICATION LIST
+                                        ================================================== --}}
 
                                         @forelse ($recentNotis as $noti)
+
                                             <li>
 
-                                                <a class="dropdown-item py-2" href="{{ route('user.notifications') }}">
+                                                <a
+                                                    href="{{ route('user.notifications') }}"
+                                                    class="ucsm-notification-item
+                                                        {{ !$noti->is_user_read ? 'unread' : '' }}">
+
+
+                                                    {{-- TOP --}}
 
                                                     <div class="d-flex justify-content-between align-items-center">
 
-                                                        <small class="fw-semibold">
+                                                        <span class="ucsm-notification-title">
 
-                                                            {{ $noti->name ?? 'Unknown Name' }}
-
-                                                        </small>
-
-
-                                                        <span
-                                                            class="badge bg-{{ $noti->status == 'success' ? 'success' : 'warning text-dark' }}">
-
-                                                            {{ ucfirst($noti->status) }}
+                                                            {{ $noti->subject ?? 'Contact Message' }}
 
                                                         </span>
+
+
+                                                        {{-- STATUS --}}
+
+                                                        @if ($noti->status === 'pending')
+
+                                                            <span class="ucsm-status ucsm-status-pending">
+
+                                                                Pending
+
+                                                            </span>
+
+                                                        @elseif ($noti->status === 'accepted')
+
+                                                            <span class="ucsm-status ucsm-status-accepted">
+
+                                                                Accepted
+
+                                                            </span>
+
+                                                        @elseif ($noti->status === 'rejected')
+
+                                                            <span class="ucsm-status ucsm-status-rejected">
+
+                                                                Rejected
+
+                                                            </span>
+
+                                                        @else
+
+                                                            <span class="ucsm-status">
+
+                                                                {{ ucfirst($noti->status ?? 'Unknown') }}
+
+                                                            </span>
+
+                                                        @endif
 
                                                     </div>
 
 
-                                                    <small class="text-muted">
 
-                                                        {{ Str::limit($noti->subject, 30) }}
+                                                    {{-- =================================================
+                                                        REPLY
+                                                    ================================================== --}}
 
-                                                    </small>
+                                                    @if (!empty($noti->reply_message))
+
+                                                        <div class="ucsm-reply-label">
+
+                                                            <i class="lni lni-reply"></i>
+
+                                                            Admin replied to your message
+
+                                                        </div>
+
+                                                    @endif
+
+
+
+                                                    {{-- MESSAGE --}}
+
+                                                    <div class="ucsm-notification-message">
+
+                                                        {{ Str::limit(
+                                                            $noti->message ?? '',
+                                                            55
+                                                        ) }}
+
+                                                    </div>
+
+
+
+                                                    {{-- DATE --}}
+
+                                                    <div class="ucsm-notification-date">
+
+                                                        <i class="lni lni-calendar"></i>
+
+                                                        {{ $noti->created_at
+                                                            ? $noti->created_at->format('d M Y, h:i A')
+                                                            : 'N/A'
+                                                        }}
+
+                                                    </div>
 
                                                 </a>
 
@@ -724,24 +1208,44 @@
 
                                             <li>
 
-                                                <span class="dropdown-item text-center py-3 text-muted">
+                                                <div class="py-4 text-center text-muted">
 
-                                                    No notifications
+                                                    <i
+                                                        class="mb-2 lni lni-envelope"
+                                                        style="font-size: 24px;">
+                                                    </i>
 
-                                                </span>
+                                                    <div>
+
+                                                        No notifications
+
+                                                    </div>
+
+                                                </div>
 
                                             </li>
+
                                         @endforelse
 
 
+
+                                        {{-- =================================================
+                                            VIEW ALL
+                                        ================================================== --}}
+
                                         <li>
 
-                                            <a class="dropdown-item text-center text-primary fw-semibold"
-                                                href="{{ route('user.notifications') }}">
+                                            <div class="ucsm-notification-footer">
 
-                                                View All Notifications
+                                                <a href="{{ route('user.notifications') }}">
 
-                                            </a>
+                                                    View All Notifications
+
+                                                    <i class="lni lni-arrow-right"></i>
+
+                                                </a>
+
+                                            </div>
 
                                         </li>
 
@@ -752,14 +1256,20 @@
                             @endif
 
 
+
                             {{-- =================================================
                                 ACCOUNT
                             ================================================== --}}
 
                             <li class="nav-item dropdown">
 
-                                <a class="nav-link dropdown-toggle ucsm-account-link" href="#"
-                                    id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <a
+                                    class="nav-link dropdown-toggle ucsm-account-link"
+                                    href="#"
+                                    id="accountDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
 
                                     <i class="lni lni-user me-1"></i>
 
@@ -768,12 +1278,18 @@
                                 </a>
 
 
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                                <ul
+                                    class="dropdown-menu dropdown-menu-end"
+                                    aria-labelledby="accountDropdown">
 
+
+                                    {{-- PROFILE --}}
 
                                     <li>
 
-                                        <a class="dropdown-item py-2" href="{{ route('user.profile') }}">
+                                        <a
+                                            class="dropdown-item py-2"
+                                            href="{{ route('user.profile') }}">
 
                                             <i class="lni lni-user me-2 text-primary"></i>
 
@@ -784,9 +1300,14 @@
                                     </li>
 
 
+
+                                    {{-- CHANGE PASSWORD --}}
+
                                     <li>
 
-                                        <a class="dropdown-item py-2" href="{{ route('user.password.change') }}">
+                                        <a
+                                            class="dropdown-item py-2"
+                                            href="{{ route('user.password.change') }}">
 
                                             <i class="lni lni-lock me-2 text-warning"></i>
 
@@ -797,6 +1318,7 @@
                                     </li>
 
 
+
                                     <li>
 
                                         <hr class="dropdown-divider">
@@ -804,13 +1326,21 @@
                                     </li>
 
 
+
+                                    {{-- LOGOUT --}}
+
                                     <li>
 
-                                        <form action="{{ route('logout') }}" method="POST" class="px-2 py-1">
+                                        <form
+                                            action="{{ route('logout') }}"
+                                            method="POST"
+                                            class="px-2 py-1">
 
                                             @csrf
 
-                                            <button type="submit" class="btn btn-danger btn-sm w-100 rounded-pill">
+                                            <button
+                                                type="submit"
+                                                class="btn btn-danger btn-sm w-100 rounded-pill">
 
                                                 <i class="lni lni-power-switch me-1"></i>
 
@@ -826,7 +1356,6 @@
 
                             </li>
 
-
                         </ul>
 
                     </div>
@@ -840,6 +1369,7 @@
     </header>
 
 
+
     {{-- =========================================================
         MAIN CONTENT
     ========================================================== --}}
@@ -849,6 +1379,7 @@
         @yield('content')
 
     </main>
+
 
 
     {{-- =========================================================
@@ -871,6 +1402,7 @@
     </footer>
 
 
+
     {{-- =========================================================
         JAVASCRIPT
     ========================================================== --}}
@@ -882,6 +1414,7 @@
     <script src="{{ asset('user/js/wow.min.js') }}"></script>
 
     <script src="{{ asset('user/js/main.js') }}"></script>
+
 
     @stack('scripts')
 

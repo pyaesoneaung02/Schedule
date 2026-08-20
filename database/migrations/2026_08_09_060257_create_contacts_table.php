@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('department')->nullable();
             $table->string('subject')->nullable();
             $table->text('message');
+            $table->text('reply_message')->nullable();
             $table->string('status')->default('pending');
             $table->boolean('is_user_read')->default(false);
             $table->timestamps();

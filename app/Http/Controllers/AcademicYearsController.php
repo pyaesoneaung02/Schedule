@@ -74,11 +74,11 @@ class AcademicYearsController extends Controller
 
     }
 
-    // Update
+    // Update Academic Year
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name'       => 'required',
+            'name'       => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after:start_date',
         ]);
@@ -89,10 +89,12 @@ class AcademicYearsController extends Controller
             'name'       => $request->name,
             'start_date' => $request->start_date,
             'end_date'   => $request->end_date,
-            'status'     => $request->status,
         ]);
 
-        Alert::success('Success', 'Academic Year Updated Successfully');
+        Alert::success(
+            'Success',
+            'Academic Year Updated Successfully'
+        );
 
         return redirect()->route('academicYear.list');
     }

@@ -162,15 +162,32 @@ class ContactController extends Controller
     {
         $userId = auth()->id();
 
-        // For read message
+        $notifications = Contact::where('user_id', $userId)
+            ->latest()
+            ->get();
+
+
         Contact::where('user_id', $userId)
-               ->where('status', 'success')
-               ->where('is_user_read', false)
-               ->update(['is_user_read' => true]);
+            ->where('is_user_read', false)
+            ->where(function ($query) {
 
-        $notifications = Contact::where('user_id', $userId)->latest()->get();
+                $query->whereNotNull('reply_message')
+                      ->where('reply_message', '!=', '');
 
-        return view('user.component.notification', compact('notifications'));
+                $query->orWhereIn('status', [
+                    'accepted',
+                    'rejected',
+                ]);
+
+            })
+            ->update([
+                'is_user_read' => true,
+            ]);
+
+        return view(
+            'user.component.notification',
+            compact('notifications')
+        );
     }
 
 
@@ -184,6 +201,34 @@ class ContactController extends Controller
         return redirect()->route(
             'contact.list'
         );
+    }
+
+    //contact reply route
+    public function reply($id)
+    {
+        $contact = Contact::findOrFail($id);
+
+        return view('admin.contact.reply', compact('contact'));
+    }
+
+    //send reply
+    public function sendReply(Request $request, $id)
+    {
+        $request->validate([
+            'reply_message' => 'required|string|max:5000',
+        ]);
+
+        $contact = Contact::findOrFail($id);
+
+        $contact->reply_message = $request->reply_message;
+
+        $contact->is_user_read = false;
+
+        $contact->save();
+
+        return redirect()
+            ->route('contact.show', $contact->id)
+            ->with('success', 'Reply sent successfully.');
     }
 
 
@@ -215,27 +260,6 @@ class ContactController extends Controller
         );
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | CREATE AUTO SCHEDULE
-    |--------------------------------------------------------------------------
-    |
-    | IMPORTANT RULE
-    |
-    | Subject time_number is NOT used here.
-    |
-    | One subject for one section:
-    |
-    |       3 times / week
-    |       1 period each time
-    |
-    | Therefore:
-    |
-    |       required = 3
-    |
-    |--------------------------------------------------------------------------
-    */
 
     public function createSchedule(Request $request)
     {

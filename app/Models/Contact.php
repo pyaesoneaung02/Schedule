@@ -1,13 +1,10 @@
 <?php
 namespace App\Models;
 
-use App\Models\Teacher;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Contact extends Model
 {
-    //contact model
     protected $fillable = [
         'teacher_id',
         'user_id',
@@ -16,15 +13,10 @@ class Contact extends Model
         'department',
         'subject',
         'message',
+        'reply_message',
         'status',
-        // 'is_user_read',
     ];
 
-    //   protected $casts = [
-    //     'is_user_read' => 'boolean',
-    // ];
-
-    // to delete contact
     public function teacher()
     {
         return $this->belongsTo(
@@ -33,7 +25,6 @@ class Contact extends Model
         );
     }
 
-    // to delete contact
     public function user()
     {
         return $this->belongsTo(

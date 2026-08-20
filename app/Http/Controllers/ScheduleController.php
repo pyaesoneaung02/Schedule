@@ -728,24 +728,6 @@ class ScheduleController extends Controller
                 ]);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | 13. CLASS DAILY MAXIMUM
-        |
-        | Maximum 4 usable periods per day
-        |
-        | Because timetable:
-        |
-        | 09:00 - 10:30
-        | 10:30 - 12:00
-        | Lunch
-        | 01:00 - 02:30
-        | 02:30 - 04:00
-        |
-        | = 4 usable periods
-        |--------------------------------------------------------------------------
-        */
-
         $classDaily = Schedule::query()
             ->where(
                 'academic_year_id',
@@ -1462,18 +1444,29 @@ class ScheduleController extends Controller
     public function downloadPDF($yearId, $roomId, $majorId, $academicYearID)
     {
         $yearData = Year::findOrFail($yearId);
-        $room     = Room::findOrFail($roomId);
-        $major    = Major::findOrFail($majorId);
+
+        $room = Room::findOrFail($roomId);
+
+        $major = Major::findOrFail($majorId);
 
         $academicYear = AcademicYears::findOrFail($academicYearID);
 
-        $semesters = Semesters::findOrFail(request('semesterID'));
-        $sections  = Sections::findOrFail(request('sectionID'));
+        $semesters = Semesters::findOrFail(
+            request('semesterID')
+        );
 
-        $days  = Day::all();
+        $sections = Sections::findOrFail(
+            request('sectionID')
+        );
+
+        $days = Day::all();
+
         $times = Time::all();
 
-        $schedules = Schedule::with(['subject', 'teacher'])
+        $schedules = Schedule::with([
+            'subject',
+            'teacher'
+        ])
             ->where('academic_year_id', $academicYearID)
             ->where('year_id', $yearId)
             ->where('room_id', $roomId)
@@ -1482,20 +1475,27 @@ class ScheduleController extends Controller
             ->where('section_id', $sections->id)
             ->get();
 
-        $pdf = Pdf::loadView('admin.schedule.pdf', compact(
-            'yearData',
-            'room',
-            'major',
-            'academicYear',
-            'semesters',
-            'sections',
-            'days',
-            'times',
-            'schedules'
-        ));
 
-        return $pdf->setPaper('a4', 'landscape')
-            ->download('TimeTable.pdf');
+        $pdf = Pdf::loadView(
+            'admin.schedule.pdf',
+            compact(
+                'yearData',
+                'room',
+                'major',
+                'academicYear',
+                'semesters',
+                'sections',
+                'days',
+                'times',
+                'schedules'
+            )
+        );
+
+
+        $pdf->setPaper('A4', 'landscape');
+
+
+        return $pdf->download('TimeTable.pdf');
     }
 
     // generate schedule

@@ -197,13 +197,16 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         // Auto Generate Result
         Route::post('result/{year}', [ScheduleController::class, 'result'])->name('schedule.result');
 
-
         // Drag & Drop Swap
         Route::post('schedule/swap', [ScheduleController::class, 'swap'])->name('schedule.swap');
 
         // PDF
         // Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
         //     ->name('schedule.pdf');
+        Route::get(
+            'pdf/{year}/{room}/{major}/{academicYearID}',
+            [ScheduleController::class, 'downloadPDF']
+        )->name('schedule.pdf');
 
         // Teacher timetable
         Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])
@@ -239,8 +242,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
         Route::put('accept/{id}', [ContactController::class, 'accept'])->name('contact.accept');
 
-        Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject'); 
-    });
+        Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject');
 
+        Route::get('/contact/{id}/reply', [ContactController::class, 'reply'])->name('contact.reply');
+
+        Route::post('/{id}/reply', [ContactController::class, 'sendReply'])->name('contact.sendReply');
+
+        Route::get('/{id}', [ContactController::class, 'show'])->name('contact.show');
+
+    });
 
 });

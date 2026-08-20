@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 
 <head>
 
@@ -7,93 +7,470 @@
 
     <title>Weekly Timetable</title>
 
+    @php
+
+        /*
+        |--------------------------------------------------------------------------
+        | UNIQUE SUBJECTS
+        |--------------------------------------------------------------------------
+        */
+
+        $uniqueSubjects = $schedules->unique('subject_id');
+
+        $subjectCount = $uniqueSubjects->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AUTO COMPACT
+        |--------------------------------------------------------------------------
+        */
+
+        if ($subjectCount <= 6) {
+
+            $compactClass = 'compact-normal';
+
+        } elseif ($subjectCount <= 8) {
+
+            $compactClass = 'compact-medium';
+
+        } elseif ($subjectCount <= 10) {
+
+            $compactClass = 'compact-small';
+
+        } else {
+
+            $compactClass = 'compact-ultra';
+
+        }
+
+    @endphp
+
 
     <style>
+
+        /* =========================================================
+           PAGE
+        ========================================================== */
+
         @page {
 
             size: A4 landscape;
 
-            margin: 10mm;
+            /*
+            |--------------------------------------------------------------------------
+            | TOP    = 8mm
+            | RIGHT  = 12mm
+            | BOTTOM = 8mm
+            | LEFT   = 12mm
+            |--------------------------------------------------------------------------
+            */
+
+            margin: 8mm 12mm 8mm 12mm;
+        }
+
+
+        /* =========================================================
+           RESET
+        ========================================================== */
+
+        * {
+
+            box-sizing: border-box;
 
         }
 
+
+        html,
+        body {
+
+            margin: 0;
+
+            padding: 0;
+
+        }
+
+
+        /* =========================================================
+           BODY
+        ========================================================== */
 
         body {
 
-            font-family: DejaVu Sans, sans-serif;
+            font-family: 'NotoSansMyanmar', sans-serif;
 
-            font-size: 10px;
+            font-size: 9px;
 
-            color: #000;
+            color: #4b5563;
 
         }
 
 
-        /* ================= HEADER ================= */
+        /* =========================================================
+           MAIN WRAPPER
+        ========================================================== */
 
+        .pdf-wrapper {
+
+            width: 96%;
+
+            margin: 0 auto;
+
+            padding: 0;
+
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================== */
 
         .header {
 
+            width: 100%;
+
             text-align: center;
 
-            margin-bottom: 15px;
+            margin-bottom: 7px;
 
         }
 
 
-        .university {
+        .university-name {
 
-            font-size: 18px;
+            margin: 0;
+
+            font-size: 17px;
 
             font-weight: bold;
 
             color: #007bff;
 
+            line-height: 1.25;
+
         }
 
 
-        .title {
+        .academic-info {
 
-            margin-top: 8px;
+            margin-top: 4px;
 
-            font-size: 12px;
+            font-size: 10px;
 
             font-weight: bold;
 
-            line-height: 18px;
+            line-height: 1.35;
+
+            color: #343a40;
 
         }
 
 
+        /* =========================================================
+           TIMETABLE INFORMATION
+        ========================================================== */
 
-        /* ================= INFO ================= */
-
-
-        .info-table {
+        .timetable-info {
 
             width: 100%;
 
-            margin-bottom: 10px;
+            margin: 0 auto 4px;
+
+            font-size: 8.5px;
+
+            font-weight: bold;
+
+        }
+
+
+        .timetable-info table {
+
+            width: 100%;
 
             border-collapse: collapse;
 
         }
 
 
-        .info-table td {
+        .timetable-info td {
 
             border: none;
 
-            font-weight: bold;
+            padding: 0;
 
         }
 
 
+        .info-left {
 
-        /* ================= TIMETABLE ================= */
+            text-align: left;
 
+        }
+
+
+        .info-right {
+
+            text-align: right;
+
+        }
+
+
+        /* =========================================================
+           TIMETABLE
+        ========================================================== */
 
         .timetable {
+
+            width: 100%;
+
+            margin: 0 auto;
+
+            border-collapse: collapse;
+
+            table-layout: fixed;
+
+            page-break-inside: avoid;
+
+        }
+
+
+        /* =========================================================
+           TABLE HEADER
+        ========================================================== */
+
+        .timetable th {
+
+            height: 31px;
+
+            padding: 2px;
+
+            border: 1px solid #222;
+
+            background-color: #6c757d;
+
+            color: #ffffff;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+            font-size: 8px;
+
+            font-weight: bold;
+
+            line-height: 1.1;
+
+        }
+
+
+        /* =========================================================
+           TABLE BODY
+        ========================================================== */
+
+        .timetable td {
+
+            height: 55px;
+
+            padding: 2px;
+
+            border: 1px solid #222;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+            font-size: 8px;
+
+            line-height: 1.15;
+
+        }
+
+
+        /* =========================================================
+           DAY
+        ========================================================== */
+
+        .day-header {
+
+            width: 14%;
+
+        }
+
+
+        .day-cell {
+
+            width: 14%;
+
+            background-color: #6c757d;
+
+            color: #ffffff;
+
+            font-weight: bold;
+
+            font-size: 9px;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+        }
+
+
+        /* =========================================================
+           TIME
+        ========================================================== */
+
+        .time-header {
+
+            width: 19.75%;
+
+        }
+
+
+        /* =========================================================
+           LUNCH HEADER
+        ========================================================== */
+
+        .lunch-header {
+
+            width: 7%;
+
+            padding: 0 !important;
+
+        }
+
+
+        /* =========================================================
+           LUNCH CELL
+        ========================================================== */
+
+        .lunch-cell {
+
+            width: 7%;
+
+            padding: 0 !important;
+
+            background-color: #dee2e6;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+        }
+
+
+        /* =========================================================
+           LUNCH TEXT
+        ========================================================== */
+
+        .lunch-text {
+
+            display: inline-block;
+
+            font-family: 'NotoSansMyanmar', sans-serif;
+
+            font-size: 8px;
+
+            font-weight: bold;
+
+            color: #6c757d;
+
+            white-space: nowrap;
+
+            text-align: center;
+
+            transform: rotate(-90deg);
+
+            -webkit-transform: rotate(-90deg);
+
+        }
+
+
+        /* =========================================================
+           SUBJECT
+        ========================================================== */
+
+        .subject-cell {
+
+            background-color: #ffffff;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+        }
+
+
+        .subject-code {
+
+            display: block;
+
+            margin-bottom: 2px;
+
+            font-size: 9px;
+
+            font-weight: bold;
+
+            color: #007bff;
+
+            line-height: 1.1;
+
+        }
+
+
+        .teacher-name {
+
+            display: block;
+
+            font-size: 7px;
+
+            color: #6c757d;
+
+            line-height: 1.1;
+
+        }
+
+
+        /* =========================================================
+           EMPTY
+        ========================================================== */
+
+        .empty-slot {
+
+            background-color: #fafafa;
+
+            text-align: center;
+
+            vertical-align: middle;
+
+        }
+
+
+        .extra-curriculum {
+
+            font-size: 7px;
+
+            color: #6c757d;
+
+        }
+
+
+        /* =========================================================
+           SUBJECT LIST
+        ========================================================== */
+
+        .subject-list {
+
+            width: 100%;
+
+            margin: 7px auto 0;
+
+            page-break-inside: auto;
+
+        }
+
+
+        .subject-list table {
 
             width: 100%;
 
@@ -104,159 +481,458 @@
         }
 
 
-        .timetable th {
+        .subject-list thead {
 
-            background: #6c757d;
-
-            color: white;
-
-            border: 1px solid #000;
-
-            padding: 6px;
-
-            text-align: center;
-
-            font-size: 10px;
+            display: table-header-group;
 
         }
 
 
+        .subject-list tr {
 
-        .timetable td {
+            page-break-inside: avoid;
 
-            border: 1px solid #000;
+            page-break-after: auto;
 
-            height: 38px;
+        }
 
-            text-align: center;
+
+        /* =========================================================
+           SUBJECT LIST HEADER
+        ========================================================== */
+
+        .subject-list th {
+
+            padding: 3px 6px;
+
+            border-bottom: 1px solid #bfc3c8;
+
+            text-align: left;
+
+            font-size: 8px;
+
+            font-weight: bold;
+
+            color: #374151;
+
+            line-height: 1.1;
+
+        }
+
+
+        /* =========================================================
+           SUBJECT LIST BODY
+        ========================================================== */
+
+        .subject-list td {
+
+            padding: 3px 6px;
+
+            border-bottom: 1px solid #e5e7eb;
 
             vertical-align: middle;
 
-        }
+            font-size: 7.5px;
 
-
-
-        .timetable th:first-child,
-
-        .timetable td:first-child {
-
-            width: 70px;
+            line-height: 1.15;
 
         }
 
 
+        .subject-code-list {
 
-        .day {
-
-            background: #6c757d;
-
-            color: white;
+            width: 15%;
 
             font-weight: bold;
-
-        }
-
-
-
-        .subject {
 
             color: #007bff;
 
-            font-weight: bold;
+            white-space: nowrap;
 
         }
 
 
+        .subject-name-list {
 
-        .extra {
+            width: 85%;
 
-            color: #777;
+            color: #6b7280;
 
-            font-style: italic;
-
-        }
-
-
-
-        .lunch {
-
-            background: #dee2e6;
-
-            font-weight: bold;
-
-            text-align: center;
-
-            vertical-align: middle;
+            white-space: normal;
 
         }
 
 
+        .teacher-text {
 
-        /* ================= SUBJECT LIST ================= */
-
-
-        .subject-area {
-
-            margin-top: 20px;
+            color: #6c757d;
 
         }
 
 
-
-        .subject-table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-        }
-
-
-
-        .subject-table td {
-
-            border: none;
-
-            padding: 4px;
-
-        }
-
-
-
-        .subject-table .code {
-
-            width: 120px;
-
-            color: #007bff;
-
-            font-weight: bold;
-
-        }
-
-
-
-        .subject-header {
-
-            font-weight: bold;
-
-        }
-
-
-
-        /* ================= FOOTER ================= */
-
+        /* =========================================================
+           FOOTER
+        ========================================================== */
 
         .footer {
 
-            margin-top: 15px;
+            width: 100%;
+
+            margin: 5px auto 0;
 
             text-align: right;
+
+            font-size: 6.5px;
+
+            color: #9ca3af;
+
+        }
+
+
+        /* =========================================================
+           COMPACT MEDIUM
+        ========================================================== */
+
+        .compact-medium .header {
+
+            margin-bottom: 5px;
+
+        }
+
+
+        .compact-medium .university-name {
+
+            font-size: 16px;
+
+        }
+
+
+        .compact-medium .academic-info {
 
             font-size: 9px;
 
         }
-    </style>
 
+
+        .compact-medium .timetable th {
+
+            height: 29px;
+
+            font-size: 7.5px;
+
+        }
+
+
+        .compact-medium .timetable td {
+
+            height: 51px;
+
+            font-size: 7.5px;
+
+        }
+
+
+        .compact-medium .subject-code {
+
+            font-size: 8px;
+
+            margin-bottom: 1px;
+
+        }
+
+
+        .compact-medium .teacher-name {
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-medium .subject-list {
+
+            margin-top: 5px;
+
+        }
+
+
+        .compact-medium .subject-list th {
+
+            padding: 2px 5px;
+
+            font-size: 7.5px;
+
+        }
+
+
+        .compact-medium .subject-list td {
+
+            padding: 2px 5px;
+
+            font-size: 7px;
+
+        }
+
+
+        /* =========================================================
+           COMPACT SMALL
+        ========================================================== */
+
+        .compact-small .header {
+
+            margin-bottom: 4px;
+
+        }
+
+
+        .compact-small .university-name {
+
+            font-size: 15px;
+
+        }
+
+
+        .compact-small .academic-info {
+
+            font-size: 8.5px;
+
+            line-height: 1.2;
+
+        }
+
+
+        .compact-small .timetable-info {
+
+            margin-bottom: 3px;
+
+            font-size: 7.5px;
+
+        }
+
+
+        .compact-small .timetable th {
+
+            height: 27px;
+
+            padding: 1px;
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-small .timetable td {
+
+            height: 47px;
+
+            padding: 1px;
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-small .day-cell {
+
+            font-size: 8px;
+
+        }
+
+
+        .compact-small .subject-code {
+
+            font-size: 7.5px;
+
+            margin-bottom: 1px;
+
+        }
+
+
+        .compact-small .teacher-name {
+
+            font-size: 6px;
+
+        }
+
+
+        .compact-small .extra-curriculum {
+
+            font-size: 6px;
+
+        }
+
+
+        .compact-small .lunch-text {
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-small .subject-list {
+
+            margin-top: 4px;
+
+        }
+
+
+        .compact-small .subject-list th {
+
+            padding: 2px 4px;
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-small .subject-list td {
+
+            padding: 2px 4px;
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-small .footer {
+
+            margin-top: 3px;
+
+            font-size: 6px;
+
+        }
+
+
+        /* =========================================================
+           COMPACT ULTRA
+        ========================================================== */
+
+        .compact-ultra .header {
+
+            margin-bottom: 3px;
+
+        }
+
+
+        .compact-ultra .university-name {
+
+            font-size: 14px;
+
+        }
+
+
+        .compact-ultra .academic-info {
+
+            font-size: 8px;
+
+            line-height: 1.15;
+
+        }
+
+
+        .compact-ultra .timetable-info {
+
+            margin-bottom: 2px;
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-ultra .timetable th {
+
+            height: 25px;
+
+            padding: 1px;
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-ultra .timetable td {
+
+            height: 43px;
+
+            padding: 1px;
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-ultra .day-cell {
+
+            font-size: 7px;
+
+        }
+
+
+        .compact-ultra .subject-code {
+
+            font-size: 7px;
+
+            margin-bottom: 0;
+
+        }
+
+
+        .compact-ultra .teacher-name {
+
+            font-size: 5.5px;
+
+        }
+
+
+        .compact-ultra .extra-curriculum {
+
+            font-size: 5.5px;
+
+        }
+
+
+        .compact-ultra .lunch-text {
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-ultra .subject-list {
+
+            margin-top: 3px;
+
+        }
+
+
+        .compact-ultra .subject-list th {
+
+            padding: 1.5px 3px;
+
+            font-size: 6.5px;
+
+        }
+
+
+        .compact-ultra .subject-list td {
+
+            padding: 1.5px 3px;
+
+            font-size: 6px;
+
+            line-height: 1.05;
+
+        }
+
+
+        .compact-ultra .footer {
+
+            margin-top: 2px;
+
+            font-size: 5.5px;
+
+        }
+
+    </style>
 
 </head>
 
@@ -264,300 +940,346 @@
 <body>
 
 
+<div class="pdf-wrapper">
 
-    <!-- HEADER -->
 
+    {{-- =========================================================
+        HEADER
+    ========================================================== --}}
 
     <div class="header">
 
-
-        <div class="university">
+        <div class="university-name">
 
             ကွန်ပျူတာတက္ကသိုလ် (မကွေး)
 
         </div>
 
 
+        <div class="academic-info">
 
-        <div class="title">
+            {{ $academicYear->name ?? '' }}
 
+            ပညာသင်နှစ်
 
-            {{ $academicYear->name }} ပညာသင်နှစ်
+            @if ($semesters)
 
-            ({{ $semesters->name }})
+                ({{ $semesters->name }})
 
+            @endif
 
             <br>
 
+            {{ $yearData->name ?? '' }}
 
-            {{ $yearData->name }}
+            ({{ $major->name ?? '' }})
 
-            ({{ $major->name }})
+            -
 
-            - Section({{ $sections->name }})
-
+            Section({{ $sections->name ?? '' }})
 
         </div>
-
-
 
     </div>
 
 
+    {{-- =========================================================
+        INFORMATION
+    ========================================================== --}}
 
+    <div class="timetable-info">
 
-
-    <!-- INFORMATION -->
-
-
-    <table class="info-table">
-
-
-        <tr>
-
-
-            <td>
-
-                {{ $yearData->name }}
-
-                ({{ $major->name }})
-
-            </td>
-
-
-            <td style="text-align:right">
-
-                Section({{ $sections->name }})
-
-                -
-
-                အခန်း({{ $room->name }})
-
-            </td>
-
-
-        </tr>
-
-
-    </table>
-
-
-
-
-
-
-    <!-- TIMETABLE -->
-
-
-    <table class="timetable">
-
-
-        <thead>
-
+        <table>
 
             <tr>
 
+                <td class="info-left">
 
-                <th>
+                    အတန်း -
 
-                    Day / Time
+                    {{ $yearData->name ?? '' }}
 
-                </th>
+                    ({{ $major->name ?? '' }})
 
-
-
-                @foreach ($times as $time)
-                    @if (str_replace(' ', '', $time->name) == '12:00-01:00')
-                        <th></th>
-                    @else
-                        <th>
-
-                            {{ $time->name }}
-
-                        </th>
-                    @endif
-                @endforeach
+                </td>
 
 
+                <td class="info-right">
+
+                    Section({{ $sections->name ?? '' }})
+
+                    -
+
+                    အခန်း({{ $room->name ?? '' }})
+
+                </td>
 
             </tr>
 
+        </table>
+
+    </div>
+
+
+    {{-- =========================================================
+        TIMETABLE
+    ========================================================== --}}
+
+    <table class="timetable">
+
+        <thead>
+
+        <tr>
+
+            <th class="day-header">
+
+                Day / Time
+
+            </th>
+
+
+            @foreach ($times as $time)
+
+                @php
+
+                    $timeName = trim($time->name);
+
+                    $isLunch =
+                        str_replace(' ', '', $timeName)
+                        === '12:00-01:00';
+
+                @endphp
+
+
+                @if ($isLunch)
+
+                    <th class="lunch-header">
+
+                        &nbsp;
+
+                    </th>
+
+                @else
+
+                    <th class="time-header">
+
+                        {{ $time->name }}
+
+                    </th>
+
+                @endif
+
+            @endforeach
+
+        </tr>
 
         </thead>
 
 
-
-
-
         <tbody>
 
+        @foreach ($days as $dayIndex => $day)
+
+            <tr>
+
+                {{-- DAY --}}
+
+                <td class="day-cell">
+
+                    {{ $day->name }}
+
+                </td>
 
 
-            @foreach ($days as $day)
-                <tr>
+                @foreach ($times as $time)
+
+                    @php
+
+                        $timeName = trim($time->name);
+
+                        $isLunch =
+                            str_replace(' ', '', $timeName)
+                            === '12:00-01:00';
+
+                    @endphp
 
 
+                    {{-- =================================================
+                        LUNCH
+                    ================================================== --}}
 
-                    <td class="day">
+                    @if ($isLunch)
 
-                        {{ $day->name }}
+                        @if ($dayIndex === 0)
 
-                    </td>
+                            <td
+                                rowspan="{{ $days->count() }}"
+                                class="lunch-cell"
+                            >
 
-
-
-
-                    @foreach ($times as $time)
-                        @if (str_replace(' ', '', $time->name) == '12:00-01:00')
-                            @if ($day->id == $days->first()->id)
-                                <td rowspan="{{ $days->count() }}" class="lunch">
-
+                                <span class="lunch-text">
 
                                     ထမင်းစားနားချိန်
 
+                                </span>
 
-                                </td>
-                            @endif
-                        @else
-                            @php
+                            </td>
 
-                                $schedule = $schedules->where('day_id', $day->id)->where('time_id', $time->id)->first();
-
-                            @endphp
+                        @endif
 
 
+                    {{-- =================================================
+                        NORMAL TIME
+                    ================================================== --}}
+
+                    @else
+
+                        @php
+
+                            $schedule = $schedules
+                                ->where('day_id', $day->id)
+                                ->where('time_id', $time->id)
+                                ->first();
+
+                        @endphp
 
 
-                            @if ($schedule)
-                                <td class="subject">
+                        @if (!$schedule)
 
+                            <td class="empty-slot">
 
-                                    {{ $schedule->subject?->short_name }}
-
-
-                                </td>
-                            @else
-                                <td class="extra">
-
+                                <span class="extra-curriculum">
 
                                     Extra Curriculum
 
+                                </span>
 
-                                </td>
-                            @endif
+                            </td>
+
+
+                        @else
+
+                            <td class="subject-cell">
+
+                                <span class="subject-code">
+
+                                    {{ $schedule->subject->short_name ?? '' }}
+
+                                </span>
+
+
+                                @if ($schedule->teacher)
+
+                                    <span class="teacher-name">
+
+                                        {{ $schedule->teacher->name }}
+
+                                    </span>
+
+                                @endif
+
+                            </td>
+
                         @endif
-                    @endforeach
 
+                    @endif
 
+                @endforeach
 
-                </tr>
-            @endforeach
+            </tr>
 
-
+        @endforeach
 
         </tbody>
-
 
     </table>
 
 
+    {{-- =========================================================
+        SUBJECT LIST
+    ========================================================== --}}
 
+    <div class="subject-list">
 
+        <table>
 
-
-
-    <!-- SUBJECT CODE / NAME -->
-
-
-    <div class="subject-area">
-
-
-
-        <table class="subject-table">
-
+            <thead>
 
             <tr>
 
-
-                <td class="code">
+                <th style="width: 15%;">
 
                     Subject Code
 
-                </td>
+                </th>
 
 
-
-                <td>
+                <th style="width: 85%;">
 
                     Subject Name
 
-                </td>
-
+                </th>
 
             </tr>
 
+            </thead>
 
 
+            <tbody>
 
-            @foreach ($schedules->unique('subject_id') as $schedule)
+            @foreach ($uniqueSubjects as $item)
+
                 <tr>
 
+                    <td class="subject-code-list">
 
-                    <td class="code">
-
-
-                        {{ $schedule->subject?->short_name }}
-
+                        {{ $item->subject->short_name ?? '' }}
 
                     </td>
 
 
+                    <td class="subject-name-list">
 
-                    <td>
-
-
-                        {{ $schedule->subject?->long_name }}
+                        {{ $item->subject->long_name ?? '' }}
 
 
-                        ({{ $schedule->teacher?->name }})
+                        @if ($item->teacher)
+
+                            <span class="teacher-text">
+
+                                ({{ $item->teacher->name }})
+
+                            </span>
+
+                        @endif
+
                     </td>
-
 
                 </tr>
+
             @endforeach
 
-
+            </tbody>
 
         </table>
-
-
 
     </div>
 
 
+    {{-- =========================================================
+        FOOTER
+    ========================================================== --}}
 
+    <div class="footer">
 
+        Generated Timetable
 
+    </div>
 
-
-    <!-- FOOTER -->
-
-
-    <!--
-
-<div class="footer">
-
-Generated Date :
-
-{{ now()->format('d-m-Y h:i A') }}
 
 </div>
 
--->
-
-
 
 </body>
-
 
 </html>
