@@ -112,7 +112,7 @@
 
             <div class="table-responsive print-table">
 
-                <table class="table table-bordered text-center">
+                <table class="table text-center table-bordered">
 
                     <thead>
 

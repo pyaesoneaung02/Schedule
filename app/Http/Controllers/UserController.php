@@ -1,16 +1,19 @@
 <?php
-namespace App\Http\Controllers\User;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicYears;
 use App\Models\Day;
 use App\Models\Major;
+use App\Models\Room;
 use App\Models\Schedule;
 use App\Models\Sections;
+use App\Models\Semesters;
 use App\Models\Subject;
 use App\Models\Teacher;
-use App\Models\Teaching;
 use App\Models\Time;
 use App\Models\Year;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,11 +21,9 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-
-    // direct user home page
+    // Dashboard
     public function userHome()
     {
-        // return view('user.home.list');
         $years     = Year::all();
         $sections  = Sections::all();
         $days      = Day::all();
@@ -47,7 +48,6 @@ class UserController extends Controller
         $assignedSubjects = $teacher && $teacher->teachings ? $teacher->teachings->map->subject : collect();
 
         return view('user.home.list', compact('years', 'sections', 'days', 'times', 'schedules', 'teacher', 'assignedSubjects'));
-
     }
 
     //landing page route start
@@ -61,7 +61,17 @@ class UserController extends Controller
             'major',
         ])->get();
 
-        $years = Year::all();
+        // $years = Year::all();
+        $years = Year::orderByRaw("
+                CASE
+                    WHEN name LIKE '%ပထမနှစ်%' THEN 1
+                    WHEN name LIKE '%ဒုတိယနှစ်%' THEN 2
+                    WHEN name LIKE '%တတိယနှစ်%' THEN 3
+                    WHEN name LIKE '%စတုတ္ထနှစ်%' THEN 4
+                    WHEN name LIKE '%ပဉ္စမနှစ်%' THEN 5
+                    ELSE 999
+                END
+            ")->get();
 
         $majors = Major::all();
 
@@ -98,7 +108,17 @@ class UserController extends Controller
             ->where('year_id', $id)
             ->get();
 
-        $years = Year::all();
+        // $years = Year::all();
+        $years = Year::orderByRaw("
+                CASE
+                    WHEN name LIKE '%ပထမနှစ်%' THEN 1
+                    WHEN name LIKE '%ဒုတိယနှစ်%' THEN 2
+                    WHEN name LIKE '%တတိယနှစ်%' THEN 3
+                    WHEN name LIKE '%စတုတ္ထနှစ်%' THEN 4
+                    WHEN name LIKE '%ပဉ္စမနှစ်%' THEN 5
+                    ELSE 999
+                END
+            ")->get();
 
         $selectedYear = Year::findOrFail($id);
 
@@ -133,7 +153,6 @@ class UserController extends Controller
     {
 
         $subject = Subject::findOrFail($id);
-
         if ($subject->image) {
             Storage::disk('public')->delete($subject->image);
         }
@@ -146,22 +165,50 @@ class UserController extends Controller
 
     //landing page route end
 
-    //subject page
+    // Subject
     public function subjectPage()
     {
+        $user = auth()->user();
 
-        $userId  = auth()->id();
-        $teacher = Teacher::where('user_id', $userId)->first();
+        // Teacher
 
-        $teachings = collect();
+        if ($user->role == 'teacher') {
+            $teacher   = \App\Models\Teacher::where('user_id', $user->id)->first();
+            $teachings = collect();
 
-        if ($teacher) {
-            $teachings = Teaching::with(['subject', 'year', 'major', 'section', 'room'])
-                ->where('teacher_id', $teacher->id)
-                ->get();
+            if ($teacher) {
+                $teachings = \App\Models\Teaching::with(['subject', 'year', 'major', 'section', 'room'])
+                    ->where('teacher_id', $teacher->id)
+                    ->get();
+            }
+
+            return view('user.component.subject', compact('teachings'));
         }
 
-        return view('user.component.subject', compact('teachings'));
+        // Student
+
+        else {
+
+            $allSubjects = \App\Models\Subject::with(['year', 'semester'])->get();
+
+            return view('user.component.allSubject', compact('allSubjects'));
+        }
+    }
+
+    // Schedule
+    public function userSchedule()
+    {
+        // Extract Year and Section
+        $years    = Year::all();
+        $sections = Sections::all();
+
+        $days  = Day::all();
+        $times = Time::all();
+
+        // Extract all data
+        $schedules = Schedule::with(['subject', 'teacher', 'room', 'day', 'time', 'section'])->get();
+
+        return view('user.component.schedule', compact('years', 'sections', 'schedules', 'days', 'times'));
     }
 
     //contact page
@@ -169,7 +216,7 @@ class UserController extends Controller
     {
         return view('user.component.contact');
     }
-    
+
     //  Teacher Profile
     public function profile()
     {
@@ -192,7 +239,6 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
@@ -208,7 +254,7 @@ class UserController extends Controller
             $teacher->save();
         }
 
-        return redirect()->route('user.profile')->with('success', 'Profile updated successfully!');
+        return redirect()->route('user.profile.accountProfile')->with('success', 'Profile updated successfully!');
     }
 
     // Change Password
@@ -232,4 +278,47 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Password changed successfully!');
     }
 
+    // Download PDF
+
+    public function downloadSchedulePdf(Request $request)
+    {
+
+        $academicYear = AcademicYears::find($request->query('academicYearID'));
+        $semesters    = Semesters::find($request->query('semesterID'));
+        $yearData     = Year::find($request->query('year'));
+        $major        = Major::find($request->query('major'));
+        $sections     = Sections::find($request->query('sectionID'));
+        $room         = Room::find($request->query('room'));
+
+        $days  = Day::all();
+        $times = Time::all();
+
+        // Get Subject and Teacher from Schedule
+        $schedules = Schedule::with(['subject', 'teacher'])
+            ->where('year_id', $yearData->id ?? null)
+            ->where('section_id', $sections->id ?? null)
+            ->get();
+
+        // PDF View
+        $pdf = Pdf::loadView('user.component.pdf', compact(
+            'academicYear',
+            'semesters',
+            'yearData',
+            'major',
+            'sections',
+            'room',
+            'days',
+            'times',
+            'schedules'
+        ));
+
+        $pdf->setPaper('a4', 'landscape');
+
+        // File name
+        $yearName    = $yearData->name ?? 'Unknown_Year';
+        $sectionName = $sections->name ?? 'Unknown_Section';
+        $fileName    = 'Timetable_' . $yearName . '_' . $sectionName . '.pdf';
+
+        return $pdf->download($fileName);
+    }
 }

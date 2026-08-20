@@ -1,6 +1,6 @@
 <?php
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
@@ -9,25 +9,13 @@ Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
     Route::get('home', [UserController::class, 'userHome'])->name('userHome');
 
     // Schedule
-    // Route::get('schedule', function () {
-    //     return view('user.schedule');
-    // })->name('user.schedule');
-    Route::get('schedule', [UserController::class, 'schedulePage'])->name('user.schedule');
+    Route::get('schedule', [UserController::class, 'userSchedule'])->name('user.schedule');
 
     // Subject
-    // Route::get('subject', function () {
-    //     return view('user.subject');
-    // })->name('user.subject');
     Route::get('subject', [UserController::class, 'subjectPage'])->name('user.subject');
 
     // Contact
-    // Route::get('contact', function () {
-    //     return view('user.contact');
-    // })->name('user.contact');
     Route::get('contact', [UserController::class, 'contactPage'])->name('user.contact');
-
-    // Subject
-    // Route::get('subject', [UserController::class, 'subjectPage'])->name('user.subject');
 
     // Contact store
     Route::post('contact/store', [ContactController::class, 'store'])->name('contact.store');
@@ -43,5 +31,11 @@ Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
     // Password Routes
     Route::get('password/change', [UserController::class, 'changePasswordPage'])->name('user.password.change');
     Route::post('password/update', [UserController::class, 'updatePassword'])->name('user.password.update');
+
+    // Notification
+    Route::get('notifications', [ContactController::class, 'userNotifications'])->name('user.notifications');
+
+     // PDF Download Route
+    Route::get('/schedule/pdf', [UserController::class, 'downloadSchedulePdf'])->name('schedule.pdf');
 
 });

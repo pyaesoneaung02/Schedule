@@ -156,22 +156,22 @@ class ContactController extends Controller
         );
     }
 
-    //notification
+    //notification page
 
-    // public function userNotifications()
-    // {
-    //     $userId = auth()->id();
-    
-    //     // For read message
-    //     Contact::where('user_id', $userId)
-    //            ->where('status', 'success')
-    //            ->where('is_user_read', false)
-    //            ->update(['is_user_read' => true]);
+    public function userNotifications()
+    {
+        $userId = auth()->id();
 
-    //     $notifications = Contact::where('user_id', $userId)->latest()->get();
+        // For read message
+        Contact::where('user_id', $userId)
+               ->where('status', 'success')
+               ->where('is_user_read', false)
+               ->update(['is_user_read' => true]);
 
-    //     return view('user.component.notification', compact('notifications'));
-    // }
+        $notifications = Contact::where('user_id', $userId)->latest()->get();
+
+        return view('user.component.notification', compact('notifications'));
+    }
 
 
     //contact read

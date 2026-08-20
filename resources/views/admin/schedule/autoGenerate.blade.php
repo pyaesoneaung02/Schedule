@@ -6,59 +6,153 @@
 
         <div class="row justify-content-center">
 
-            <div class="col-lg-8 mt-5">
+            <div class="mt-4 mb-5 col-xl-8 col-lg-9 col-md-11">
 
-                <div class="card shadow border-0">
+                {{-- =========================
+                PAGE HEADER
+            ========================== --}}
+                <div class="mb-4">
 
-                    <div class="card-header bg-primary text-white">
+                    <div class="d-flex align-items-center">
 
-                        <h5 class="mb-0">
-                            <i class="fa-solid fa-bolt mr-2"></i>
-                            Auto Generate Timetable
-                        </h5>
+                        <div class="mr-3 d-flex align-items-center justify-content-center"
+                            style="
+                            width:48px;
+                            height:48px;
+                            border-radius:14px;
+                            background:#eef3ff;
+                        ">
+                            <i class="fa-solid fa-bolt text-primary" style="font-size:20px;"></i>
+                        </div>
+
+                        <div>
+
+                            <h3 class="mb-1 font-weight-bold text-dark">
+                                Auto Generate Timetable
+                            </h3>
+
+                            <p class="mb-0 text-muted">
+                                Select the academic information and room
+                                to generate a timetable automatically.
+                            </p>
+
+                        </div>
 
                     </div>
 
+                </div>
 
-                    <div class="card-body">
 
-                        {{-- Error Message --}}
+                {{-- =========================
+                ERROR MESSAGE
+            ========================== --}}
+                @if ($errors->any())
+                    <div class="border-0 shadow-sm alert alert-danger">
 
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
+                        <div class="d-flex align-items-start">
 
-                                <ul class="mb-0">
+                            <i class="mt-1 mr-3 fas fa-circle-exclamation"></i>
+
+                            <div>
+
+                                <strong>
+                                    Please check the following errors:
+                                </strong>
+
+                                <ul class="mt-2 mb-0">
 
                                     @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
+                                        <li>
+                                            {{ $error }}
+                                        </li>
                                     @endforeach
 
                                 </ul>
 
                             </div>
-                        @endif
+
+                        </div>
+
+                    </div>
+                @endif
 
 
-                        {{-- Generate Form --}}
+                {{-- =========================
+                MAIN CARD
+            ========================== --}}
+                <div class="border-0 shadow-sm card"
+                    style="
+                    border-radius:22px;
+                    overflow:hidden;
+                ">
 
-                        <form action="{{ route('schedule.createSchedule') }}" method="POST">
+                    {{-- Card Header --}}
+                    <div class="px-4 pt-4 pb-3 bg-white border-0 card-header">
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <div>
+
+                                <h5 class="mb-1 font-weight-bold text-dark">
+
+                                    <i class="mr-2 fa-solid fa-sliders text-primary"></i>
+
+                                    Schedule Configuration
+
+                                </h5>
+
+                                <small class="text-muted">
+
+                                    Choose all required information before generating.
+
+                                </small>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="px-3 py-2 badge badge-light text-primary" style="border-radius:10px;">
+                                    <i class="mr-1 fa-solid fa-wand-magic-sparkles"></i>
+                                    Automatic
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- Card Body --}}
+                    <div class="px-4 pb-4 card-body">
+
+                        <form action="{{ route('schedule.createSchedule') }}" method="POST" id="autoGenerateForm">
 
                             @csrf
 
 
+                            {{-- =========================
+                            FIRST ROW
+                        ========================== --}}
                             <div class="row">
 
                                 {{-- Academic Year --}}
-
                                 <div class="col-md-6">
 
-                                    <div class="form-group">
+                                    <div class="mb-4 form-group">
 
-                                        <label class="font-weight-bold">
+                                        <label class="font-weight-bold text-dark">
+
+                                            <i class="mr-2 fa-solid fa-calendar-days text-primary"></i>
+
                                             Academic Year
+
                                         </label>
 
-                                        <select name="academicYearID" class="form-control" required>
+
+                                        <select name="academicYearID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Academic Year --
@@ -75,16 +169,25 @@
 
                                     </div>
 
+                                </div>
 
-                                    {{-- Semester --}}
 
-                                    <div class="form-group">
+                                {{-- Semester --}}
+                                <div class="col-md-6">
 
-                                        <label class="font-weight-bold">
+                                    <div class="mb-4 form-group">
+
+                                        <label class="font-weight-bold text-dark">
+
+                                            <i class="mr-2 fa-solid fa-layer-group text-primary"></i>
+
                                             Semester
+
                                         </label>
 
-                                        <select name="semesterID" class="form-control" required>
+
+                                        <select name="semesterID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Semester --
@@ -101,16 +204,29 @@
 
                                     </div>
 
+                                </div>
 
-                                    {{-- Year --}}
 
-                                    <div class="form-group">
+                                {{-- =========================
+                                SECOND ROW
+                            ========================== --}}
 
-                                        <label class="font-weight-bold">
+                                {{-- Class Year --}}
+                                <div class="col-md-6">
+
+                                    <div class="mb-4 form-group">
+
+                                        <label class="font-weight-bold text-dark">
+
+                                            <i class="mr-2 fa-solid fa-graduation-cap text-primary"></i>
+
                                             Class Year
+
                                         </label>
 
-                                        <select name="yearID" class="form-control" required>
+
+                                        <select name="yearID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Year --
@@ -130,17 +246,22 @@
                                 </div>
 
 
+                                {{-- Major --}}
                                 <div class="col-md-6">
 
-                                    {{-- Major --}}
+                                    <div class="mb-4 form-group">
 
-                                    <div class="form-group">
+                                        <label class="font-weight-bold text-dark">
 
-                                        <label class="font-weight-bold">
+                                            <i class="mr-2 fa-solid fa-building-columns text-primary"></i>
+
                                             Major
+
                                         </label>
 
-                                        <select name="majorID" class="form-control" required>
+
+                                        <select name="majorID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Major --
@@ -157,16 +278,29 @@
 
                                     </div>
 
+                                </div>
 
-                                    {{-- Section --}}
 
-                                    <div class="form-group">
+                                {{-- =========================
+                                THIRD ROW
+                            ========================== --}}
 
-                                        <label class="font-weight-bold">
+                                {{-- Section --}}
+                                <div class="col-md-6">
+
+                                    <div class="mb-4 form-group">
+
+                                        <label class="font-weight-bold text-dark">
+
+                                            <i class="mr-2 fa-solid fa-table-cells text-primary"></i>
+
                                             Section
+
                                         </label>
 
-                                        <select name="sectionID" class="form-control" required>
+
+                                        <select name="sectionID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Section --
@@ -183,16 +317,25 @@
 
                                     </div>
 
+                                </div>
 
-                                    {{-- Room --}}
 
-                                    <div class="form-group">
+                                {{-- Room --}}
+                                <div class="col-md-6">
 
-                                        <label class="font-weight-bold">
+                                    <div class="mb-4 form-group">
+
+                                        <label class="font-weight-bold text-dark">
+
+                                            <i class="mr-2 fa-solid fa-door-open text-primary"></i>
+
                                             Room
+
                                         </label>
 
-                                        <select name="roomID" class="form-control" required>
+
+                                        <select name="roomID" id="roomID" class="form-control" required
+                                            style="height:48px;border-radius:12px;">
 
                                             <option value="">
                                                 -- Select Room --
@@ -211,49 +354,118 @@
 
                                 </div>
 
-
-                                <div class="col-md-12">
-
-                                    {{-- Generate Button --}}
-
-                                    <div class="text-center mt-4">
-
-                                        {{-- <button type="submit" class="btn btn-primary btn-lg px-5">
-
-                                            <i class="fas fa-magic mr-2"></i>
-
-                                            Auto Generate Schedule
-
-                                        </button> --}}
-
-                                        <button type="submit" class="mb-3 btn btn-primary w-100">
-
-                                            <i class="mr-2 fa-solid fa-bolt"></i>
-
-                                            Auto Generate Schedule
-
-                                        </button>
-
-                                        <a href="{{ route('schedule.list') }}" class="btn btn-outline-primary w-100">
+                            </div>
 
 
-                                            <i class="mr-2 fa-solid fa-list"></i>
-                                            View Schedule List
+                            {{-- =========================
+                            ROOM STATUS
+                        ========================== --}}
+                            <div id="roomSelectedMessage" class="mb-4 d-none">
+
+                                <div class="p-3"
+                                    style="
+                                    background:#f0f7ff;
+                                    border:1px solid #d8e9ff;
+                                    border-radius:14px;
+                                ">
+
+                                    <div class="d-flex align-items-center">
+
+                                        <div class="mr-3 d-flex align-items-center justify-content-center"
+                                            style="
+                                            width:40px;
+                                            height:40px;
+                                            border-radius:12px;
+                                            background:#e5f0ff;
+                                        ">
+
+                                            <i class="fa-solid fa-door-open text-primary"></i>
+
+                                        </div>
 
 
-                                        </a>
+                                        <div>
 
-                                        <a href="{{ route('teacher.list') }}" class="btn btn-outline-primary w-100 mt-3">
+                                            <div class="font-weight-bold text-dark" id="selectedRoomName">
+                                            </div>
 
+                                            <small class="text-muted">
+                                                Room selected successfully.
+                                            </small>
 
-                                            <i class="mr-2 fa-solid fa-list"></i>
-                                            View Teacher List
-
-
-                                        </a>
+                                        </div>
 
                                     </div>
+
                                 </div>
+
+                            </div>
+
+
+                            {{-- =========================
+                            ACTION BUTTONS
+                        ========================== --}}
+                            <div class="mt-2">
+
+                                {{-- Auto Generate --}}
+                                {{-- <button type="submit" id="generateBtn" class="py-3 btn btn-primary btn-block"
+                                    style="
+                                    border-radius:13px;
+                                    font-weight:700;
+                                ">
+
+                                    <i class="mr-2 fa-solid fa-bolt"></i>
+
+                                    Auto Generate Schedule
+
+                                </button> --}}
+
+
+                                {{-- TEMPORARILY Auto Generate WHILE TESTING --}}
+
+
+                                <button type="submit" class="py-3 btn btn-primary btn-block"
+                                    style="
+                                    border-radius:13px;
+                                    font-weight:700;
+                                ">
+
+                                    <i class="mr-2 fa-solid fa-bolt"></i>
+
+                                    Auto Generate Schedule
+
+                                </button>
+
+
+
+                                {{-- View Schedule --}}
+                                <a href="{{ route('schedule.list') }}"
+                                    class="py-3 mt-3 btn btn-outline-primary btn-block"
+                                    style="
+                                    border-radius:13px;
+                                    font-weight:600;
+                                ">
+
+                                    <i class="mr-2 fa-solid fa-list"></i>
+
+                                    View Schedule List
+
+                                </a>
+
+
+                                {{-- View Teacher --}}
+                                <a href="{{ route('teacher.list') }}"
+                                    class="py-3 mt-3 btn btn-outline-secondary btn-block"
+                                    style="
+                                    border-radius:13px;
+                                    font-weight:600;
+                                ">
+
+                                    <i class="mr-2 fa-solid fa-chalkboard-user"></i>
+
+                                    View Teacher List
+
+                                </a>
 
                             </div>
 
@@ -268,5 +480,91 @@
         </div>
 
     </div>
+
+
+    {{-- =========================
+    ROOM BUTTON SCRIPT
+========================== --}}
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                const roomSelect = document.getElementById('roomID');
+
+                const generateBtn = document.getElementById('generateBtn');
+
+                const roomMessage = document.getElementById('roomSelectedMessage');
+
+                const selectedRoomName =
+                    document.getElementById('selectedRoomName');
+
+
+                function checkRoomSelection() {
+
+                    if (roomSelect.value !== '') {
+
+                        /*
+                        ==========================================
+                        Room Selected
+                        ==========================================
+                        */
+
+                        generateBtn.style.display = 'none';
+
+                        roomMessage.classList.remove('d-none');
+
+
+                        const selectedOption =
+                            roomSelect.options[
+                                roomSelect.selectedIndex
+                            ];
+
+
+                        selectedRoomName.textContent =
+                            selectedOption.text;
+
+
+                    } else {
+
+                        /*
+                        ==========================================
+                        No Room Selected
+                        ==========================================
+                        */
+
+                        generateBtn.style.display = 'block';
+
+                        roomMessage.classList.add('d-none');
+
+                        selectedRoomName.textContent = '';
+
+                    }
+
+                }
+
+
+                /*
+                ==========================================
+                Room Change Event
+                ==========================================
+                */
+
+                roomSelect.addEventListener(
+                    'change',
+                    checkRoomSelection
+                );
+
+
+                /*
+                ==========================================
+                Check Old Value After Validation Error
+                ==========================================
+                */
+
+                checkRoomSelection();
+
+            });
+        </script>
+    @endpush
 
 @endsection

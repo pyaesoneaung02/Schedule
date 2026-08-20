@@ -983,22 +983,11 @@ class ScheduleController extends Controller
     }
 
     // view schedule
-    // public function viewSchedule($id)
-    // {
-    //     $years = Year::findOrFail($id);
-
-    //     $majors    = Major::all();
-    //     $rooms     = Room::all();
-    //     $semesters = Semesters::all();
-    //     $sections  = Sections::all();
-
-    //     return view('admin.schedule.viewSchedule', compact('years', 'majors', 'rooms', 'semesters', 'sections'));
-    // }
 
     public function viewSchedule($id)
     {
-        $years = Year::findOrFail($id);
 
+        $years         = Year::findOrFail($id);
         $academicYears = AcademicYears::all();
         $majors        = Major::all();
         $rooms         = Room::all();
@@ -1016,86 +1005,28 @@ class ScheduleController extends Controller
         );
     }
 
-    // result schedule
-    // public function result(Request $request, $year)
-    // {
-    //     $request->validate([
-
-    //         'roomID'     => 'required',
-    //         'majorID'    => 'required',
-    //         'semesterID' => 'required',
-    //         'sectionID'  => 'required',
-
-    //     ], [
-
-    //         'roomID.required'     => 'Please select Room.',
-    //         'majorID.required'    => 'Please select Major.',
-    //         'semesterID.required' => 'Please select Semester.',
-    //         'sectionID.required'  => 'Please select Section.',
-
-    //     ]);
-
-    //     $days  = Day::all();
-    //     $times = Time::all();
-
-    //     $schedules = Schedule::with([
-    //         'day',
-    //         'subject',
-    //         'time',
-    //         'teacher',
-    //         'academicYear',
-    //         'semester',
-    //     ])
-    //         ->where('year_id', $year)
-    //         ->where('room_id', $request->roomID)
-    //         ->where('major_id', $request->majorID)
-    //         ->where('semester_id', $request->semesterID)
-    //         ->where('section_id', $request->sectionID)
-    //         ->get();
-
-    //     $yearData = Year::findOrFail($year);
-
-    //     $room = Room::findOrFail($request->roomID);
-
-    //     $major = Major::findOrFail($request->majorID);
-
-    //     $semesters = Semesters::findOrFail($request->semesterID);
-
-    //     $sections = Sections::findOrFail($request->sectionID);
-
-    //     $academicYear = AcademicYears::where('status', 'Active')->first();
-
-    //     return view('admin.schedule.result',
-    //         compact(
-    //             'schedules',
-    //             'yearData',
-    //             'room',
-    //             'major',
-    //             'days',
-    //             'times',
-    //             'semesters',
-    //             'sections',
-    //             'academicYear'
-    //         )
-    //     );
-    // }
-
     // =========================================================
     // RESULT SCHEDULE
     // =========================================================
 
     public function result(Request $request, $year)
     {
+        // =====================================================
+        // Validation
+        // =====================================================
+
         $request->validate([
-            'roomID'     => ['required', 'integer'],
-            'majorID'    => ['required', 'integer'],
-            'semesterID' => ['required', 'integer'],
-            'sectionID'  => ['required', 'integer'],
+            'academicYearID' => ['required', 'integer'],
+            'roomID'         => ['required', 'integer'],
+            'majorID'        => ['required', 'integer'],
+            'semesterID'     => ['required', 'integer'],
+            'sectionID'      => ['required', 'integer'],
         ], [
-            'roomID.required'     => 'Please select Room.',
-            'majorID.required'    => 'Please select Major.',
-            'semesterID.required' => 'Please select Semester.',
-            'sectionID.required'  => 'Please select Section.',
+            'academicYearID.required' => 'Please select Academic Year.',
+            'roomID.required'         => 'Please select Room.',
+            'majorID.required'        => 'Please select Major.',
+            'semesterID.required'     => 'Please select Semester.',
+            'sectionID.required'      => 'Please select Section.',
         ]);
 
         // =====================================================
@@ -1111,6 +1042,14 @@ class ScheduleController extends Controller
         $times = Time::orderBy('id')->get();
 
         // =====================================================
+        // Academic Year
+        // =====================================================
+
+        $academicYear = AcademicYears::findOrFail(
+            $request->academicYearID
+        );
+
+        // =====================================================
         // Schedules
         // =====================================================
 
@@ -1118,6 +1057,7 @@ class ScheduleController extends Controller
             'subject',
             'teacher',
         ])
+            ->where('academic_year_id', $request->academicYearID)
             ->where('year_id', $year)
             ->where('room_id', $request->roomID)
             ->where('major_id', $request->majorID)
@@ -1140,8 +1080,6 @@ class ScheduleController extends Controller
         $semesters = Semesters::findOrFail($request->semesterID);
 
         $sections = Sections::findOrFail($request->sectionID);
-
-        $academicYear = AcademicYears::where('status', 'Active')->first();
 
         // =====================================================
         // View
@@ -1190,7 +1128,6 @@ class ScheduleController extends Controller
         $id1 = (int) $validated['schedule1_id'];
         $id2 = (int) $validated['schedule2_id'];
 
-
         // =====================================================
         // 2. SAME SCHEDULE CHECK
         // =====================================================
@@ -1203,7 +1140,6 @@ class ScheduleController extends Controller
             ], 422);
 
         }
-
 
         try {
 
@@ -1224,7 +1160,6 @@ class ScheduleController extends Controller
                 $schedule2 = Schedule::lockForUpdate()
                     ->with(['teacher', 'subject', 'room'])
                     ->findOrFail($id2);
-
 
                 // =============================================
                 // 4. SAME TIMETABLE CHECK
@@ -1266,17 +1201,15 @@ class ScheduleController extends Controller
 
                 }
 
-
                 // =============================================
                 // 5. ORIGINAL POSITIONS
                 // =============================================
 
-                $day1 = (int) $schedule1->day_id;
+                $day1  = (int) $schedule1->day_id;
                 $time1 = (int) $schedule1->time_id;
 
-                $day2 = (int) $schedule2->day_id;
+                $day2  = (int) $schedule2->day_id;
                 $time2 = (int) $schedule2->time_id;
-
 
                 // =============================================
                 // 6. INVALID POSITION CHECK
@@ -1295,7 +1228,6 @@ class ScheduleController extends Controller
 
                 }
 
-
                 // =================================================
                 // 7. TEACHER 1 CONFLICT
                 //
@@ -1311,7 +1243,7 @@ class ScheduleController extends Controller
                 // Do NOT limit by room/section.
                 // =================================================
 
-                if (!empty($schedule1->teacher_id)) {
+                if (! empty($schedule1->teacher_id)) {
 
                     $teacher1Conflict = Schedule::query()
 
@@ -1337,18 +1269,13 @@ class ScheduleController extends Controller
 
                         ->exists();
 
-
                     if ($teacher1Conflict) {
 
                         $teacherName =
-                            optional($schedule1->teacher)->name
-                            ?? 'Teacher';
-
+                        optional($schedule1->teacher)->name ?? 'Teacher';
 
                         $subjectName =
-                            optional($schedule1->subject)->short_name
-                            ?? 'Subject';
-
+                        optional($schedule1->subject)->short_name ?? 'Subject';
 
                         throw new \Exception(
                             "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် {$day2} / {$time2} အချိန်တွင် အခြားအခန်း/Section၌ သင်ကြားနေပါသည်။"
@@ -1357,7 +1284,6 @@ class ScheduleController extends Controller
                     }
 
                 }
-
 
                 // =================================================
                 // 8. TEACHER 2 CONFLICT
@@ -1371,7 +1297,7 @@ class ScheduleController extends Controller
                 // day1/time1
                 // =================================================
 
-                if (!empty($schedule2->teacher_id)) {
+                if (! empty($schedule2->teacher_id)) {
 
                     $teacher2Conflict = Schedule::query()
 
@@ -1397,13 +1323,10 @@ class ScheduleController extends Controller
 
                         ->exists();
 
-
                     if ($teacher2Conflict) {
 
                         $teacherName =
-                            optional($schedule2->teacher)->name
-                            ?? 'Teacher';
-
+                        optional($schedule2->teacher)->name ?? 'Teacher';
 
                         throw new \Exception(
                             "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် {$day1} / {$time1} အချိန်တွင် အခြားအခန်း/Section၌ သင်ကြားနေပါသည်။"
@@ -1412,7 +1335,6 @@ class ScheduleController extends Controller
                     }
 
                 }
-
 
                 // =================================================
                 // 9. ROOM 1 CONFLICT
@@ -1444,7 +1366,6 @@ class ScheduleController extends Controller
 
                     ->exists();
 
-
                 if ($room1Conflict) {
 
                     throw new \Exception(
@@ -1452,7 +1373,6 @@ class ScheduleController extends Controller
                     );
 
                 }
-
 
                 // =================================================
                 // 10. ROOM 2 CONFLICT
@@ -1484,7 +1404,6 @@ class ScheduleController extends Controller
 
                     ->exists();
 
-
                 if ($room2Conflict) {
 
                     throw new \Exception(
@@ -1493,17 +1412,15 @@ class ScheduleController extends Controller
 
                 }
 
-
                 // =================================================
                 // 11. SWAP
                 // =================================================
 
-                $schedule1->day_id = $day2;
+                $schedule1->day_id  = $day2;
                 $schedule1->time_id = $time2;
 
-                $schedule2->day_id = $day1;
+                $schedule2->day_id  = $day1;
                 $schedule2->time_id = $time1;
-
 
                 // =================================================
                 // 12. SAVE
@@ -1514,7 +1431,6 @@ class ScheduleController extends Controller
 
             });
 
-
             // =====================================================
             // 13. SUCCESS RESPONSE
             // =====================================================
@@ -1524,11 +1440,9 @@ class ScheduleController extends Controller
                 'message' => 'Timetable swapped successfully.',
             ]);
 
-
         } catch (\Illuminate\Validation\ValidationException $e) {
 
             throw $e;
-
 
         } catch (\Throwable $e) {
 

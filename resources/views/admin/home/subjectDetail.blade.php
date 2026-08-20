@@ -895,7 +895,7 @@
 
                     <!-- SUBJECT -->
 
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
 
                         <a href="{{ route('page') }}#subjects" class="nav-link active">
 
@@ -903,7 +903,7 @@
 
                         </a>
 
-                    </li>
+                    </li> --}}
 
 
                     <!-- ABOUT -->

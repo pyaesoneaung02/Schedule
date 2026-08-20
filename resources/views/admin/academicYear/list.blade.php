@@ -5,11 +5,16 @@
 
         <!-- Page Heading -->
         <div class="mb-4">
+
             <h2 class="text-primary font-weight-bold">
                 <i class="mr-2 fa-solid fa-calendar-days"></i>
                 Academic Year Management
             </h2>
-            <p class="text-muted">Create and manage academic years.</p>
+
+            <p class="text-muted">
+                Create and manage academic years.
+            </p>
+
         </div>
 
 
@@ -22,10 +27,12 @@
                 <div class="border-0 shadow-sm card">
 
                     <div class="text-white card-header bg-primary">
+
                         <h5 class="mb-0">
                             <i class="mr-2 fa-solid fa-plus"></i>
                             Add Academic Year
                         </h5>
+
                     </div>
 
 
@@ -36,16 +43,16 @@
                             @csrf
 
 
+                            <!-- Academic Year Name -->
                             <div class="form-group">
 
-                                <label>
+                                <label class="font-weight-bold">
                                     Academic Year Name
                                 </label>
 
                                 <input type="text" name="name" value="{{ old('name') }}"
                                     class="form-control @error('name') is-invalid @enderror"
                                     placeholder="Example: 2025-2026">
-
 
                                 @error('name')
                                     <span class="invalid-feedback">
@@ -56,16 +63,15 @@
                             </div>
 
 
-
+                            <!-- Start Date -->
                             <div class="form-group">
 
-                                <label>
+                                <label class="font-weight-bold">
                                     Start Date
                                 </label>
 
                                 <input type="date" name="start_date" value="{{ old('start_date') }}"
                                     class="form-control @error('start_date') is-invalid @enderror">
-
 
                                 @error('start_date')
                                     <span class="invalid-feedback">
@@ -76,16 +82,15 @@
                             </div>
 
 
-
+                            <!-- End Date -->
                             <div class="form-group">
 
-                                <label>
+                                <label class="font-weight-bold">
                                     End Date
                                 </label>
 
                                 <input type="date" name="end_date" value="{{ old('end_date') }}"
                                     class="form-control @error('end_date') is-invalid @enderror">
-
 
                                 @error('end_date')
                                     <span class="invalid-feedback">
@@ -96,46 +101,17 @@
                             </div>
 
 
-
-                            <div class="form-group">
-
-                                <label>
-                                    Status
-                                </label>
-
-                                <select name="status" class="form-control @error('status') is-invalid @enderror">
-
-                                    <option value="Active">
-                                        Active
-                                    </option>
-
-                                    <option value="Inactive">
-                                        Inactive
-                                    </option>
-
-                                </select>
-
-
-                                @error('status')
-                                    <span class="invalid-feedback">
-                                        {{ $message }}
-                                    </span>
-                                @enderror
-
-                            </div>
-
-
-
-                            <button class="btn btn-primary btn-block">
+                            <!-- Create Button -->
+                            <button type="submit" class="btn btn-primary btn-block">
 
                                 <i class="mr-2 fa-solid fa-floppy-disk"></i>
-                                Create
+
+                                Create Academic Year
 
                             </button>
 
 
                         </form>
-
 
                     </div>
 
@@ -148,7 +124,6 @@
             <!-- Academic Year List -->
             <div class="col-lg-8">
 
-
                 <div class="border-0 shadow-sm card">
 
 
@@ -157,6 +132,7 @@
                         <h5 class="mb-0">
 
                             <i class="mr-2 fa-solid fa-list"></i>
+
                             Academic Year List
 
                         </h5>
@@ -169,7 +145,6 @@
 
 
                         <div class="table-responsive">
-
 
                             <table class="table align-middle table-hover table-bordered">
 
@@ -190,10 +165,6 @@
                                             Period
                                         </th>
 
-                                        <th>
-                                            Status
-                                        </th>
-
                                         <th width="180">
                                             Created Date
                                         </th>
@@ -206,6 +177,7 @@
 
                                 </thead>
 
+
                                 <tbody>
 
 
@@ -213,50 +185,56 @@
                                         <tr>
 
 
+                                            <!-- ID -->
                                             <td class="text-center">
+
                                                 {{ $item->id }}
+
                                             </td>
 
 
 
+                                            <!-- Academic Year -->
                                             <td>
-                                                {{ $item->name }}
-                                            </td>
 
+                                                <span class="font-weight-bold">
 
+                                                    {{ $item->name }}
 
-                                            <td class="text-center">
-
-                                                {{ $item->start_date }}
-                                                <br>
-                                                <span class="text-muted">
-                                                    to
                                                 </span>
-                                                <br>
-                                                {{ $item->end_date }}
 
                                             </td>
 
 
 
+                                            <!-- Period -->
                                             <td class="text-center">
 
+                                                <div>
 
-                                                @if ($item->status == 'Active')
-                                                    <span class="badge badge-success">
-                                                        Active
+                                                    <span class="font-weight-bold">
+                                                        {{ $item->start_date }}
                                                     </span>
-                                                @else
-                                                    <span class="badge badge-secondary">
-                                                        Inactive
-                                                    </span>
-                                                @endif
 
+                                                </div>
+
+                                                <div class="text-muted small">
+                                                    to
+                                                </div>
+
+                                                <div>
+
+                                                    <span class="font-weight-bold">
+                                                        {{ $item->end_date }}
+                                                    </span>
+
+                                                </div>
 
                                             </td>
 
 
 
+                                            <!-- Created Date -->
                                             <td class="text-center">
 
                                                 {{ $item->created_at->format('d M Y') }}
@@ -265,20 +243,20 @@
 
 
 
+                                            <!-- Action -->
                                             <td class="text-center">
 
 
                                                 <a href="{{ route('academicYear.updatePage', $item->id) }}"
-                                                    class="btn btn-sm btn-outline-primary">
+                                                    class="btn btn-sm btn-outline-primary" title="Edit">
 
                                                     <i class="fa-solid fa-pen-to-square"></i>
 
                                                 </a>
 
 
-
                                                 <a href="{{ route('academicYear.delete', $item->id) }}"
-                                                    class="btn btn-sm btn-outline-danger">
+                                                    class="btn btn-sm btn-outline-danger" title="Delete">
 
                                                     <i class="fa-solid fa-trash"></i>
 
@@ -293,16 +271,15 @@
 
                                     @empty
 
-
                                         <tr>
 
-                                            <td colspan="6" class="py-5 text-center text-muted">
+                                            <td colspan="5" class="py-5 text-center text-muted">
 
                                                 <i class="mb-2 fa-solid fa-folder-open fa-3x"></i>
 
                                                 <br>
 
-                                                There is no data.
+                                                There is no academic year data.
 
                                             </td>
 
@@ -310,17 +287,16 @@
                                     @endforelse
 
 
-
                                 </tbody>
 
 
                             </table>
 
-
                         </div>
 
 
 
+                        <!-- Pagination -->
                         <div class="mt-3 d-flex justify-content-end">
 
                             {{ $academicYears->links() }}
@@ -332,7 +308,6 @@
 
 
                 </div>
-
 
             </div>
 

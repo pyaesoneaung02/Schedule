@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SocialLoginController;
-use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Directory Connection
@@ -63,3 +65,12 @@ Route::post('/schedule/auto-generate',[ContactController::class, 'createSchedule
 
 Route::get('/schedule/show',[ContactController::class, 'result'])->name('schedule.show');
 
+// Student Timetable
+Route::get('/admin/schedule/view-student-timetable/{yearID}',[AdminController::class, 'viewStudentTimetable']
+)->name('schedule.viewStudentTimetable');
+
+//PDF
+Route::get(
+    'pdf/{year}/{room}/{major}/{academicYearID}',
+    [ScheduleController::class, 'downloadPDF']
+)->name('schedule.pdf');

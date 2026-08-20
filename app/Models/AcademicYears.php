@@ -11,7 +11,6 @@ class AcademicYears extends Model
         'name',
         'start_date',
         'end_date',
-        'status',
     ];
 
     //to delete subject only

@@ -1176,48 +1176,44 @@
 
                 <ul class="navbar-nav ms-auto align-items-lg-center">
 
+                    <!-- Home -->
                     <li class="nav-item">
-
                         <a href="#home" class="nav-link active">
+                            <i class="bi bi-house-door me-1"></i>
                             Home
                         </a>
-
                     </li>
 
+                    <!-- Subject -->
                     <li class="nav-item">
-
                         <a href="#subjects" class="nav-link">
+                            <i class="bi bi-book me-1"></i>
                             Subject
                         </a>
-
                     </li>
 
+                    <!-- About -->
                     <li class="nav-item">
-
                         <a href="#about" class="nav-link">
+                            <i class="bi bi-info-circle me-1"></i>
                             About
                         </a>
-
                     </li>
 
+                    <!-- Location -->
                     <li class="nav-item">
-
                         <a href="#location" class="nav-link">
+                            <i class="bi bi-geo-alt me-1"></i>
                             Location
                         </a>
-
                     </li>
 
+                    <!-- Login -->
                     <li class="nav-item">
-
                         <a href="{{ route('login') }}" class="nav-link login-button">
-
-                            <i class="bi bi-person me-2"></i>
-
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
                             Login
-
                         </a>
-
                     </li>
 
                 </ul>

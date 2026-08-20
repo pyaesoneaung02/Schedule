@@ -1,202 +1,141 @@
 @extends('user.layouts.master')
 
 @section('content')
-    <section id="schedule" class="feature-section feature-style-5 pb-100 pt-100">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
-                    <div class="section-title text-center mb-50">
-                        <h3 class="mb-15 wow fadeInUp" data-wow-delay=".2s">Weekly Timetable (By Year & Section)</h3>
-                    </div>
-                </div>
+    <section id="schedule" class="pb-100 pt-100 feature-section feature-style-5">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
+            <div class="mb-50 text-center section-title">
+              <h3 class="mb-15 wow fadeInUp" data-wow-delay=".2s">Weekly Timetable (By Year & Section)</h3>
             </div>
-
-            <div class="row wow fadeInUp" data-wow-delay=".5s">
-                <div class="col-12">
-                    <!-- Main Year Tabs -->
-                    <ul class="nav nav-tabs justify-content-center border-0 mb-4" id="timetableTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="first-year-tab" data-bs-toggle="tab"
-                                data-bs-target="#first-year" type="button" role="tab">First Year</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="second-year-tab" data-bs-toggle="tab" data-bs-target="#second-year"
-                                type="button" role="tab">Second Year</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="third-year-tab" data-bs-toggle="tab" data-bs-target="#third-year"
-                                type="button" role="tab">Third Year</button>
-                        </li>
-                    </ul>
-
-                    <!-- Tabs Content -->
-                    <div class="tab-content shadow-sm p-4 rounded bg-white" id="timetableTabContent">
-
-                        <!-- First Year Timetable -->
-                        <div class="tab-pane fade show active" id="first-year" role="tabpanel">
-
-                            <!-- Inner Section Tabs for First Year -->
-                            <ul class="nav nav-pills mb-3 justify-content-center" id="pills-tab-1" role="tablist">
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link active btn-sm px-4 py-2 me-2 rounded-pill" id="pills-1A-tab"
-                                        data-bs-toggle="pill" data-bs-target="#pills-1A" type="button"
-                                        role="tab">Section A</button>
-                                </li>
-                                <li class="nav-item" role="presentation">
-                                    <button class="nav-link btn-sm px-4 py-2 rounded-pill" id="pills-1B-tab"
-                                        data-bs-toggle="pill" data-bs-target="#pills-1B" type="button"
-                                        role="tab">Section B</button>
-                                </li>
-                            </ul>
-
-                            <div class="tab-content" id="pills-tabContent-1">
-                                <!-- Section A Timetable -->
-                                <div class="tab-pane fade show active" id="pills-1A" role="tabpanel">
-                                    <h5 class="text-center text-primary mb-3">First Year - Section (A) Timetable</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered text-center timetable-table mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" style="width: 15%;">Time / Day</th>
-                                                    <th scope="col">Monday</th>
-                                                    <th scope="col">Tuesday</th>
-                                                    <th scope="col">Wednesday</th>
-                                                    <th scope="col">Thursday</th>
-                                                    <th scope="col">Friday</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">09:00 - 10:30 AM</th>
-                                                    <td><span class="subject-title">C++ Programming</span><span
-                                                            class="room-no">Room 101</span></td>
-                                                    <td><span class="subject-title">Calculus I</span><span
-                                                            class="room-no">Room 102</span></td>
-                                                    <td><span class="subject-title">English</span><span class="room-no">Room
-                                                            104</span></td>
-                                                    <td><span class="subject-title">Physics</span><span class="room-no">Room
-                                                            103</span></td>
-                                                    <td><span class="subject-title">Myanmar</span><span class="room-no">Room
-                                                            102</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">10:45 - 12:15 PM</th>
-                                                    <td><span class="subject-title">IT Fundamentals</span><span
-                                                            class="room-no">Room 105</span></td>
-                                                    <td><span class="subject-title">- Free Period -</span></td>
-                                                    <td><span class="subject-title">Physics</span><span class="room-no">Lab
-                                                            B</span></td>
-                                                    <td><span class="subject-title">IT Fundamentals</span><span
-                                                            class="room-no">Room 105</span></td>
-                                                    <td><span class="subject-title">English</span><span class="room-no">Room
-                                                            104</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="6" class="bg-light text-muted fw-bold py-3">LUNCH
-                                                        BREAK (12:15 PM - 01:15 PM)</th>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">01:15 - 03:00 PM</th>
-                                                    <td><span class="subject-title">C++ Practical Lab</span><span
-                                                            class="room-no">Computer Lab 1</span></td>
-                                                    <td><span class="subject-title">C++ Practical Lab</span><span
-                                                            class="room-no">Computer Lab 1</span></td>
-                                                    <td><span class="subject-title">Physics Lab</span><span
-                                                            class="room-no">Physics Lab</span></td>
-                                                    <td><span class="subject-title">- Free Period -</span></td>
-                                                    <td><span class="subject-title">Library</span><span
-                                                            class="room-no">Library</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Section B Timetable -->
-                                <div class="tab-pane fade" id="pills-1B" role="tabpanel">
-                                    <h5 class="text-center text-primary mb-3">First Year - Section (B) Timetable</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered text-center timetable-table mb-0">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col" style="width: 15%;">Time / Day</th>
-                                                    <th scope="col">Monday</th>
-                                                    <th scope="col">Tuesday</th>
-                                                    <th scope="col">Wednesday</th>
-                                                    <th scope="col">Thursday</th>
-                                                    <th scope="col">Friday</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">09:00 - 10:30 AM</th>
-                                                    <td><span class="subject-title">Calculus I</span><span
-                                                            class="room-no">Room 102</span></td>
-                                                    <td><span class="subject-title">C++ Programming</span><span
-                                                            class="room-no">Room 101</span></td>
-                                                    <td><span class="subject-title">Physics</span><span
-                                                            class="room-no">Room 103</span></td>
-                                                    <td><span class="subject-title">English</span><span
-                                                            class="room-no">Room 104</span></td>
-                                                    <td><span class="subject-title">Myanmar</span><span
-                                                            class="room-no">Room 102</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">10:45 - 12:15 PM</th>
-                                                    <td><span class="subject-title">IT Fundamentals</span><span
-                                                            class="room-no">Room 105</span></td>
-                                                    <td><span class="subject-title">English</span><span
-                                                            class="room-no">Room 104</span></td>
-                                                    <td><span class="subject-title">- Free Period -</span></td>
-                                                    <td><span class="subject-title">IT Fundamentals</span><span
-                                                            class="room-no">Room 105</span></td>
-                                                    <td><span class="subject-title">Physics</span><span
-                                                            class="room-no">Lab B</span></td>
-                                                </tr>
-                                                <tr>
-                                                    <th colspan="6" class="bg-light text-muted fw-bold py-3">LUNCH
-                                                        BREAK (12:15 PM - 01:15 PM)</th>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row" class="bg-light text-dark">01:15 - 03:00 PM</th>
-                                                    <td><span class="subject-title">Physics Lab</span><span
-                                                            class="room-no">Physics Lab</span></td>
-                                                    <td><span class="subject-title">- Free Period -</span></td>
-                                                    <td><span class="subject-title">C++ Practical Lab</span><span
-                                                            class="room-no">Computer Lab 2</span></td>
-                                                    <td><span class="subject-title">C++ Practical Lab</span><span
-                                                            class="room-no">Computer Lab 2</span></td>
-                                                    <td><span class="subject-title">Library</span><span
-                                                            class="room-no">Library</span></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                        <!-- Second Year Timetable (Placeholder for Section A/B setup) -->
-                        <div class="tab-pane fade" id="second-year" role="tabpanel">
-                            <div class="text-center p-4">
-                                <h5 class="text-muted">Second Year sections (Section A & B) can be structured similarly
-                                    here.</h5>
-                            </div>
-                        </div>
-
-                        <!-- Third Year Timetable -->
-                        <div class="tab-pane fade" id="third-year" role="tabpanel">
-                            <div class="text-center p-4">
-                                <h5 class="text-muted">Third Year sections (CS & CT specializations/sections) can be added
-                                    here.</h5>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
+          </div>
         </div>
+
+        <div class="row wow fadeInUp" data-wow-delay=".5s">
+          <div class="col-12">
+
+            <!-- Main Year Tabs (Dynamic) -->
+            <ul class="mb-4 border-0 nav nav-tabs justify-content-center" id="timetableTabs" role="tablist">
+              @foreach($years as $year)
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                          id="year-{{ $year->id }}-tab"
+                          data-bs-toggle="tab"
+                          data-bs-target="#year-{{ $year->id }}"
+                          type="button"
+                          role="tab">
+                    {{ $year->name }}
+                  </button>
+                </li>
+              @endforeach
+            </ul>
+
+            <!-- Tabs Content for Years -->
+            <div class="p-4 bg-white rounded shadow-sm tab-content" id="timetableTabContent">
+
+              @foreach($years as $year)
+                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                     id="year-{{ $year->id }}"
+                     role="tabpanel">
+
+                  @php
+                      $yearSections = $sections->where('year_id', $year->id);
+                  @endphp
+
+                  <!-- Inner Section Tabs for current Year (Dynamic) -->
+                  <ul class="mb-3 nav nav-pills justify-content-center" id="pills-tab-year-{{ $year->id }}" role="tablist">
+                    @foreach($yearSections as $section)
+                      <li class="nav-item" role="presentation">
+                        <button class="nav-link {{ $loop->first ? 'active' : '' }} btn-sm px-4 py-2 me-2 rounded-pill"
+                                id="pills-year-{{ $year->id }}-sec-{{ $section->id }}-tab"
+                                data-bs-toggle="pill"
+                                data-bs-target="#pills-year-{{ $year->id }}-sec-{{ $section->id }}"
+                                type="button"
+                                role="tab">
+                          {{ $section->name }}
+                        </button>
+                      </li>
+                    @endforeach
+                  </ul>
+
+                  <!-- Tab Content for Sections -->
+                  <div class="tab-content" id="pills-tabContent-year-{{ $year->id }}">
+                    @foreach($yearSections as $section)
+                      <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                           id="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
+                           role="tabpanel">
+
+                        <h5 class="mb-3 text-center text-primary">{{ $year->name }} - {{ $section->name }} Timetable</h5>
+
+                        <!-- Download Button  Start -->
+                        <div class="mb-3 text-end">
+                            <a href="{{ route('schedule.pdf', [
+                                    'year' => $year->id,
+                                    'sectionID' => $section->id,
+                                    'academicYearID' => $academicYear->id ?? 1,
+                                    'semesterID' => $semesters->id ?? 1,
+                                    'major' => $major->id ?? 1,
+                                    'room' => $room->id ?? 1
+                                ]) }}"
+                               class="px-3 btn btn-danger btn-sm">
+                                <i class="me-1 fa-solid fa-file-pdf"></i> Download PDF
+                            </a>
+                        </div>
+                        <!-- Download Button End -->
+
+                        <div class="table-responsive">
+                          <table class="table mb-0 text-center table-bordered timetable-table">
+                            <thead>
+                              <tr>
+                                <th scope="col" style="width: 15%;">Time / Day</th>
+                                @foreach($days as $day)
+                                  <th scope="col">{{ $day->name }}</th>
+                                @endforeach
+                              </tr>
+                            </thead>
+                            <tbody>
+                              @foreach($times as $time)
+                                <tr>
+                                  <th scope="row" class="bg-light text-dark">{{ $time->name }}</th>
+
+                                  @foreach($days as $day)
+                                    <td>
+                                      @php
+                                          // Filter the specific schedule dynamically
+                                          $class = $schedules->where('year_id', $year->id)
+                                                             ->where('section_id', $section->id)
+                                                             ->where('day_id', $day->id)
+                                                             ->where('time_id', $time->id)
+                                                             ->first();
+                                      @endphp
+
+                                      @if($class)
+                                          <span class="fw-bold d-block subject-title">{{ $class->subject->short_name ?? $class->subject->name ?? '' }}</span>
+                                          <span class="small text-muted room-no">{{ $class->room->name ?? '' }}</span>
+                                      @else
+                                          <span class="small text-black-50 subject-title">- Free -</span>
+                                      @endif
+                                    </td>
+                                  @endforeach
+
+                                </tr>
+                              @endforeach
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </div>
+                    @endforeach
+                  </div> <!-- End Section Tab Content -->
+
+                </div>
+              @endforeach
+
+            </div> <!-- End Year Tabs Content -->
+
+          </div>
+        </div>
+
+      </div>
     </section>
 @endsection

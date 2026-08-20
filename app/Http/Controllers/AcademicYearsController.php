@@ -32,8 +32,6 @@ class AcademicYearsController extends Controller
 
             'end_date'   => $request->end_date,
 
-            'status'     => $request->status,
-
             'created_at' => Carbon::now(),
 
             'updated_at' => Carbon::now(),
@@ -83,7 +81,6 @@ class AcademicYearsController extends Controller
             'name'       => 'required',
             'start_date' => 'required|date',
             'end_date'   => 'required|date|after:start_date',
-            'status'     => 'required',
         ]);
 
         $academicYear = AcademicYears::findOrFail($id);
@@ -109,7 +106,6 @@ class AcademicYearsController extends Controller
             'name'       =>'required|unique:academic_years,name,' . $id,
             'start_date' =>'required|date',
             'end_date'   =>'required|date|after:start_date',
-            'status'     =>'required|in:Active,Inactive',
 
         ]);
 

@@ -202,8 +202,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::post('schedule/swap', [ScheduleController::class, 'swap'])->name('schedule.swap');
 
         // PDF
-        Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
-            ->name('schedule.pdf');
+        // Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
+        //     ->name('schedule.pdf');
 
         // Teacher timetable
         Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])
@@ -217,7 +217,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
         Route::post('shift/{id}', [ScheduleController::class, 'shift'])->name('schedule.shift');
 
+        // Student Schedule
+
+        // Student Timetable
+        Route::get(
+            'student-timetable',
+            [AdminController::class, 'viewStudentTimetable']
+        )->name('schedule.viewStudentTimetable');
     });
+
     // contacts
     Route::group(['prefix' => 'contact'], function () {
 
@@ -231,7 +239,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
 
         Route::put('accept/{id}', [ContactController::class, 'accept'])->name('contact.accept');
 
-        Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject');
+        Route::put('reject/{id}', [ContactController::class, 'reject'])->name('contact.reject'); 
     });
+
 
 });

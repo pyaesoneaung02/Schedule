@@ -51,40 +51,65 @@
                     <div class="card-body">
 
 
-                        <form action="{{ route('schedule.result', $years->id) }}" method="POST">
+                        <form action="{{ route('schedule.result', ['year' => $years->id]) }}" method="POST">
 
                             @csrf
 
-
-
+                            {{-- Academic Year --}}
                             <div class="mb-3">
 
-
                                 <label class="form-label">
-                                    Select Room
+                                    Select Academic Year
                                 </label>
 
-
-                                <select name="roomID" class="form-control @error('roomID') is-invalid @enderror">
-
+                                <select name="academicYearID"
+                                    class="form-control @error('academicYearID') is-invalid @enderror" required>
 
                                     <option value="">
-                                        -- Choose Room --
+                                        -- Choose Academic Year --
                                     </option>
 
-
-                                    @foreach ($rooms as $item)
-                                        <option value="{{ $item->id }}"
-                                            @if (old('roomID') == $item->id) selected @endif>
+                                    @foreach ($academicYears as $item)
+                                        <option value="{{ $item->id }}" @selected(old('academicYearID') == $item->id)>
 
                                             {{ $item->name }}
 
                                         </option>
                                     @endforeach
 
-
                                 </select>
 
+                                @error('academicYearID')
+                                    <span class="invalid-feedback">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+
+                            </div>
+
+
+                            {{-- Room --}}
+                            <div class="mb-3">
+
+                                <label class="form-label">
+                                    Select Room
+                                </label>
+
+                                <select name="roomID" class="form-control @error('roomID') is-invalid @enderror" required>
+
+                                    <option value="">
+                                        -- Choose Room --
+                                    </option>
+
+                                    @foreach ($rooms as $item)
+                                        <option value="{{ $item->id }}" @selected(old('roomID') == $item->id)>
+
+                                            {{ $item->name }}
+
+                                        </option>
+                                    @endforeach
+
+                                </select>
 
                                 @error('roomID')
                                     <span class="invalid-feedback">
@@ -92,40 +117,31 @@
                                     </span>
                                 @enderror
 
-
                             </div>
 
 
-
-
+                            {{-- Major --}}
                             <div class="mb-3">
-
 
                                 <label class="form-label">
                                     Select Major
                                 </label>
 
-
-                                <select name="majorID" class="form-control @error('majorID') is-invalid @enderror">
-
+                                <select name="majorID" class="form-control @error('majorID') is-invalid @enderror" required>
 
                                     <option value="">
                                         -- Choose Major --
                                     </option>
 
-
                                     @foreach ($majors as $item)
-                                        <option value="{{ $item->id }}"
-                                            @if (old('majorID') == $item->id) selected @endif>
+                                        <option value="{{ $item->id }}" @selected(old('majorID') == $item->id)>
 
                                             {{ $item->name }}
 
                                         </option>
                                     @endforeach
 
-
                                 </select>
-
 
                                 @error('majorID')
                                     <span class="invalid-feedback">
@@ -133,36 +149,32 @@
                                     </span>
                                 @enderror
 
-
                             </div>
 
+
+                            {{-- Semester --}}
                             <div class="mb-3">
 
                                 <label class="form-label">
                                     Select Semester
                                 </label>
 
-
-                                <select name="semesterID" class="form-control @error('semesterID') is-invalid @enderror">
-
+                                <select name="semesterID" class="form-control @error('semesterID') is-invalid @enderror"
+                                    required>
 
                                     <option value="">
                                         -- Choose Semester --
                                     </option>
 
-
                                     @foreach ($semesters as $item)
-                                        <option value="{{ $item->id }}"
-                                            @if (old('semesterID') == $item->id) selected @endif>
+                                        <option value="{{ $item->id }}" @selected(old('semesterID') == $item->id)>
 
                                             {{ $item->name }}
 
                                         </option>
                                     @endforeach
 
-
                                 </select>
-
 
                                 @error('semesterID')
                                     <span class="invalid-feedback">
@@ -170,37 +182,32 @@
                                     </span>
                                 @enderror
 
-
                             </div>
 
 
+                            {{-- Section --}}
                             <div class="mb-3">
 
                                 <label class="form-label">
                                     Select Section
                                 </label>
 
-
-                                <select name="sectionID" class="form-control @error('sectionID') is-invalid @enderror">
-
+                                <select name="sectionID" class="form-control @error('sectionID') is-invalid @enderror"
+                                    required>
 
                                     <option value="">
                                         -- Choose Section --
                                     </option>
 
-
                                     @foreach ($sections as $item)
-                                        <option value="{{ $item->id }}"
-                                            @if (old('sectionID') == $item->id) selected @endif>
+                                        <option value="{{ $item->id }}" @selected(old('sectionID') == $item->id)>
 
                                             {{ $item->name }}
 
                                         </option>
                                     @endforeach
 
-
                                 </select>
-
 
                                 @error('sectionID')
                                     <span class="invalid-feedback">
@@ -208,35 +215,20 @@
                                     </span>
                                 @enderror
 
-
                             </div>
 
 
+                            {{-- Submit --}}
                             <button type="submit" class="mb-3 btn btn-primary w-100">
-
 
                                 <i class="mr-2 fa-solid fa-gears"></i>
 
                                 Auto Generate Time Table
 
-
                             </button>
 
-                            {{-- <a href="{{ route('schedule.autoGenerate', [
-                                'academicYearID' => $academicYearID,
-                                'semesterID' => $semesterID,
-                                'yearID' => $yearID,
-                                'majorID' => $majorID,
-                                'sectionID' => $sectionID,
-                            ]) }}"
-                                class="btn btn-success">
 
-                                <i class="fas fa-magic me-1"></i>
-                                Auto Generate Schedule
-
-                            </a> --}}
-
-
+                            {{-- Teacher Timetable --}}
                             <a href="{{ route('schedule.teacherTimeTable', $years->id) }}"
                                 class="mb-3 btn btn-success w-100">
 
@@ -246,18 +238,27 @@
 
                             </a>
 
+                            <!-- Student Timetable -->
+                            <a href="{{ route('schedule.viewStudentTimetable', [
+                                'yearID' => $years->id,
+                            ]) }}"
+                                class="mb-3 btn btn-danger w-100">
 
+                                <i class="mr-2 fa-solid fa-user-graduate"></i>
+
+                                View Student Time Table
+
+                            </a>
+
+
+                            {{-- Year List --}}
                             <a href="{{ route('schedule.timeTable') }}" class="btn btn-outline-primary w-100">
-
 
                                 <i class="mr-2 fa-solid fa-list"></i>
 
                                 View Year List
 
-
                             </a>
-
-
 
                         </form>
 
