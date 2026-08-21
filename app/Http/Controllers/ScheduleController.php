@@ -1834,42 +1834,5 @@ class ScheduleController extends Controller
         }
     }
 
-    //sawp
-    // public function swap(Request $request)
-    // {
-    //     $request->validate([
-    //         'schedule1_id' => 'required|integer',
-    //         'schedule2_id' => 'required|integer',
-    //     ]);
-
-    //     $schedule1 = Schedule::findOrFail($request->schedule1_id);
-    //     $schedule2 = Schedule::findOrFail($request->schedule2_id);
-
-    //     // Same schedule ကို သူ့နေရာသူ ပြန်ချတာ
-    //     if ($schedule1->id === $schedule2->id) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Same timetable slot cannot be swapped.'
-    //         ], 422);
-    //     }
-
-    //     // Time / Day ကို swap
-    //     $day1  = $schedule1->day_id;
-    //     $time1 = $schedule1->time_id;
-
-    //     $schedule1->day_id  = $schedule2->day_id;
-    //     $schedule1->time_id = $schedule2->time_id;
-
-    //     $schedule2->day_id  = $day1;
-    //     $schedule2->time_id = $time1;
-
-    //     $schedule1->save();
-    //     $schedule2->save();
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Timetable swapped successfully.'
-    //     ]);
-    // }
 
 }

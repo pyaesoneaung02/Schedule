@@ -5,7 +5,7 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
-            <div class="mb-50 text-center section-title">
+            <div class="text-center mb-50 section-title">
               <h3 class="mb-15 wow fadeInUp" data-wow-delay=".2s">Weekly Timetable (By Year & Section)</h3>
             </div>
           </div>
@@ -65,9 +65,9 @@
                            id="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
                            role="tabpanel">
 
-                        <h5 class="mb-3 text-center text-primary">{{ $year->name }} - {{ $section->name }} Timetable</h5>
+                        <h5 class="mb-3 text-center" style="color: #6c757d;">{{ $year->name }} - Section ({{ $section->name }}) Timetable</h5>
 
-                        <!-- Download Button  Start -->
+                        <!-- Download Button Start -->
                         <div class="mb-3 text-end">
                             <a href="{{ route('schedule.pdf', [
                                     'year' => $year->id,
@@ -84,40 +84,56 @@
                         <!-- Download Button End -->
 
                         <div class="table-responsive">
-                          <table class="table mb-0 text-center table-bordered timetable-table">
-                            <thead>
+                          <table class="table mb-0 text-center shadow-sm table-bordered timetable-table">
+                            <thead class="align-middle">
                               <tr>
-                                <th scope="col" style="width: 15%;">Time / Day</th>
-                                @foreach($days as $day)
-                                  <th scope="col">{{ $day->name }}</th>
+                                <th scope="col" style="width: 15%; background-color: #6c757d; color: #fff; border-color: #6c757d;">Day / Time</th>
+                                @foreach($times as $time)
+                                    <th scope="col" style="background-color: #6c757d; color: #fff; border-color: #6c757d;">
+                                        @if($time->name === '12:00-01:00')
+                                            &nbsp;
+                                        @else
+                                            {{ $time->name }}
+                                        @endif
+                                    </th>
                                 @endforeach
                               </tr>
                             </thead>
                             <tbody>
-                              @foreach($times as $time)
+                              @foreach($days as $dayIndex => $day)
                                 <tr>
-                                  <th scope="row" class="bg-light text-dark">{{ $time->name }}</th>
+                                  <!-- DAY -->
+                                  <th scope="row" class="align-middle" style="background-color: #6c757d; color: #fff; border-color: #6c757d;">{{ $day->name }}</th>
 
-                                  @foreach($days as $day)
-                                    <td>
-                                      @php
-                                          // Filter the specific schedule dynamically
-                                          $class = $schedules->where('year_id', $year->id)
-                                                             ->where('section_id', $section->id)
-                                                             ->where('day_id', $day->id)
-                                                             ->where('time_id', $time->id)
-                                                             ->first();
-                                      @endphp
-
-                                      @if($class)
-                                          <span class="fw-bold d-block subject-title">{{ $class->subject->short_name ?? $class->subject->name ?? '' }}</span>
-                                          <span class="small text-muted room-no">{{ $class->room->name ?? '' }}</span>
+                                  @foreach($times as $time)
+                                      {{-- LUNCH BREAK --}}
+                                      @if($time->name === '12:00-01:00')
+                                          @if($dayIndex === 0)
+                                              <td rowspan="{{ $days->count() }}" class="align-middle bg-light">
+                                                  <span class="fw-bold d-block text-secondary" style="writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 auto; letter-spacing: 2px;">
+                                                      ထမင်းစားနားချိန်
+                                                  </span>
+                                              </td>
+                                          @endif
                                       @else
-                                          <span class="small text-black-50 subject-title">- Free -</span>
-                                      @endif
-                                    </td>
-                                  @endforeach
+                                          @php
+                                              $class = $schedules->where('year_id', $year->id)
+                                                                 ->where('section_id', $section->id)
+                                                                 ->where('day_id', $day->id)
+                                                                 ->where('time_id', $time->id)
+                                                                 ->first();
+                                          @endphp
 
+                                          <td class="align-middle">
+                                              @if($class)
+                                                  <span class="fw-bold d-block subject-title">{{ $class->subject->short_name ?? $class->subject->name ?? '' }}</span>
+                                                  <span class="small text-muted room-no">{{ $class->teacher->name ?? '' }}</span>
+                                              @else
+                                                  <span class="small text-black-50 subject-title">Extra Curriculum</span>
+                                              @endif
+                                          </td>
+                                      @endif
+                                  @endforeach
                                 </tr>
                               @endforeach
                             </tbody>

@@ -203,10 +203,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         // PDF
         // Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
         //     ->name('schedule.pdf');
-        Route::get(
-            'pdf/{year}/{room}/{major}/{academicYearID}',
-            [ScheduleController::class, 'downloadPDF']
-        )->name('schedule.pdf');
+        Route::get('pdf/{year}/{room}/{major}/{academicYearID}',[ScheduleController::class, 'downloadPDF'])->name('schedule.pdf');
 
         // Teacher timetable
         Route::get('teacher-time-table/{yearID}', [ScheduleController::class, 'teacherTimeTable'])

@@ -102,27 +102,13 @@
 
         <div class="timetable-info">
 
-            <div>
-
-                အတန်း -
-
-                {{ $yearData->name ?? '-' }}
-
-                ({{ $major->name ?? '-' }})
-
+            <div class="timetable-info-left">
+                အတန်း - {{ $yearData->name ?? '-' }} ({{ $major->name ?? '-' }})
             </div>
 
 
-            <div>
-
-                Section
-                ({{ $section->name ?? '-' }})
-
-                -
-
-                အခန်း
-                ({{ $room->name ?? '-' }})
-
+            <div class="timetable-info-right">
+                Section ({{ $section->name ?? '-' }}) - အခန်း ({{ $room->name ?? '-' }})
             </div>
 
         </div>
@@ -212,18 +198,14 @@
                                 @else
 
                                     @php
-
                                         $schedule = $schedules->first(
                                             function ($item) use ($day, $time) {
-
                                                 return
                                                     (int) $item->day_id === (int) $day->id
                                                     &&
                                                     (int) $item->time_id === (int) $time->id;
-
                                             }
                                         );
-
                                     @endphp
 
 
@@ -473,7 +455,7 @@
 <style>
 
 /* =========================================================
-   PAGE
+    PAGE
 ========================================================= */
 
 .timetable-page {
@@ -486,7 +468,7 @@
 
 
 /* =========================================================
-   SECTION FILTER
+    SECTION FILTER
 ========================================================= */
 
 .section-filter {
@@ -539,7 +521,7 @@
 
 
 /* =========================================================
-   SECTION BUTTON
+    SECTION BUTTON
 ========================================================= */
 
 .section-btn {
@@ -600,7 +582,7 @@
 
 
 /* =========================================================
-   HEADER
+    HEADER
 ========================================================= */
 
 .timetable-header {
@@ -611,7 +593,7 @@
 
 
 /* =========================================================
-   INFO
+    INFO
 ========================================================= */
 
 .timetable-info {
@@ -626,11 +608,25 @@
 
     margin-bottom: 10px;
 
+    width: 100%;
+
+}
+
+.timetable-info-left {
+
+    text-align: left;
+
+}
+
+.timetable-info-right {
+
+    text-align: right;
+
 }
 
 
 /* =========================================================
-   TABLE
+    TABLE
 ========================================================= */
 
 .print-table table {
@@ -787,7 +783,7 @@
 
 
 /* =========================================================
-   SUBJECT LIST
+    SUBJECT LIST
 ========================================================= */
 
 .subject-table {
@@ -821,7 +817,7 @@
 
 
 /* =========================================================
-   BOTTOM ACTIONS
+    BOTTOM ACTIONS
 ========================================================= */
 
 .timetable-actions {
@@ -942,7 +938,7 @@
 
 
 /* =========================================================
-   LOADING
+    LOADING
 ========================================================= */
 
 .swap-loading {
@@ -995,7 +991,7 @@
 
 
 /* =========================================================
-   RESPONSIVE
+    RESPONSIVE
 ========================================================= */
 
 @media(max-width:768px) {
@@ -1025,11 +1021,11 @@
 
     .timetable-info {
 
-        flex-direction: column;
+        flex-direction: row !important;
 
-        align-items: flex-start;
+        justify-content: space-between !important;
 
-        gap: 5px;
+        align-items: center !important;
 
     }
 
@@ -1046,7 +1042,7 @@
 
 
 /* =========================================================
-   PRINT
+    PRINT
 ========================================================= */
 
 @media print {
@@ -1170,8 +1166,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =========================================================
-       DRAG START
-    ========================================================== */
+        DRAG START
+    ========================================================= */
 
     subjectCells.forEach(function (cell) {
 
@@ -1221,8 +1217,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         /* =====================================================
-           DRAG END
-        ====================================================== */
+            DRAG END
+        ===================================================== */
 
         cell.addEventListener(
             'dragend',
@@ -1251,15 +1247,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =========================================================
-       DROP TARGETS
-    ========================================================== */
+        DROP TARGETS
+    ========================================================= */
 
     allCells.forEach(function (cell) {
 
 
         /* =====================================================
-           DRAG OVER
-        ====================================================== */
+            DRAG OVER
+        ===================================================== */
 
         cell.addEventListener(
             'dragover',
@@ -1307,8 +1303,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         /* =====================================================
-           DRAG LEAVE
-        ====================================================== */
+            DRAG LEAVE
+        ===================================================== */
 
         cell.addEventListener(
             'dragleave',
@@ -1323,8 +1319,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         /* =====================================================
-           DROP
-        ====================================================== */
+            DROP
+        ===================================================== */
 
         cell.addEventListener(
             'drop',
@@ -1382,7 +1378,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                 /* =================================================
-                   VALIDATE
+                    VALIDATE
                 ================================================== */
 
                 if (
@@ -1411,7 +1407,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                 /* =================================================
-                   CONFIRM
+                    CONFIRM
                 ================================================== */
 
                 const confirmed =
@@ -1428,7 +1424,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                 /* =================================================
-                   SEND
+                    SEND
                 ================================================== */
 
                 swapSchedules(
@@ -1443,8 +1439,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =========================================================
-       SWAP
-    ========================================================== */
+        SWAP
+    ========================================================= */
 
     async function swapSchedules(
         schedule1Id,
@@ -1532,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             /* =================================================
-               HTTP ERROR
+                HTTP ERROR
             ================================================== */
 
             if (!response.ok) {
@@ -1546,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             /* =================================================
-               APPLICATION ERROR
+                APPLICATION ERROR
             ================================================== */
 
             if (!result.success) {
@@ -1560,7 +1556,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             /* =================================================
-               SUCCESS
+                SUCCESS
             ================================================== */
 
             window.location.reload();
@@ -1591,8 +1587,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =========================================================
-       SHOW LOADING
-    ========================================================== */
+        SHOW LOADING
+    ========================================================= */
 
     function showLoading() {
 
@@ -1607,8 +1603,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     /* =========================================================
-       HIDE LOADING
-    ========================================================== */
+        HIDE LOADING
+    ========================================================= */
 
     function hideLoading() {
 
