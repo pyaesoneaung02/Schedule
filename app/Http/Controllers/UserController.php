@@ -166,33 +166,120 @@ class UserController extends Controller
     //landing page route end
 
     // Subject
-    public function subjectPage()
+    // public function subjectPage()
+    // {
+    //     $user = auth()->user();
+
+    //     // Teacher
+
+    //     if ($user->role == 'teacher') {
+    //         $teacher   = \App\Models\Teacher::where('user_id', $user->id)->first();
+    //         $teachings = collect();
+
+    //         if ($teacher) {
+    //             $teachings = \App\Models\Teaching::with(['subject', 'year', 'major', 'section', 'room'])
+    //                 ->where('teacher_id', $teacher->id)
+    //                 ->get();
+    //         }
+
+    //         return view('user.component.subject', compact('teachings'));
+    //     }
+
+    //     // Student
+
+    //     else {
+
+    //         $allSubjects = \App\Models\Subject::with(['year', 'semester'])->get();
+
+    //         return view('user.component.allSubject', compact('allSubjects'));
+    //     }
+    // }
+    // public function subjectPage()
+    // {
+
+    //     $allSubjects = \App\Models\Subject::with([
+    //         'year',
+    //         'semester',
+    //     ])
+    //     ->latest()
+    //     ->get();
+
+    //     return view('user.component.subject',
+    //         compact('allSubjects')
+    //     );
+    // }
+    public function subjectPage(Request $request)
     {
-        $user = auth()->user();
+        /*
+        |--------------------------------------------------------------------------
+        | SELECTED YEAR
+        |--------------------------------------------------------------------------
+        */
 
-        // Teacher
+        $yearID = $request->get('yearID');
 
-        if ($user->role == 'teacher') {
-            $teacher   = \App\Models\Teacher::where('user_id', $user->id)->first();
-            $teachings = collect();
 
-            if ($teacher) {
-                $teachings = \App\Models\Teaching::with(['subject', 'year', 'major', 'section', 'room'])
-                    ->where('teacher_id', $teacher->id)
-                    ->get();
-            }
+        /*
+        |--------------------------------------------------------------------------
+        | YEARS
+        |--------------------------------------------------------------------------
+        */
 
-            return view('user.component.subject', compact('teachings'));
+        $years = \App\Models\Year::orderBy('id')->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUBJECTS
+        |--------------------------------------------------------------------------
+        */
+
+        $query = \App\Models\Subject::with([
+            'year',
+            'semester',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | YEAR FILTER
+        |--------------------------------------------------------------------------
+        */
+
+        if (!empty($yearID)) {
+
+            $query->where(
+                'year_id',
+                $yearID
+            );
+
         }
 
-        // Student
 
-        else {
+        /*
+        |--------------------------------------------------------------------------
+        | GET SUBJECTS
+        |--------------------------------------------------------------------------
+        */
 
-            $allSubjects = \App\Models\Subject::with(['year', 'semester'])->get();
+        $allSubjects = $query
+            ->latest()
+            ->get();
 
-            return view('user.component.allSubject', compact('allSubjects'));
-        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | VIEW
+        |--------------------------------------------------------------------------
+        */
+
+        return view('user.component.subject',
+            compact(
+                'allSubjects',
+                'years',
+                'yearID'
+            )
+        );
     }
 
     // Schedule

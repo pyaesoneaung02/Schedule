@@ -966,24 +966,324 @@ class ScheduleController extends Controller
 
     // view schedule
 
-    public function viewSchedule($id)
+    // public function viewSchedule($id)
+    // {
+
+    //     $years         = Year::findOrFail($id);
+    //     $academicYears = AcademicYears::all();
+    //     $majors        = Major::all();
+    //     $rooms         = Room::all();
+    //     $semesters     = Semesters::all();
+    //     $sections      = Sections::all();
+
+    //     return view('admin.schedule.viewSchedule', compact(
+    //         'years',
+    //         'academicYears',
+    //         'majors',
+    //         'rooms',
+    //         'semesters',
+    //         'sections'
+    //     )
+    //     );
+    // }
+    // =========================================================
+    // VIEW SCHEDULE
+    // =========================================================
+    public function viewSchedule(Request $request, $id)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | SELECTED YEAR
+        |--------------------------------------------------------------------------
+        */
+        $yearData = Year::findOrFail($id);
 
-        $years         = Year::findOrFail($id);
-        $academicYears = AcademicYears::all();
-        $majors        = Major::all();
-        $rooms         = Room::all();
-        $semesters     = Semesters::all();
-        $sections      = Sections::all();
+        /*
+        |--------------------------------------------------------------------------
+        | $years
+        | Blade မှာ $years ကို reference လုပ်ထားရင် error မတက်အောင်
+        |--------------------------------------------------------------------------
+        */
+        $years = $yearData;
 
-        return view('admin.schedule.viewSchedule', compact(
-            'years',
-            'academicYears',
-            'majors',
-            'rooms',
-            'semesters',
-            'sections'
+
+        /*
+        |--------------------------------------------------------------------------
+        | MASTER DATA
+        |--------------------------------------------------------------------------
+        */
+        $academicYears = AcademicYears::orderBy('id', 'desc')->get();
+
+        $majors = Major::orderBy('name')->get();
+
+        $rooms = Room::orderBy('name')->get();
+
+        $semesters = Semesters::orderBy('id')->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACADEMIC YEAR
+        |--------------------------------------------------------------------------
+        */
+        $academicYearID = $request->input('academicYearID');
+
+        if ($academicYearID) {
+
+            $academicYear = AcademicYears::find($academicYearID);
+
+        } else {
+
+            $academicYear = AcademicYears::latest('id')->first();
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEMESTER
+        |--------------------------------------------------------------------------
+        */
+        $semesterID = $request->input('semesterID');
+
+        if ($semesterID) {
+
+            $semester = Semesters::find($semesterID);
+
+        } else {
+
+            $semester = Semesters::first();
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MAJOR
+        |--------------------------------------------------------------------------
+        */
+        $majorID = $request->input('majorID');
+
+        $major = null;
+
+        if ($majorID) {
+
+            $major = Major::find($majorID);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROOM
+        |--------------------------------------------------------------------------
+        */
+        $roomID = $request->input('roomID');
+
+        $room = null;
+
+        if ($roomID) {
+
+            $room = Room::find($roomID);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SECTION
+        |--------------------------------------------------------------------------
+        */
+        $sectionID = $request->input('sectionID');
+
+        $section = null;
+
+        if ($sectionID) {
+
+            $section = Sections::find($sectionID);
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ONLY SECTIONS BELONGING TO SELECTED YEAR
+        |--------------------------------------------------------------------------
+        */
+        $sectionIDs = Schedule::where(
+            'year_id',
+            $yearData->id
         )
+        ->whereNotNull('section_id')
+        ->pluck('section_id')
+        ->unique()
+        ->values();
+
+
+        $sections = Sections::whereIn(
+            'id',
+            $sectionIDs
+        )
+        ->orderBy('name')
+        ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DAYS
+        |--------------------------------------------------------------------------
+        */
+        $days = Day::orderBy('id')->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TIMES
+        |--------------------------------------------------------------------------
+        */
+        $times = Time::orderBy('id')->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SCHEDULE
+        |
+        | IMPORTANT:
+        | Always filter by selected YEAR
+        |--------------------------------------------------------------------------
+        */
+        $schedulesQuery = Schedule::with([
+            'subject',
+            'teacher',
+            'day',
+            'time',
+            'major',
+            'room',
+            'section',
+            'year',
+            'academicYear',
+            'semester'
+        ])
+        ->where(
+            'year_id',
+            $yearData->id
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ACADEMIC YEAR
+        |--------------------------------------------------------------------------
+        */
+        if ($academicYear) {
+
+            $schedulesQuery->where(
+                'academic_year_id',
+                $academicYear->id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEMESTER
+        |--------------------------------------------------------------------------
+        */
+        if ($semester) {
+
+            $schedulesQuery->where(
+                'semester_id',
+                $semester->id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MAJOR
+        |--------------------------------------------------------------------------
+        */
+        if ($major) {
+
+            $schedulesQuery->where(
+                'major_id',
+                $major->id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ROOM
+        |--------------------------------------------------------------------------
+        */
+        if ($room) {
+
+            $schedulesQuery->where(
+                'room_id',
+                $room->id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SECTION
+        |
+        | All = no section filter
+        | A   = A only
+        | B   = B only
+        |--------------------------------------------------------------------------
+        */
+        if ($section) {
+
+            $schedulesQuery->where(
+                'section_id',
+                $section->id
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET SCHEDULES
+        |--------------------------------------------------------------------------
+        */
+        $schedules = $schedulesQuery
+            ->orderBy('day_id')
+            ->orderBy('time_id')
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN VIEW
+        |--------------------------------------------------------------------------
+        */
+        return view(
+            'admin.schedule.viewSchedule',
+            compact(
+                'years',
+                'yearData',
+                'academicYears',
+                'majors',
+                'rooms',
+                'semesters',
+                'sections',
+                'academicYear',
+                'semester',
+                'major',
+                'room',
+                'section',
+                'days',
+                'times',
+                'schedules'
+            )
         );
     }
 

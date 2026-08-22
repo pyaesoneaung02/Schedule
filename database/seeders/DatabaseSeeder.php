@@ -16,8 +16,8 @@ class DatabaseSeeder extends Seeder
     {
 
     User::create([
-        'name' => 'Super Admin Account',
-        'email' => 'superadmin@gmail.com',
+        'name' => 'Admin Account',
+        'email' => 'admin@gmail.com',
         'password' => Hash::make('Admin@123'),
         'role' => 'superadmin',
         'created_at' => Carbon::now(),

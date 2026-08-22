@@ -201,8 +201,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'admin'], function () {
         Route::post('schedule/swap', [ScheduleController::class, 'swap'])->name('schedule.swap');
 
         // PDF
-        // Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])
-        //     ->name('schedule.pdf');
         Route::get('pdf/{year}/{room}/{major}/{academicYearID}',[ScheduleController::class, 'downloadPDF'])->name('schedule.pdf');
 
         // Teacher timetable

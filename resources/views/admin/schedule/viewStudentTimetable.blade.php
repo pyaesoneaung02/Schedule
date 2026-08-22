@@ -5,43 +5,61 @@
 <div class="container-fluid timetable-page">
 
     {{-- =========================================================
-        TOP SECTION BUTTONS
+        SECTION FILTER
     ========================================================== --}}
+
     <div class="section-filter print-hide">
+
+        <div class="section-filter-title">
+            <i class="mr-2 fa-solid fa-layer-group"></i>
+            Select Section
+        </div>
 
         <div class="section-buttons">
 
-            @if(isset($sections) && $sections->count())
+            {{-- ALL --}}
+            <button
+                type="button"
+                class="section-btn active"
+                data-section-filter="all"
+                data-section-name=""
+            >
+                All
+            </button>
 
-                @foreach($sections as $item)
 
-                    <a
-                        href="{{ request()->fullUrlWithQuery([
-                            'sectionID' => $item->id
-                        ]) }}"
-                        class="section-btn
-                        {{ isset($section) && $section && $section->id == $item->id ? 'active' : '' }}"
+            {{-- SECTIONS --}}
+            @foreach($sections as $sectionItem)
+
+                @php
+                    $hasSchedule = $schedules
+                        ->where('section_id', $sectionItem->id)
+                        ->count() > 0;
+                @endphp
+
+                @if($hasSchedule)
+
+                    <button
+                        type="button"
+                        class="section-btn"
+                        data-section-filter="{{ $sectionItem->id }}"
+                        data-section-name="{{ $sectionItem->name }}"
                     >
-                        {{ $item->name }}
-                    </a>
+                        Section {{ $sectionItem->name }}
+                    </button>
 
-                @endforeach
+                @endif
 
-            @else
-
-                <span class="text-muted">
-                    No Section
-                </span>
-
-            @endif
+            @endforeach
 
         </div>
 
     </div>
 
 
+
     {{-- =========================================================
-        HEADER
+        MAIN HEADER
     ========================================================== --}}
 
     <div class="mb-4 text-center timetable-header">
@@ -59,7 +77,13 @@
 
             {{ $academicYear->name ?? '' }}
 
-            ပညာသင်နှစ် ({{ $semester->name ?? ''}})
+            ပညာသင်နှစ်
+
+            @if(isset($semester) && $semester)
+
+                ({{ $semester->name ?? '' }})
+
+            @endif
 
             <br><br>
 
@@ -67,14 +91,70 @@
 
             ({{ $major->name ?? '' }})
 
-            -
-
-            Section
-            ({{ $section->name ?? '-' }})
+            <span id="selectedSectionHeader"></span>
 
         </h4>
 
     </div>
+
+
+
+    {{-- =========================================================
+        SUCCESS
+    ========================================================== --}}
+
+    @if(session('success'))
+
+        <div class="alert alert-success alert-dismissible fade show print-hide">
+
+            <i class="mr-2 fa-solid fa-circle-check"></i>
+
+            {{ session('success') }}
+
+            <button
+                type="button"
+                class="close"
+                data-dismiss="alert"
+            >
+                <span>&times;</span>
+            </button>
+
+        </div>
+
+    @endif
+
+
+
+    {{-- =========================================================
+        ERROR
+    ========================================================== --}}
+
+    @if($errors->any())
+
+        <div class="alert alert-danger print-hide">
+
+            <strong>
+
+                <i class="mr-2 fa-solid fa-triangle-exclamation"></i>
+
+                Error
+
+            </strong>
+
+            <ul class="mb-0 mt-2">
+
+                @foreach($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
 
 
     {{-- =========================================================
@@ -97,326 +177,547 @@
 
 
         {{-- =====================================================
-            INFO
+            SECTION TIMETABLES
         ====================================================== --}}
 
-        <div class="timetable-info">
+        @foreach($sections as $sectionItem)
 
-            <div class="timetable-info-left">
-                အတန်း - {{ $yearData->name ?? '-' }} ({{ $major->name ?? '-' }})
-            </div>
+            @php
 
+                /*
+                |--------------------------------------------------------------------------
+                | CURRENT SECTION SCHEDULES
+                |--------------------------------------------------------------------------
+                */
 
-            <div class="timetable-info-right">
-                Section ({{ $section->name ?? '-' }}) - အခန်း ({{ $room->name ?? '-' }})
-            </div>
-
-        </div>
-
-
-        {{-- =====================================================
-            TIMETABLE
-        ====================================================== --}}
-
-        <div class="table-responsive print-table">
-
-            <table class="table text-center table-bordered">
-
-                <thead>
-
-                    <tr>
-
-                        <th class="table-header">
-                            Day / Time
-                        </th>
+                $sectionSchedules = $schedules
+                    ->where('section_id', $sectionItem->id);
 
 
-                        @foreach($times as $time)
+                /*
+                |--------------------------------------------------------------------------
+                | SKIP EMPTY SECTION
+                |--------------------------------------------------------------------------
+                */
 
-                            <th class="table-header">
-
-                                @if($time->name === '12:00-01:00')
-
-                                    &nbsp;
-
-                                @else
-
-                                    {{ $time->name }}
-
-                                @endif
-
-                            </th>
-
-                        @endforeach
-
-                    </tr>
-
-                </thead>
+                if($sectionSchedules->count() === 0) {
+                    continue;
+                }
 
 
-                <tbody>
+                /*
+                |--------------------------------------------------------------------------
+                | SECTION ROOM
+                |
+                | Room ကို ဒီ Section ရဲ့ Schedule ထဲကနေယူမယ်။
+                |--------------------------------------------------------------------------
+                */
 
-                    @foreach($days as $dayIndex => $day)
-
-                        <tr>
-
-                            {{-- DAY --}}
-
-                            <td class="day-cell">
-
-                                {{ $day->name }}
-
-                            </td>
-
-
-                            @foreach($times as $time)
-
-                                {{-- =================================================
-                                    LUNCH
-                                ================================================== --}}
-
-                                @if($time->name === '12:00-01:00')
-
-                                    @if($dayIndex === 0)
-
-                                        <td
-                                            rowspan="{{ $days->count() }}"
-                                            class="lunch-cell"
-                                        >
-
-                                            <span class="lunch-text">
-
-                                                ထမင်းစားနားချိန်
-
-                                            </span>
-
-                                        </td>
-
-                                    @endif
+                $sectionRoom =
+                    $sectionSchedules
+                        ->first()
+                        ?->room;
 
 
-                                @else
+                /*
+                |--------------------------------------------------------------------------
+                | ROOM ID
+                |--------------------------------------------------------------------------
+                */
 
-                                    @php
-                                        $schedule = $schedules->first(
-                                            function ($item) use ($day, $time) {
-                                                return
-                                                    (int) $item->day_id === (int) $day->id
-                                                    &&
-                                                    (int) $item->time_id === (int) $time->id;
-                                            }
-                                        );
-                                    @endphp
+                $sectionRoomId =
+                    $sectionSchedules
+                        ->first()
+                        ?->room_id;
 
-
-                                    {{-- =================================================
-                                        EMPTY SLOT
-                                    ================================================== --}}
-
-                                    @if(!$schedule)
-
-                                        <td
-                                            class="schedule-cell empty-slot"
-                                            data-day-id="{{ $day->id }}"
-                                            data-time-id="{{ $time->id }}"
-                                        >
-
-                                            <span class="text-muted">
-
-                                                Extra Curriculum
-
-                                            </span>
-
-                                        </td>
+            @endphp
 
 
-                                    {{-- =================================================
-                                        SUBJECT
-                                    ================================================== --}}
+
+            {{-- =================================================
+                SECTION CONTAINER
+            ================================================== --}}
+
+            <div
+                class="section-timetable"
+                data-section="{{ $sectionItem->id }}"
+            >
+
+
+                {{-- =================================================
+                    SECTION HEADER
+                ================================================== --}}
+
+                <div class="section-title">
+
+                    <div>
+
+                        <span class="section-title-icon">
+
+                            <i class="fa-solid fa-layer-group"></i>
+
+                        </span>
+
+                        <span>
+                            Section {{ $sectionItem->name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="section-title-info">
+
+                        {{ $yearData->name ?? '' }}
+
+                        -
+
+                        {{ $major->name ?? '' }}
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                    SECTION INFO
+                ================================================== --}}
+
+                <div class="timetable-info">
+
+                    <div>
+
+                        အတန်း -
+
+                        <strong>
+
+                            {{ $yearData->name ?? '-' }}
+
+                        </strong>
+
+                        ({{ $major->name ?? '-' }})
+
+                    </div>
+
+
+                    <div>
+
+                        Section
+
+                        <strong>
+
+                            {{ $sectionItem->name }}
+
+                        </strong>
+
+                        -
+
+                        အခန်း
+
+                        <strong>
+
+                            {{ $sectionRoom->name ?? '-' }}
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                    TIMETABLE
+                ================================================== --}}
+
+                <div class="table-responsive print-table">
+
+                    <table
+                        class="table table-bordered text-center align-middle timetable-table"
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="table-header day-column">
+
+                                    Day / Time
+
+                                </th>
+
+
+                                @foreach($times as $time)
+
+                                    @if($time->name === '12:00-01:00')
+
+                                        <th class="table-header lunch-column">
+
+                                            &nbsp;
+
+                                        </th>
 
                                     @else
 
-                                        <td
-                                            class="schedule-cell subject-slot"
-                                            draggable="true"
+                                        <th class="table-header time-column">
 
-                                            data-schedule-id="{{ $schedule->id }}"
+                                            {{ $time->name }}
 
-                                            data-day-id="{{ $schedule->day_id }}"
-
-                                            data-time-id="{{ $schedule->time_id }}"
-                                        >
-
-                                            <div class="subject-content">
-
-                                                <span class="subject-code">
-
-                                                    {{ $schedule->subject->short_name ?? '' }}
-
-                                                </span>
-
-
-                                                @if($schedule->teacher)
-
-                                                    <small class="teacher-name">
-
-                                                        {{ $schedule->teacher->name }}
-
-                                                    </small>
-
-                                                @endif
-
-                                            </div>
-
-                                        </td>
+                                        </th>
 
                                     @endif
 
-                                @endif
+                                @endforeach
+
+                            </tr>
+
+                        </thead>
+
+
+
+                        <tbody>
+
+                            @foreach($days as $dayIndex => $day)
+
+                                <tr>
+
+                                    {{-- =================================
+                                        DAY
+                                    ================================== --}}
+
+                                    <td class="day-cell day-column">
+
+                                        {{ $day->name }}
+
+                                    </td>
+
+
+
+                                    @foreach($times as $time)
+
+                                        {{-- =================================
+                                            LUNCH
+                                        ================================== --}}
+
+                                        @if($time->name === '12:00-01:00')
+
+                                            @if($dayIndex === 0)
+
+                                                <td
+                                                    rowspan="{{ $days->count() }}"
+                                                    class="lunch-cell lunch-column"
+                                                >
+
+                                                    <span class="lunch-text">
+
+                                                        ထမင်းစားနားချိန်
+
+                                                    </span>
+
+                                                </td>
+
+                                            @endif
+
+
+                                        @else
+
+                                            {{-- =================================
+                                                FIND SECTION SCHEDULE
+                                            ================================== --}}
+
+                                            @php
+
+                                                $schedule =
+                                                    $sectionSchedules->first(
+                                                        function($item) use(
+                                                            $day,
+                                                            $time
+                                                        ) {
+
+                                                            return
+                                                                (int)$item->day_id
+                                                                ===
+                                                                (int)$day->id
+
+                                                                &&
+
+                                                                (int)$item->time_id
+                                                                ===
+                                                                (int)$time->id;
+
+                                                        }
+                                                    );
+
+                                            @endphp
+
+
+
+                                            {{-- =================================
+                                                EMPTY SLOT
+                                            ================================== --}}
+
+                                            @if(!$schedule)
+
+                                                <td
+                                                    class="schedule-cell empty-slot"
+                                                    data-section-id="{{ $sectionItem->id }}"
+                                                    data-day-id="{{ $day->id }}"
+                                                    data-time-id="{{ $time->id }}"
+                                                >
+
+                                                    <span class="text-muted extra-text">
+
+                                                        Extra Curriculum
+
+                                                    </span>
+
+                                                </td>
+
+
+                                            {{-- =================================
+                                                SUBJECT SLOT
+                                            ================================== --}}
+
+                                            @else
+
+                                                <td
+                                                    class="schedule-cell subject-slot"
+                                                    draggable="true"
+
+                                                    data-schedule-id="{{ $schedule->id }}"
+
+                                                    data-section-id="{{ $sectionItem->id }}"
+
+                                                    data-day-id="{{ $schedule->day_id }}"
+
+                                                    data-time-id="{{ $schedule->time_id }}"
+                                                >
+
+                                                    <div class="subject-content">
+
+                                                        <span class="subject-code">
+
+                                                            {{ $schedule->subject->short_name ?? '' }}
+
+                                                        </span>
+
+
+                                                        @if($schedule->teacher)
+
+                                                            <small class="teacher-name">
+
+                                                                {{ $schedule->teacher->name }}
+
+                                                            </small>
+
+                                                        @endif
+
+                                                    </div>
+
+                                                </td>
+
+                                            @endif
+
+                                        @endif
+
+                                    @endforeach
+
+                                </tr>
 
                             @endforeach
 
-                        </tr>
+                        </tbody>
 
-                    @endforeach
+                    </table>
 
-                </tbody>
-
-            </table>
-
-        </div>
+                </div>
 
 
-        {{-- =====================================================
-            SUBJECT LIST
-        ====================================================== --}}
 
-        <div class="mt-4 subject-list">
+                {{-- =================================================
+                    SUBJECT LIST
+                ================================================== --}}
 
-            <table class="table table-borderless subject-table">
+                <div class="mt-4 subject-list">
 
-                <thead>
+                    <table class="table table-borderless subject-table">
 
-                    <tr>
+                        <thead>
 
-                        <th width="15%">
-                            Subject Code
-                        </th>
+                            <tr>
 
-                        <th width="85%">
-                            Subject Name
-                        </th>
+                                <th width="15%">
+                                    Subject Code
+                                </th>
 
-                    </tr>
+                                <th width="85%">
+                                    Subject Name
+                                </th>
 
-                </thead>
+                            </tr>
 
-
-                <tbody>
-
-                    @foreach($schedules->unique('subject_id') as $item)
-
-                        <tr>
-
-                            <td class="font-weight-bold text-primary">
-
-                                {{ $item->subject->short_name ?? '' }}
-
-                            </td>
+                        </thead>
 
 
-                            <td>
+                        <tbody>
 
-                                {{ $item->subject->long_name ?? '' }}
+                            @foreach(
+                                $sectionSchedules->unique('subject_id')
+                                as $subjectItem
+                            )
 
+                                <tr>
 
-                                @if($item->teacher)
+                                    <td class="font-weight-bold text-primary">
 
-                                    <span class="text-muted">
+                                        {{ $subjectItem->subject->short_name ?? '' }}
 
-                                        ({{ $item->teacher->name }})
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
+                                    </td>
 
 
-        {{-- =====================================================
-            BOTTOM BUTTONS
-        ====================================================== --}}
+                                    <td>
 
-        <div class="timetable-actions print-hide">
-
-            {{-- PRINT --}}
-
-            <button
-                type="button"
-                onclick="window.print()"
-                class="action-btn print-btn"
-            >
-
-                <i class="mr-2 fa-solid fa-print"></i>
-
-                Print Timetable
-
-            </button>
+                                        {{ $subjectItem->subject->long_name ?? '' }}
 
 
-            {{-- PDF --}}
+                                        @if($subjectItem->teacher)
 
-            <a
-                href="{{ route('schedule.pdf', [
-                    'year' => $yearData->id,
-                    'room' => $room->id,
-                    'major' => $major->id,
-                    'academicYearID' => $academicYear->id,
-                    'semesterID' => $semester->id ?? null,
-                    'sectionID' => $section->id,
-                ]) }}"
-                class="action-btn pdf-btn"
-            >
+                                            <span class="text-muted">
 
-                <i class="mr-2 fa-solid fa-file-pdf"></i>
+                                                ({{ $subjectItem->teacher->name }})
 
-                Download PDF
+                                            </span>
 
-            </a>
+                                        @endif
+
+                                    </td>
+
+                                </tr>
+
+                            @endforeach
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
 
-            {{-- MANUAL --}}
 
-            <a
-                href="{{ route('schedule.create', [
-                    $yearData->id,
-                    $room->id,
-                    $major->id
-                ]) }}"
-                class="action-btn manual-btn"
-            >
+                {{-- =================================================
+                    ACTION BUTTONS
+                ================================================== --}}
 
-                <i class="mr-2 fa-solid fa-pen"></i>
+                <div class="mt-4 mb-5 text-center timetable-actions print-hide">
 
-                Manual Timetable
 
-            </a>
+                    {{-- PRINT --}}
 
-        </div>
+                    <button
+                        type="button"
+                        onclick="printSection('{{ $sectionItem->id }}')"
+                        class="action-btn print-btn"
+                    >
+
+                        <i class="mr-2 fa-solid fa-print"></i>
+
+                        Print Timetable
+
+                    </button>
+
+
+
+                    {{-- PDF --}}
+
+                    @if(
+                        isset($academicYear) &&
+                        $academicYear &&
+                        isset($semester) &&
+                        $semester &&
+                        isset($yearData) &&
+                        $yearData &&
+                        isset($major) &&
+                        $major &&
+                        $sectionRoomId
+                    )
+
+                        <a
+                            href="{{ route('schedule.pdf', [
+
+                                'year' =>
+                                    $yearData->id,
+
+                                'room' =>
+                                    $sectionRoomId,
+
+                                'major' =>
+                                    $major->id,
+
+                                'academicYearID' =>
+                                    $academicYear->id,
+
+                                'semesterID' =>
+                                    $semester->id,
+
+                                'sectionID' =>
+                                    $sectionItem->id,
+
+                            ]) }}"
+
+                            class="action-btn pdf-btn"
+                        >
+
+                            <i class="mr-2 fa-solid fa-file-pdf"></i>
+
+                            Download PDF
+
+                        </a>
+
+                    @endif
+
+
+
+                    {{-- MANUAL --}}
+
+                    @if(
+                        isset($yearData) &&
+                        $yearData &&
+                        isset($major) &&
+                        $major &&
+                        $sectionRoomId
+                    )
+
+                        <a
+                            href="{{ route(
+                                'schedule.create',
+                                [
+                                    $yearData->id,
+                                    $sectionRoomId,
+                                    $major->id
+                                ]
+                            ) }}"
+
+                            class="action-btn manual-btn"
+                        >
+
+                            <i class="mr-2 fa-solid fa-pen"></i>
+
+                            Manual Timetable
+
+                        </a>
+
+                    @endif
+
+                </div>
+
+            </div>
+
+        @endforeach
 
     @endif
 
 </div>
+
 
 
 {{-- =========================================================
@@ -426,7 +727,6 @@
 <div
     id="swapLoading"
     class="swap-loading"
-    style="display:none;"
 >
 
     <div class="swap-loading-box">
@@ -448,60 +748,44 @@
 @endsection
 
 
+
 {{-- =========================================================
     CSS
 ========================================================= --}}
 
 <style>
 
-/* =========================================================
-    PAGE
-========================================================= */
-
 .timetable-page {
-
     padding-top: 15px;
-
     padding-bottom: 40px;
-
 }
 
 
 /* =========================================================
-    SECTION FILTER
+   SECTION FILTER
 ========================================================= */
 
 .section-filter {
 
-    display: flex;
+    margin-bottom: 25px;
+    padding: 18px;
 
-    justify-content: center;
+    background: #ffffff;
 
-    align-items: center;
+    border-radius: 12px;
 
-    flex-wrap: wrap;
-
-    gap: 12px;
-
-    margin-bottom: 30px;
-
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.06);
 }
 
 
 .section-filter-title {
 
-    display: inline-flex;
+    margin-bottom: 12px;
 
-    align-items: center;
-
-    gap: 7px;
-
-    font-size: 15px;
+    color: #343a40;
 
     font-weight: 700;
-
-    color: #495057;
-
 }
 
 
@@ -509,91 +793,145 @@
 
     display: flex;
 
-    align-items: center;
-
-    justify-content: center;
-
     flex-wrap: wrap;
 
     gap: 8px;
-
 }
 
 
-/* =========================================================
-    SECTION BUTTON
-========================================================= */
-
 .section-btn {
 
-    display: inline-flex;
+    border: 1px solid #007bff;
 
-    align-items: center;
+    background: #ffffff;
 
-    justify-content: center;
+    color: #007bff;
 
-    min-width: 100px;
+    border-radius: 6px;
 
-    padding: 8px 22px;
+    padding: 7px 16px;
 
-    border: 1px solid #dee2e6;
-
-    border-radius: 50px;
-
-    background: #fff;
-
-    color: #495057;
-
-    font-size: 14px;
+    font-size: 13px;
 
     font-weight: 600;
 
-    text-decoration: none !important;
+    cursor: pointer;
 
     transition: all .2s ease;
-
 }
 
 
 .section-btn:hover {
 
-    color: #0d6efd;
+    background: #007bff;
 
-    border-color: #0d6efd;
-
-    background: #f4f8ff;
+    color: #ffffff;
 
     transform: translateY(-1px);
-
 }
 
 
 .section-btn.active {
 
-    color: #fff;
+    background: #007bff;
 
-    background: #0d6efd;
+    color: #ffffff;
 
-    border-color: #0d6efd;
-
-    box-shadow: 0 4px 10px rgba(13,110,253,.20);
-
+    box-shadow:
+        0 4px 10px rgba(0,123,255,.20);
 }
 
 
+
 /* =========================================================
-    HEADER
+   HEADER
 ========================================================= */
 
 .timetable-header {
 
     margin-bottom: 25px;
-
 }
 
 
+
 /* =========================================================
-    INFO
+   SECTION TIMETABLE
+========================================================= */
+
+.section-timetable {
+
+    margin-bottom: 45px;
+
+    padding: 18px;
+
+    background: #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 4px 18px rgba(0,0,0,.07);
+}
+
+
+.section-title {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    padding: 12px 16px;
+
+    border-radius: 8px;
+
+    background: #f8f9fa;
+
+    color: #343a40;
+
+    font-size: 17px;
+
+    font-weight: 700;
+}
+
+
+.section-title-icon {
+
+    display: inline-flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    width: 34px;
+
+    height: 34px;
+
+    margin-right: 8px;
+
+    border-radius: 8px;
+
+    background: #007bff;
+
+    color: #ffffff;
+}
+
+
+.section-title-info {
+
+    color: #6c757d;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+
+/* =========================================================
+   INFO
 ========================================================= */
 
 .timetable-info {
@@ -604,35 +942,48 @@
 
     align-items: center;
 
-    font-weight: bold;
+    width: 100%;
 
     margin-bottom: 10px;
 
-    width: 100%;
+    padding: 5px 2px;
 
+    font-weight: bold;
 }
 
-.timetable-info-left {
-
-    text-align: left;
-
-}
-
-.timetable-info-right {
-
-    text-align: right;
-
-}
 
 
 /* =========================================================
-    TABLE
+   TABLE
 ========================================================= */
 
-.print-table table {
+.timetable-table {
+
+    width: 100% !important;
+
+    table-layout: fixed !important;
 
     border-collapse: collapse !important;
 
+    margin-bottom: 0 !important;
+}
+
+
+.timetable-table .day-column {
+
+    width: 18% !important;
+}
+
+
+.timetable-table .time-column {
+
+    width: 18% !important;
+}
+
+
+.timetable-table .lunch-column {
+
+    width: 8% !important;
 }
 
 
@@ -640,93 +991,89 @@
 .print-table td {
 
     border: 1px solid #000 !important;
-
 }
 
 
-.print-table .table-header {
+.print-table thead th.table-header {
 
     background-color: #6c757d !important;
 
-    color: #fff !important;
+    color: #ffffff !important;
+
+    text-align: center;
 
     vertical-align: middle;
 
+    height: 42px;
+
+    padding: 6px 4px !important;
+
+    font-size: 13px;
 }
 
 
-.print-table .day-cell {
+.print-table td.day-cell {
 
     background-color: #6c757d !important;
 
-    color: #fff !important;
+    color: #ffffff !important;
 
     font-weight: bold;
 
-    vertical-align: middle;
-
-}
-
-
-.print-table .lunch-cell {
-
-    background-color: #dee2e6 !important;
+    text-align: center;
 
     vertical-align: middle;
 
+    height: 42px;
+
+    padding: 5px !important;
 }
 
 
-.lunch-text {
+.print-table td.schedule-cell {
 
-    writing-mode: vertical-rl;
+    height: 70px !important;
 
-    font-weight: bold;
+    padding: 5px 3px !important;
 
+    text-align: center;
+
+    vertical-align: middle;
 }
 
 
-.schedule-cell {
 
-    min-width: 150px;
-
-    height: 90px;
-
-    vertical-align: middle !important;
-
-}
-
+/* =========================================================
+   SUBJECT
+========================================================= */
 
 .subject-slot {
 
     cursor: grab;
 
-    background: #fff;
+    background-color: #ffffff;
 
     user-select: none;
 
-    transition: background .15s ease;
-
+    transition: all .15s ease;
 }
 
 
 .subject-slot:hover {
 
-    background: #f0f7ff;
-
+    background-color: #f0f7ff;
 }
 
 
 .subject-slot:active {
 
     cursor: grabbing;
-
 }
 
 
 .subject-content {
 
-    min-height: 65px;
+    min-height: 55px;
 
     display: flex;
 
@@ -735,18 +1082,16 @@
     justify-content: center;
 
     align-items: center;
-
 }
 
 
 .subject-code {
 
-    font-size: 16px;
-
-    font-weight: bold;
-
     color: #007bff;
 
+    font-size: 14px;
+
+    font-weight: bold;
 }
 
 
@@ -755,48 +1100,102 @@
     margin-top: 5px;
 
     color: #6c757d;
-
 }
 
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
 
 .empty-slot {
 
-    background: #fafafa;
-
+    background-color: #fafafa;
 }
 
+
+.extra-text {
+
+    font-size: 12px;
+}
+
+
+
+/* =========================================================
+   DRAG
+========================================================= */
 
 .dragging {
 
     opacity: .4;
-
 }
 
 
 .drag-over {
 
-    background: #dbeafe !important;
+    background-color: #dbeafe !important;
 
     border: 3px dashed #007bff !important;
-
 }
 
 
+
 /* =========================================================
-    SUBJECT LIST
+   LUNCH
 ========================================================= */
+
+.lunch-cell {
+
+    width: 8% !important;
+
+    padding: 0 !important;
+
+    text-align: center !important;
+
+    vertical-align: middle !important;
+
+    background-color: #dee2e6 !important;
+}
+
+
+.lunch-text {
+
+    writing-mode: vertical-rl;
+
+    text-orientation: mixed;
+
+    white-space: nowrap;
+
+    display: inline-block;
+
+    font-weight: bold;
+
+    font-size: 13px;
+}
+
+
+
+/* =========================================================
+   SUBJECT LIST
+========================================================= */
+
+.subject-table,
+.subject-table th,
+.subject-table td {
+
+    border: none !important;
+}
+
 
 .subject-table {
 
     margin-bottom: 0;
-
 }
 
 
 .subject-table thead {
 
     border-bottom: 2px solid #dee2e6;
-
 }
 
 
@@ -805,19 +1204,18 @@
     color: #495057;
 
     font-size: 14px;
-
 }
 
 
 .subject-table td {
 
     padding: 8px 10px;
-
 }
 
 
+
 /* =========================================================
-    BOTTOM ACTIONS
+   ACTION BUTTONS
 ========================================================= */
 
 .timetable-actions {
@@ -828,14 +1226,9 @@
 
     align-items: center;
 
-    gap: 12px;
-
-    margin-top: 30px;
-
-    margin-bottom: 35px;
+    gap: 10px;
 
     flex-wrap: wrap;
-
 }
 
 
@@ -851,20 +1244,19 @@
 
     padding: 11px 22px;
 
+    border: none;
+
     border-radius: 7px;
-
-    text-decoration: none !important;
-
-    font-weight: 600;
 
     font-size: 14px;
 
-    border: none;
+    font-weight: 600;
+
+    text-decoration: none !important;
 
     cursor: pointer;
 
     transition: all .2s ease;
-
 }
 
 
@@ -872,19 +1264,16 @@
 
     transform: translateY(-1px);
 
-    box-shadow: 0 5px 12px rgba(0,0,0,.12);
-
+    box-shadow:
+        0 5px 12px rgba(0,0,0,.12);
 }
 
-
-/* PRINT */
 
 .print-btn {
 
     background: #0d6efd;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
 
@@ -892,19 +1281,15 @@
 
     background: #0b5ed7;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
-
-/* PDF */
 
 .pdf-btn {
 
     background: #dc3545;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
 
@@ -912,19 +1297,15 @@
 
     background: #bb2d3b;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
-
-/* MANUAL */
 
 .manual-btn {
 
     background: #198754;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
 
@@ -932,43 +1313,42 @@
 
     background: #157347;
 
-    color: #fff;
-
+    color: #ffffff;
 }
 
 
+
 /* =========================================================
-    LOADING
+   LOADING
 ========================================================= */
 
 .swap-loading {
 
+    display: none;
+
     position: fixed;
+
+    z-index: 999999;
 
     top: 0;
 
     left: 0;
 
-    right: 0;
+    width: 100%;
 
-    bottom: 0;
-
-    z-index: 999999;
+    height: 100%;
 
     background: rgba(0,0,0,.45);
-
-    display: flex;
 
     justify-content: center;
 
     align-items: center;
-
 }
 
 
 .swap-loading-box {
 
-    background: #fff;
+    background: #ffffff;
 
     padding: 35px 55px;
 
@@ -976,57 +1356,59 @@
 
     text-align: center;
 
-    box-shadow: 0 10px 30px rgba(0,0,0,.25);
-
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.25);
 }
 
-
-.swap-loading-box .spinner-border {
-
-    width: 45px;
-
-    height: 45px;
-
-}
 
 
 /* =========================================================
-    RESPONSIVE
+   MOBILE
 ========================================================= */
 
 @media(max-width:768px) {
 
-    .section-filter {
+    .section-title {
 
         flex-direction: column;
 
-        align-items: center;
+        align-items: flex-start;
 
-    }
-
-
-    .section-buttons {
-
-        width: 100%;
-
-    }
-
-
-    .section-btn {
-
-        min-width: 90px;
-
+        gap: 8px;
     }
 
 
     .timetable-info {
 
-        flex-direction: row !important;
+        flex-direction: column;
 
-        justify-content: space-between !important;
+        align-items: flex-start;
 
-        align-items: center !important;
+        gap: 5px;
+    }
 
+
+    .section-timetable {
+
+        padding: 10px;
+    }
+
+
+    .print-table {
+
+        overflow-x: auto;
+    }
+
+
+    .timetable-table {
+
+        min-width: 900px !important;
+    }
+
+
+    .timetable-actions {
+
+        flex-direction: column;
     }
 
 
@@ -1035,14 +1417,14 @@
         width: 100%;
 
         max-width: 300px;
-
     }
 
 }
 
 
+
 /* =========================================================
-    PRINT
+   PRINT
 ========================================================= */
 
 @media print {
@@ -1051,15 +1433,13 @@
 
         size: A4 landscape;
 
-        margin: 10mm;
-
+        margin: 8mm;
     }
 
 
     .print-hide {
 
         display: none !important;
-
     }
 
 
@@ -1069,7 +1449,6 @@
     .navbar {
 
         display: none !important;
-
     }
 
 
@@ -1078,7 +1457,6 @@
         width: 100% !important;
 
         margin: 0 !important;
-
     }
 
 
@@ -1088,13 +1466,13 @@
 
         padding: 0 !important;
 
+        margin: 0 !important;
     }
 
 
     .table-responsive {
 
         overflow: visible !important;
-
     }
 
 
@@ -1105,7 +1483,86 @@
         -webkit-print-color-adjust: exact !important;
 
         print-color-adjust: exact !important;
+    }
 
+
+    .section-timetable {
+
+        box-shadow: none !important;
+
+        border-radius: 0 !important;
+
+        padding: 0 !important;
+
+        margin-bottom: 20mm !important;
+
+        page-break-after: always;
+    }
+
+
+    .section-timetable:last-child {
+
+        page-break-after: auto;
+    }
+
+
+    .section-title {
+
+        box-shadow: none !important;
+
+        border-radius: 0 !important;
+    }
+
+
+    .timetable-table {
+
+        width: 100% !important;
+
+        table-layout: fixed !important;
+
+        border-collapse: collapse !important;
+    }
+
+
+    .timetable-table .day-column {
+
+        width: 18% !important;
+    }
+
+
+    .timetable-table .time-column {
+
+        width: 18% !important;
+    }
+
+
+    .timetable-table .lunch-column {
+
+        width: 8% !important;
+    }
+
+
+    .print-table thead th.table-header {
+
+        background-color: #6c757d !important;
+
+        color: #ffffff !important;
+
+        height: 38px !important;
+    }
+
+
+    .print-table td.day-cell {
+
+        background-color: #6c757d !important;
+
+        color: #ffffff !important;
+    }
+
+
+    .print-table td.schedule-cell {
+
+        height: 40px !important;
     }
 
 
@@ -1114,12 +1571,18 @@
     .print-table td {
 
         border: 1px solid #000 !important;
+    }
 
+
+    .subject-table {
+
+        margin-top: 8px !important;
     }
 
 }
 
 </style>
+
 
 
 {{-- =========================================================
@@ -1128,109 +1591,310 @@
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
 
-    'use strict';
-
-
-    const swapUrl =
-        @json(route('schedule.swap'));
+        'use strict';
 
 
-    const csrfToken =
-        @json(csrf_token());
+
+        /* =====================================================
+           SECTION FILTER
+        ====================================================== */
+
+        const sectionButtons =
+            document.querySelectorAll(
+                '[data-section-filter]'
+            );
 
 
-    let draggedCell = null;
-
-    let isSwapping = false;
-
-
-    const subjectCells =
-        document.querySelectorAll('.subject-slot');
+        const sectionTables =
+            document.querySelectorAll(
+                '.section-timetable'
+            );
 
 
-    const allCells =
-        document.querySelectorAll('.schedule-cell');
+        const selectedSectionHeader =
+            document.getElementById(
+                'selectedSectionHeader'
+            );
 
 
-    const loading =
-        document.getElementById('swapLoading');
+
+        sectionButtons.forEach(
+            function(button) {
+
+                button.addEventListener(
+                    'click',
+                    function() {
+
+                        const selected =
+                            this.getAttribute(
+                                'data-section-filter'
+                            );
 
 
-    if (!subjectCells.length) {
-
-        return;
-
-    }
-
-
-    /* =========================================================
-        DRAG START
-    ========================================================= */
-
-    subjectCells.forEach(function (cell) {
-
-        cell.addEventListener(
-            'dragstart',
-            function (event) {
-
-                if (isSwapping) {
-
-                    event.preventDefault();
-
-                    return;
-
-                }
+                        const sectionName =
+                            this.getAttribute(
+                                'data-section-name'
+                            );
 
 
-                const scheduleId =
-                    this.dataset.scheduleId;
+
+                        /* =========================================
+                           ACTIVE BUTTON
+                        ========================================== */
+
+                        sectionButtons.forEach(
+                            function(item) {
+
+                                item.classList.remove(
+                                    'active'
+                                );
+
+                            }
+                        );
 
 
-                if (!scheduleId) {
-
-                    event.preventDefault();
-
-                    return;
-
-                }
+                        this.classList.add(
+                            'active'
+                        );
 
 
-                draggedCell = this;
+
+                        /* =========================================
+                           HEADER
+                        ========================================== */
+
+                        if(selectedSectionHeader) {
+
+                            if(
+                                selected === 'all' ||
+                                !sectionName
+                            ) {
+
+                                selectedSectionHeader.textContent =
+                                    '';
+
+                            }
+                            else {
+
+                                selectedSectionHeader.textContent =
+                                    ' - Section ' +
+                                    sectionName;
+
+                            }
+
+                        }
 
 
-                this.classList.add('dragging');
+
+                        /* =========================================
+                           SHOW / HIDE
+                        ========================================== */
+
+                        sectionTables.forEach(
+                            function(table) {
+
+                                const tableSection =
+                                    table.getAttribute(
+                                        'data-section'
+                                    );
 
 
-                event.dataTransfer.effectAllowed =
-                    'move';
+                                if(
+                                    selected === 'all'
+                                ) {
 
+                                    table.style.display =
+                                        '';
 
-                event.dataTransfer.setData(
-                    'text/plain',
-                    scheduleId
+                                }
+                                else if(
+                                    tableSection ===
+                                    selected
+                                ) {
+
+                                    table.style.display =
+                                        '';
+
+                                }
+                                else {
+
+                                    table.style.display =
+                                        'none';
+
+                                }
+
+                            }
+                        );
+
+                    }
                 );
 
             }
         );
 
 
+
         /* =====================================================
-            DRAG END
-        ===================================================== */
+           DRAG & DROP
+        ====================================================== */
 
-        cell.addEventListener(
-            'dragend',
-            function () {
+        let draggedCell = null;
 
-                this.classList.remove('dragging');
+        let isSwapping = false;
 
 
-                allCells.forEach(
-                    function (item) {
+        const subjectCells =
+            document.querySelectorAll(
+                '.subject-slot'
+            );
 
-                        item.classList.remove(
+
+        const allScheduleCells =
+            document.querySelectorAll(
+                '.schedule-cell'
+            );
+
+
+        const loading =
+            document.getElementById(
+                'swapLoading'
+            );
+
+
+        const swapUrl =
+            @json(route('schedule.swap'));
+
+
+        const csrfToken =
+            @json(csrf_token());
+
+
+
+        /* =====================================================
+           DRAG START
+        ====================================================== */
+
+        subjectCells.forEach(
+            function(cell) {
+
+                cell.addEventListener(
+                    'dragstart',
+                    function(event) {
+
+                        if(isSwapping) {
+
+                            event.preventDefault();
+
+                            return;
+
+                        }
+
+
+                        const scheduleId =
+                            this.getAttribute(
+                                'data-schedule-id'
+                            );
+
+
+                        if(!scheduleId) {
+
+                            event.preventDefault();
+
+                            return;
+
+                        }
+
+
+                        draggedCell = this;
+
+
+                        this.classList.add(
+                            'dragging'
+                        );
+
+
+                        event.dataTransfer.effectAllowed =
+                            'move';
+
+
+                        event.dataTransfer.setData(
+                            'text/plain',
+                            scheduleId
+                        );
+
+                    }
+                );
+
+
+
+                /* =================================================
+                   DRAG END
+                ================================================== */
+
+                cell.addEventListener(
+                    'dragend',
+                    function() {
+
+                        this.classList.remove(
+                            'dragging'
+                        );
+
+
+                        allScheduleCells.forEach(
+                            function(item) {
+
+                                item.classList.remove(
+                                    'drag-over'
+                                );
+
+                            }
+                        );
+
+
+                        draggedCell = null;
+
+                    }
+                );
+
+            }
+        );
+
+
+
+        /* =====================================================
+           DRAG OVER
+        ====================================================== */
+
+        subjectCells.forEach(
+            function(cell) {
+
+                cell.addEventListener(
+                    'dragover',
+                    function(event) {
+
+                        event.preventDefault();
+
+
+                        if(
+                            !draggedCell ||
+                            isSwapping ||
+                            this === draggedCell
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        event.dataTransfer.dropEffect =
+                            'move';
+
+
+                        this.classList.add(
                             'drag-over'
                         );
 
@@ -1238,385 +1902,395 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-                draggedCell = null;
-
-            }
-        );
-
-    });
-
-
-    /* =========================================================
-        DROP TARGETS
-    ========================================================= */
-
-    allCells.forEach(function (cell) {
-
-
-        /* =====================================================
-            DRAG OVER
-        ===================================================== */
-
-        cell.addEventListener(
-            'dragover',
-            function (event) {
-
-                event.preventDefault();
-
-
-                if (
-                    !draggedCell ||
-                    isSwapping ||
-                    this === draggedCell
-                ) {
-
-                    return;
-
-                }
-
-
-                /*
-                 * Subject → Subject only
-                 */
-
-                if (
-                    !this.classList.contains(
-                        'subject-slot'
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                this.classList.add(
-                    'drag-over'
-                );
-
-
-                event.dataTransfer.dropEffect =
-                    'move';
-
-            }
-        );
-
-
-        /* =====================================================
-            DRAG LEAVE
-        ===================================================== */
-
-        cell.addEventListener(
-            'dragleave',
-            function () {
-
-                this.classList.remove(
-                    'drag-over'
-                );
-
-            }
-        );
-
-
-        /* =====================================================
-            DROP
-        ===================================================== */
-
-        cell.addEventListener(
-            'drop',
-            function (event) {
-
-                event.preventDefault();
-
-
-                this.classList.remove(
-                    'drag-over'
-                );
-
-
-                if (
-                    !draggedCell ||
-                    isSwapping ||
-                    this === draggedCell
-                ) {
-
-                    return;
-
-                }
-
-
-                /*
-                 * Subject → Subject only
-                 */
-
-                if (
-                    !draggedCell.classList.contains(
-                        'subject-slot'
-                    ) ||
-                    !this.classList.contains(
-                        'subject-slot'
-                    )
-                ) {
-
-                    return;
-
-                }
-
-
-                const schedule1Id =
-                    parseInt(
-                        draggedCell.dataset.scheduleId,
-                        10
-                    );
-
-
-                const schedule2Id =
-                    parseInt(
-                        this.dataset.scheduleId,
-                        10
-                    );
-
 
                 /* =================================================
-                    VALIDATE
+                   DRAG LEAVE
                 ================================================== */
 
-                if (
-                    !Number.isInteger(schedule1Id) ||
-                    !Number.isInteger(schedule2Id) ||
-                    schedule1Id <= 0 ||
-                    schedule2Id <= 0
-                ) {
+                cell.addEventListener(
+                    'dragleave',
+                    function() {
 
-                    alert(
-                        'Invalid schedule ID. Please refresh the page.'
-                    );
-
-                    return;
-
-                }
-
-
-                if (
-                    schedule1Id === schedule2Id
-                ) {
-
-                    return;
-
-                }
-
-
-                /* =================================================
-                    CONFIRM
-                ================================================== */
-
-                const confirmed =
-                    confirm(
-                        'ဒီ Subject နှစ်ခုရဲ့ Time Slot ကို Swap လုပ်မှာ သေချာပါသလား?'
-                    );
-
-
-                if (!confirmed) {
-
-                    return;
-
-                }
-
-
-                /* =================================================
-                    SEND
-                ================================================== */
-
-                swapSchedules(
-                    schedule1Id,
-                    schedule2Id
-                );
-
-            }
-        );
-
-    });
-
-
-    /* =========================================================
-        SWAP
-    ========================================================= */
-
-    async function swapSchedules(
-        schedule1Id,
-        schedule2Id
-    ) {
-
-        if (isSwapping) {
-
-            return;
-
-        }
-
-
-        isSwapping = true;
-
-
-        showLoading();
-
-
-        try {
-
-            const response =
-                await fetch(
-                    swapUrl,
-                    {
-
-                        method: 'POST',
-
-                        headers: {
-
-                            'Content-Type':
-                                'application/json',
-
-                            'Accept':
-                                'application/json',
-
-                            'X-CSRF-TOKEN':
-                                csrfToken,
-
-                            'X-Requested-With':
-                                'XMLHttpRequest'
-
-                        },
-
-                        body:
-                            JSON.stringify({
-
-                                schedule1_id:
-                                    schedule1Id,
-
-                                schedule2_id:
-                                    schedule2Id
-
-                            })
+                        this.classList.remove(
+                            'drag-over'
+                        );
 
                     }
                 );
 
 
-            const text =
-                await response.text();
+
+                /* =================================================
+                   DROP
+                ================================================== */
+
+                cell.addEventListener(
+                    'drop',
+                    function(event) {
+
+                        event.preventDefault();
 
 
-            let result;
+                        this.classList.remove(
+                            'drag-over'
+                        );
+
+
+                        if(
+                            !draggedCell ||
+                            isSwapping ||
+                            this === draggedCell
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        const schedule1Id =
+                            parseInt(
+                                draggedCell.getAttribute(
+                                    'data-schedule-id'
+                                ),
+                                10
+                            );
+
+
+                        const schedule2Id =
+                            parseInt(
+                                this.getAttribute(
+                                    'data-schedule-id'
+                                ),
+                                10
+                            );
+
+
+                        if(
+                            !Number.isInteger(
+                                schedule1Id
+                            ) ||
+                            !Number.isInteger(
+                                schedule2Id
+                            ) ||
+                            schedule1Id <= 0 ||
+                            schedule2Id <= 0
+                        ) {
+
+                            alert(
+                                'Invalid Schedule ID. Please refresh the page.'
+                            );
+
+                            return;
+
+                        }
+
+
+                        if(
+                            schedule1Id ===
+                            schedule2Id
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        const confirmed =
+                            confirm(
+                                'ဒီ Subject နှစ်ခုရဲ့ Time Slot ကို Swap လုပ်မှာ သေချာပါသလား?'
+                            );
+
+
+                        if(!confirmed) {
+
+                            return;
+
+                        }
+
+
+                        swapSchedules(
+                            schedule1Id,
+                            schedule2Id
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+
+        /* =====================================================
+           AJAX SWAP
+        ====================================================== */
+
+        async function swapSchedules(
+            schedule1Id,
+            schedule2Id
+        ) {
+
+            if(isSwapping) {
+
+                return;
+
+            }
+
+
+            isSwapping = true;
+
+
+            showLoading();
 
 
             try {
 
-                result =
-                    JSON.parse(text);
+                const response =
+                    await fetch(
+                        swapUrl,
+                        {
+
+                            method: 'POST',
+
+                            headers: {
+
+                                'Content-Type':
+                                    'application/json',
+
+                                'Accept':
+                                    'application/json',
+
+                                'X-CSRF-TOKEN':
+                                    csrfToken,
+
+                                'X-Requested-With':
+                                    'XMLHttpRequest'
+
+                            },
+
+                            body:
+                                JSON.stringify({
+
+                                    schedule1_id:
+                                        schedule1Id,
+
+                                    schedule2_id:
+                                        schedule2Id
+
+                                })
+
+                        }
+                    );
+
+
+                const text =
+                    await response.text();
+
+
+                let data;
+
+
+                try {
+
+                    data =
+                        JSON.parse(text);
+
+                }
+                catch(error) {
+
+                    console.error(
+                        'SERVER RESPONSE:',
+                        text
+                    );
+
+                    throw new Error(
+                        'Server က JSON response မပြန်ပါ။'
+                    );
+
+                }
+
+
+                if(!response.ok) {
+
+                    throw new Error(
+                        data.message ||
+                        'Swap failed.'
+                    );
+
+                }
+
+
+                if(!data.success) {
+
+                    throw new Error(
+                        data.message ||
+                        'Swap failed.'
+                    );
+
+                }
+
+
+                window.location.reload();
 
             }
-            catch (error) {
+            catch(error) {
 
                 console.error(
-                    'SERVER RESPONSE:',
-                    text
+                    'SWAP ERROR:',
+                    error
                 );
 
-                throw new Error(
-                    'Server returned an invalid response.'
-                );
 
-            }
+                hideLoading();
 
 
-            /* =================================================
-                HTTP ERROR
-            ================================================== */
+                isSwapping = false;
 
-            if (!response.ok) {
 
-                throw new Error(
-                    result.message ||
-                    'Swap failed.'
+                alert(
+                    error.message ||
+                    'Unable to swap timetable.'
                 );
 
             }
-
-
-            /* =================================================
-                APPLICATION ERROR
-            ================================================== */
-
-            if (!result.success) {
-
-                throw new Error(
-                    result.message ||
-                    'Swap failed.'
-                );
-
-            }
-
-
-            /* =================================================
-                SUCCESS
-            ================================================== */
-
-            window.location.reload();
 
         }
-        catch (error) {
 
-            console.error(
-                'SWAP ERROR:',
-                error
+
+
+        /* =====================================================
+           LOADING
+        ====================================================== */
+
+        function showLoading() {
+
+            if(loading) {
+
+                loading.style.display =
+                    'flex';
+
+            }
+
+        }
+
+
+        function hideLoading() {
+
+            if(loading) {
+
+                loading.style.display =
+                    'none';
+
+            }
+
+        }
+
+    }
+);
+
+
+
+/* =========================================================
+   PRINT SINGLE SECTION
+========================================================= */
+
+function printSection(sectionId)
+{
+
+    const allSections =
+        document.querySelectorAll(
+            '.section-timetable'
+        );
+
+
+    const selectedSection =
+        document.querySelector(
+            '.section-timetable[data-section="' +
+            sectionId +
+            '"]'
+        );
+
+
+    if(!selectedSection) {
+
+        return;
+
+    }
+
+
+    allSections.forEach(
+        function(section) {
+
+            if(
+                section.getAttribute(
+                    'data-section'
+                ) === sectionId
+            ) {
+
+                section.classList.add(
+                    'print-selected'
+                );
+
+            }
+            else {
+
+                section.classList.add(
+                    'print-hidden'
+                );
+
+            }
+
+        }
+    );
+
+
+    window.print();
+
+
+    setTimeout(
+        function() {
+
+            allSections.forEach(
+                function(section) {
+
+                    section.classList.remove(
+                        'print-selected'
+                    );
+
+                    section.classList.remove(
+                        'print-hidden'
+                    );
+
+                }
             );
 
+        },
+        500
+    );
 
-            hideLoading();
-
-
-            isSwapping = false;
-
-
-            alert(
-                error.message ||
-                'Unable to swap timetable.'
-            );
-
-        }
-
-    }
-
-
-    /* =========================================================
-        SHOW LOADING
-    ========================================================= */
-
-    function showLoading() {
-
-        if (loading) {
-
-            loading.style.display =
-                'flex';
-
-        }
-
-    }
-
-
-    /* =========================================================
-        HIDE LOADING
-    ========================================================= */
-
-    function hideLoading() {
-
-        if (loading) {
-
-            loading.style.display =
-                'none';
-
-        }
-
-    }
-
-});
+}
 
 </script>
+
+
+
+<style>
+
+@media print {
+
+    .section-timetable.print-hidden {
+
+        display: none !important;
+
+    }
+
+
+    .section-timetable.print-selected {
+
+        display: block !important;
+
+    }
+
+}
+
+</style>

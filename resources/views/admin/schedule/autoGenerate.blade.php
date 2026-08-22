@@ -2,39 +2,106 @@
 
 @section('content')
 
-    <div class="container-fluid">
+<div class="container-fluid py-4">
 
-        <div class="row justify-content-center">
+    {{-- =====================================================
+        HEADER
+    ====================================================== --}}
 
-            <div class="mt-4 mb-5 col-xl-8 col-lg-9 col-md-11">
+    <div class="text-center mb-4">
 
-                {{-- =========================
-                PAGE HEADER
-            ========================== --}}
-                <div class="mb-4">
+        <div class="generate-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+
+        <h2 class="font-weight-bold text-primary mt-3">
+            Auto Generate Timetable
+        </h2>
+
+        <p class="text-muted mb-0">
+            Generate timetable for all sections
+        </p>
+
+    </div>
+
+
+    {{-- =====================================================
+        ERROR
+    ====================================================== --}}
+
+    @if ($errors->any())
+
+        <div class="alert alert-danger generate-alert">
+
+            <div class="font-weight-bold mb-2">
+
+                <i class="fa-solid fa-circle-exclamation mr-2"></i>
+
+                Auto Generate Failed
+
+            </div>
+
+            <ul class="mb-0 pl-4">
+
+                @foreach ($errors->all() as $error)
+
+                    <li>
+                        {{ $error }}
+                    </li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+        SUCCESS
+    ====================================================== --}}
+
+    @if (session('success'))
+
+        <div class="alert alert-success generate-alert">
+
+            <i class="fa-solid fa-circle-check mr-2"></i>
+
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- =====================================================
+        FORM
+    ====================================================== --}}
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-8 col-lg-10">
+
+            <div class="card generate-card">
+
+                <div class="card-header">
 
                     <div class="d-flex align-items-center">
 
-                        <div class="mr-3 d-flex align-items-center justify-content-center"
-                            style="
-                            width:48px;
-                            height:48px;
-                            border-radius:14px;
-                            background:#eef3ff;
-                        ">
-                            <i class="fa-solid fa-bolt text-primary" style="font-size:20px;"></i>
+                        <div class="header-icon">
+                            <i class="fa-solid fa-calendar-days"></i>
                         </div>
 
                         <div>
 
-                            <h3 class="mb-1 font-weight-bold text-dark">
-                                Auto Generate Timetable
-                            </h3>
+                            <h5 class="mb-0 font-weight-bold">
+                                Generate Timetable
+                            </h5>
 
-                            <p class="mb-0 text-muted">
-                                Select the academic information and room
-                                to generate a timetable automatically.
-                            </p>
+                            <small class="text-muted">
+                                Select academic information
+                            </small>
 
                         </div>
 
@@ -43,435 +110,224 @@
                 </div>
 
 
-                {{-- =========================
-                ERROR MESSAGE
-            ========================== --}}
-                @if ($errors->any())
-                    <div class="border-0 shadow-sm alert alert-danger">
+                <div class="card-body">
 
-                        <div class="d-flex align-items-start">
+                    <form
+                        action="{{ route('schedule.createSchedule') }}"
+                        method="POST"
+                        id="generateForm"
+                    >
 
-                            <i class="mt-1 mr-3 fas fa-circle-exclamation"></i>
+                        @csrf
+
+
+                        {{-- =================================================
+                            ACADEMIC YEAR
+                        ================================================== --}}
+
+                        <div class="form-group">
+
+                            <label>
+                                Academic Year
+                            </label>
+
+                            <select
+                                name="academicYearID"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Academic Year
+                                </option>
+
+                                @foreach ($academicYears as $academicYear)
+
+                                    <option
+                                        value="{{ $academicYear->id }}"
+                                        {{ old('academicYearID') == $academicYear->id ? 'selected' : '' }}
+                                    >
+                                        {{ $academicYear->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- =================================================
+                            SEMESTER
+                        ================================================== --}}
+
+                        <div class="form-group">
+
+                            <label>
+                                Semester
+                            </label>
+
+                            <select
+                                name="semesterID"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Semester
+                                </option>
+
+                                @foreach ($semesters as $semester)
+
+                                    <option
+                                        value="{{ $semester->id }}"
+                                        {{ old('semesterID') == $semester->id ? 'selected' : '' }}
+                                    >
+                                        {{ $semester->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- =================================================
+                            YEAR
+                        ================================================== --}}
+
+                        <div class="form-group">
+
+                            <label>
+                                Year
+                            </label>
+
+                            <select
+                                name="yearID"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Year
+                                </option>
+
+                                @foreach ($years as $year)
+
+                                    <option
+                                        value="{{ $year->id }}"
+                                        {{ old('yearID') == $year->id ? 'selected' : '' }}
+                                    >
+                                        {{ $year->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- =================================================
+                            MAJOR
+                        ================================================== --}}
+
+                        <div class="form-group">
+
+                            <label>
+                                Major
+                            </label>
+
+                            <select
+                                name="majorID"
+                                class="form-control"
+                                required
+                            >
+
+                                <option value="">
+                                    Select Major
+                                </option>
+
+                                @foreach ($majors as $major)
+
+                                    <option
+                                        value="{{ $major->id }}"
+                                        {{ old('majorID') == $major->id ? 'selected' : '' }}
+                                    >
+                                        {{ $major->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        {{-- =================================================
+                            INFORMATION
+                        ================================================== --}}
+
+                        <div class="generate-info">
+
+                            <div class="info-icon">
+
+                                <i class="fa-solid fa-circle-info"></i>
+
+                            </div>
 
                             <div>
 
                                 <strong>
-                                    Please check the following errors:
+                                    Generate All Sections
                                 </strong>
 
-                                <ul class="mt-2 mb-0">
-
-                                    @foreach ($errors->all() as $error)
-                                        <li>
-                                            {{ $error }}
-                                        </li>
-                                    @endforeach
-
-                                </ul>
+                                <p class="mb-0">
+                                    Selected Year + Major အတွက်
+                                    Database ထဲရှိ Section အားလုံးကို
+                                    တစ်ခါတည်း timetable generate လုပ်ပေးပါမည်။
+                                </p>
 
                             </div>
 
                         </div>
 
-                    </div>
-                @endif
 
+                        {{-- =================================================
+                            SUBMIT
+                        ================================================== --}}
 
-                {{-- =========================
-                MAIN CARD
-            ========================== --}}
-                <div class="border-0 shadow-sm card"
-                    style="
-                    border-radius:22px;
-                    overflow:hidden;
-                ">
+                        <button
+                            type="submit"
+                            class="btn btn-primary btn-generate"
+                            id="generateButton"
+                        >
 
-                    {{-- Card Header --}}
-                    <div class="px-4 pt-4 pb-3 bg-white border-0 card-header">
+                            <span id="generateNormal">
 
-                        <div class="d-flex justify-content-between align-items-center">
+                                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
 
-                            <div>
+                                Generate All Sections
 
-                                <h5 class="mb-1 font-weight-bold text-dark">
+                            </span>
 
-                                    <i class="mr-2 fa-solid fa-sliders text-primary"></i>
+                            <span
+                                id="generateLoading"
+                                style="display:none;"
+                            >
 
-                                    Schedule Configuration
+                                <span
+                                    class="spinner-border spinner-border-sm mr-2"
+                                ></span>
 
-                                </h5>
+                                Generating...
 
-                                <small class="text-muted">
+                            </span>
 
-                                    Choose all required information before generating.
+                        </button>
 
-                                </small>
-
-                            </div>
-
-
-                            <div>
-
-                                <span class="px-3 py-2 badge badge-light text-primary" style="border-radius:10px;">
-                                    <i class="mr-1 fa-solid fa-wand-magic-sparkles"></i>
-                                    Automatic
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- Card Body --}}
-                    <div class="px-4 pb-4 card-body">
-
-                        <form action="{{ route('schedule.createSchedule') }}" method="POST" id="autoGenerateForm">
-
-                            @csrf
-
-
-                            {{-- =========================
-                            FIRST ROW
-                        ========================== --}}
-                            <div class="row">
-
-                                {{-- Academic Year --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-calendar-days text-primary"></i>
-
-                                            Academic Year
-
-                                        </label>
-
-
-                                        <select name="academicYearID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Academic Year --
-                                            </option>
-
-                                            @foreach ($academicYears as $academicYear)
-                                                <option value="{{ $academicYear->id }}"
-                                                    {{ old('academicYearID') == $academicYear->id ? 'selected' : '' }}>
-                                                    {{ $academicYear->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- Semester --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-layer-group text-primary"></i>
-
-                                            Semester
-
-                                        </label>
-
-
-                                        <select name="semesterID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Semester --
-                                            </option>
-
-                                            @foreach ($semesters as $semester)
-                                                <option value="{{ $semester->id }}"
-                                                    {{ old('semesterID') == $semester->id ? 'selected' : '' }}>
-                                                    {{ $semester->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- =========================
-                                SECOND ROW
-                            ========================== --}}
-
-                                {{-- Class Year --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-graduation-cap text-primary"></i>
-
-                                            Class Year
-
-                                        </label>
-
-
-                                        <select name="yearID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Year --
-                                            </option>
-
-                                            @foreach ($years as $year)
-                                                <option value="{{ $year->id }}"
-                                                    {{ old('yearID') == $year->id ? 'selected' : '' }}>
-                                                    {{ $year->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- Major --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-building-columns text-primary"></i>
-
-                                            Major
-
-                                        </label>
-
-
-                                        <select name="majorID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Major --
-                                            </option>
-
-                                            @foreach ($majors as $major)
-                                                <option value="{{ $major->id }}"
-                                                    {{ old('majorID') == $major->id ? 'selected' : '' }}>
-                                                    {{ $major->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- =========================
-                                THIRD ROW
-                            ========================== --}}
-
-                                {{-- Section --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-table-cells text-primary"></i>
-
-                                            Section
-
-                                        </label>
-
-
-                                        <select name="sectionID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Section --
-                                            </option>
-
-                                            @foreach ($sections as $section)
-                                                <option value="{{ $section->id }}"
-                                                    {{ old('sectionID') == $section->id ? 'selected' : '' }}>
-                                                    {{ $section->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- Room --}}
-                                <div class="col-md-6">
-
-                                    <div class="mb-4 form-group">
-
-                                        <label class="font-weight-bold text-dark">
-
-                                            <i class="mr-2 fa-solid fa-door-open text-primary"></i>
-
-                                            Room
-
-                                        </label>
-
-
-                                        <select name="roomID" id="roomID" class="form-control" required
-                                            style="height:48px;border-radius:12px;">
-
-                                            <option value="">
-                                                -- Select Room --
-                                            </option>
-
-                                            @foreach ($rooms as $room)
-                                                <option value="{{ $room->id }}"
-                                                    {{ old('roomID') == $room->id ? 'selected' : '' }}>
-                                                    {{ $room->name }}
-                                                </option>
-                                            @endforeach
-
-                                        </select>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- =========================
-                            ROOM STATUS
-                        ========================== --}}
-                            <div id="roomSelectedMessage" class="mb-4 d-none">
-
-                                <div class="p-3"
-                                    style="
-                                    background:#f0f7ff;
-                                    border:1px solid #d8e9ff;
-                                    border-radius:14px;
-                                ">
-
-                                    <div class="d-flex align-items-center">
-
-                                        <div class="mr-3 d-flex align-items-center justify-content-center"
-                                            style="
-                                            width:40px;
-                                            height:40px;
-                                            border-radius:12px;
-                                            background:#e5f0ff;
-                                        ">
-
-                                            <i class="fa-solid fa-door-open text-primary"></i>
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <div class="font-weight-bold text-dark" id="selectedRoomName">
-                                            </div>
-
-                                            <small class="text-muted">
-                                                Room selected successfully.
-                                            </small>
-
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            {{-- =========================
-                            ACTION BUTTONS
-                        ========================== --}}
-                            <div class="mt-2">
-
-                                {{-- Auto Generate --}}
-                                {{-- <button type="submit" id="generateBtn" class="py-3 btn btn-primary btn-block"
-                                    style="
-                                    border-radius:13px;
-                                    font-weight:700;
-                                ">
-
-                                    <i class="mr-2 fa-solid fa-bolt"></i>
-
-                                    Auto Generate Schedule
-
-                                </button> --}}
-
-
-                                {{-- TEMPORARILY Auto Generate WHILE TESTING --}}
-
-
-                                <button type="submit" class="py-3 btn btn-primary btn-block"
-                                    style="
-                                    border-radius:13px;
-                                    font-weight:700;
-                                ">
-
-                                    <i class="mr-2 fa-solid fa-bolt"></i>
-
-                                    Auto Generate Schedule
-
-                                </button>
-
-
-
-                                {{-- View Schedule --}}
-                                <a href="{{ route('schedule.list') }}"
-                                    class="py-3 mt-3 btn btn-outline-primary btn-block"
-                                    style="
-                                    border-radius:13px;
-                                    font-weight:600;
-                                ">
-
-                                    <i class="mr-2 fa-solid fa-list"></i>
-
-                                    View Schedule List
-
-                                </a>
-
-
-                                {{-- View Teacher --}}
-                                <a href="{{ route('teacher.list') }}"
-                                    class="py-3 mt-3 btn btn-outline-secondary btn-block"
-                                    style="
-                                    border-radius:13px;
-                                    font-weight:600;
-                                ">
-
-                                    <i class="mr-2 fa-solid fa-chalkboard-user"></i>
-
-                                    View Teacher List
-
-                                </a>
-
-                            </div>
-
-                        </form>
-
-                    </div>
+                    </form>
 
                 </div>
 
@@ -481,90 +337,257 @@
 
     </div>
 
-
-    {{-- =========================
-    ROOM BUTTON SCRIPT
-========================== --}}
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                const roomSelect = document.getElementById('roomID');
-
-                const generateBtn = document.getElementById('generateBtn');
-
-                const roomMessage = document.getElementById('roomSelectedMessage');
-
-                const selectedRoomName =
-                    document.getElementById('selectedRoomName');
+</div>
 
 
-                function checkRoomSelection() {
+<style>
 
-                    if (roomSelect.value !== '') {
+.generate-icon {
 
-                        /*
-                        ==========================================
-                        Room Selected
-                        ==========================================
-                        */
+    width: 75px;
+    height: 75px;
 
-                        generateBtn.style.display = 'none';
+    margin: auto;
 
-                        roomMessage.classList.remove('d-none');
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 20px;
+
+    background: #f0f5ff;
+
+    color: #4e73df;
+
+    font-size: 30px;
+
+}
 
 
-                        const selectedOption =
-                            roomSelect.options[
-                                roomSelect.selectedIndex
-                            ];
+.generate-card {
+
+    border: 0;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 30px rgba(0,0,0,.08);
+
+}
 
 
-                        selectedRoomName.textContent =
-                            selectedOption.text;
+.generate-card .card-header {
+
+    background: #fff;
+
+    border-bottom: 1px solid #eee;
+
+    padding: 20px 25px;
+
+}
 
 
-                    } else {
+.header-icon {
 
-                        /*
-                        ==========================================
-                        No Room Selected
-                        ==========================================
-                        */
+    width: 45px;
+    height: 45px;
 
-                        generateBtn.style.display = 'block';
+    display: flex;
 
-                        roomMessage.classList.add('d-none');
+    align-items: center;
 
-                        selectedRoomName.textContent = '';
+    justify-content: center;
 
-                    }
+    border-radius: 12px;
+
+    background: #f0f5ff;
+
+    color: #4e73df;
+
+    margin-right: 12px;
+
+}
+
+
+.generate-card .card-body {
+
+    padding: 30px;
+
+}
+
+
+.form-group {
+
+    margin-bottom: 22px;
+
+}
+
+
+.form-group label {
+
+    display: block;
+
+    font-weight: 600;
+
+    color: #343a40;
+
+    margin-bottom: 8px;
+
+}
+
+
+.form-control {
+
+    height: 48px;
+
+    border-radius: 10px;
+
+}
+
+
+.generate-info {
+
+    display: flex;
+
+    gap: 12px;
+
+    padding: 15px;
+
+    margin-top: 10px;
+
+    margin-bottom: 25px;
+
+    border-radius: 12px;
+
+    background: #f8f9fa;
+
+}
+
+
+.info-icon {
+
+    color: #4e73df;
+
+    font-size: 20px;
+
+}
+
+
+.generate-info strong {
+
+    color: #343a40;
+
+}
+
+
+.generate-info p {
+
+    color: #6c757d;
+
+    font-size: 14px;
+
+    margin-top: 3px;
+
+}
+
+
+.btn-generate {
+
+    width: 100%;
+
+    height: 50px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+
+    font-size: 15px;
+
+}
+
+
+.generate-alert {
+
+    max-width: 900px;
+
+    margin: 0 auto 25px;
+
+    border-radius: 12px;
+
+}
+
+
+</style>
+
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        const form =
+            document.getElementById(
+                'generateForm'
+            );
+
+        const button =
+            document.getElementById(
+                'generateButton'
+            );
+
+        const normal =
+            document.getElementById(
+                'generateNormal'
+            );
+
+        const loading =
+            document.getElementById(
+                'generateLoading'
+            );
+
+
+        if (!form) {
+            return;
+        }
+
+
+        form.addEventListener(
+            'submit',
+            function () {
+
+                if (button) {
+
+                    button.disabled = true;
 
                 }
 
 
-                /*
-                ==========================================
-                Room Change Event
-                ==========================================
-                */
+                if (normal) {
 
-                roomSelect.addEventListener(
-                    'change',
-                    checkRoomSelection
-                );
+                    normal.style.display =
+                        'none';
+
+                }
 
 
-                /*
-                ==========================================
-                Check Old Value After Validation Error
-                ==========================================
-                */
+                if (loading) {
 
-                checkRoomSelection();
+                    loading.style.display =
+                        'inline';
 
-            });
-        </script>
-    @endpush
+                }
+
+            }
+        );
+
+    }
+);
+
+</script>
 
 @endsection

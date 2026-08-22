@@ -239,10 +239,21 @@
                             </a>
 
                             <!-- Student Timetable -->
-                            <a href="{{ route('schedule.viewStudentTimetable', [
+                            {{-- <a href="{{ route('schedule.viewStudentTimetable', [
                                 'yearID' => $years->id,
                             ]) }}"
                                 class="mb-3 btn btn-danger w-100">
+
+                                <i class="mr-2 fa-solid fa-user-graduate"></i>
+
+                                View Student Time Table
+
+                            </a> --}}
+                            <!-- Student Timetable -->
+                            <a href="{{ route('schedule.viewStudentTimetable', [
+                                'yearID' => $yearData->id,
+                            ]) }}"
+                               class="mb-3 btn btn-danger w-100">
 
                                 <i class="mr-2 fa-solid fa-user-graduate"></i>
 

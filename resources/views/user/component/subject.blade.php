@@ -2,31 +2,26 @@
 
 @section('content')
 
-<section id="subject" class="pricing-section bg-light pb-100 pt-100">
+<section id="subject" class="pricing-section bg-light pt-100 pb-100">
 
     <div class="container">
 
         {{-- =====================================================
             HEADER
         ====================================================== --}}
-        <div class="mb-5 row justify-content-center">
 
-            <div class="text-center col-lg-7">
+        <div class="row justify-content-center mb-5">
+
+            <div class="col-lg-8 text-center">
 
                 <div class="section-title">
 
-                    <h3 class="mb-2 fw-bold wow fadeInUp"
-                        data-wow-delay=".2s">
-
-                        Assigned Subjects
-
+                    <h3 class="fw-bold mb-2">
+                        Subjects
                     </h3>
 
-                    <p class="text-muted wow fadeInUp"
-                       data-wow-delay=".3s">
-
-                        Overview of your assigned subjects and classroom details
-
+                    <p class="text-muted mb-0">
+                        Browse subjects by academic year
                     </p>
 
                 </div>
@@ -37,95 +32,225 @@
 
 
         {{-- =====================================================
+            YEAR FILTER
+        ====================================================== --}}
+
+        <div class="year-filter-wrapper mb-5">
+
+            <div class="year-filter">
+
+                {{-- ALL --}}
+
+                <a
+                    href="{{ route('user.subject') }}"
+                    class="year-filter-btn
+                    {{ empty($yearID) ? 'active' : '' }}"
+                >
+
+                    All
+
+                </a>
+
+
+                {{-- YEAR LOOP --}}
+
+                @foreach($years as $year)
+
+                    <a
+                        href="{{ route('user.subject', [
+                            'yearID' => $year->id
+                        ]) }}"
+                        class="year-filter-btn
+                        {{ (string) $yearID === (string) $year->id
+                            ? 'active'
+                            : ''
+                        }}"
+                    >
+
+                        {{ $year->name }}
+
+                    </a>
+
+                @endforeach
+
+            </div>
+
+        </div>
+
+
+        {{-- =====================================================
+            SELECTED YEAR TITLE
+        ====================================================== --}}
+
+        @if(!empty($yearID))
+
+            @php
+
+                $selectedYear = $years->firstWhere(
+                    'id',
+                    $yearID
+                );
+
+            @endphp
+
+            @if($selectedYear)
+
+                <div class="selected-year mb-4">
+
+                    <div>
+
+                        <span class="selected-year-label">
+                            Showing Subjects For
+                        </span>
+
+                        <h4 class="mb-0 fw-bold">
+                            {{ $selectedYear->name }}
+                        </h4>
+
+                    </div>
+
+                    <span class="subject-count">
+
+                        {{ $allSubjects->count() }}
+                        Subject{{ $allSubjects->count() != 1 ? 's' : '' }}
+
+                    </span>
+
+                </div>
+
+            @endif
+
+        @else
+
+            <div class="selected-year mb-4">
+
+                <div>
+
+                    <span class="selected-year-label">
+                        Showing
+                    </span>
+
+                    <h4 class="mb-0 fw-bold">
+                        All Subjects
+                    </h4>
+
+                </div>
+
+                <span class="subject-count">
+
+                    {{ $allSubjects->count() }}
+                    Subject{{ $allSubjects->count() != 1 ? 's' : '' }}
+
+                </span>
+
+            </div>
+
+        @endif
+
+
+
+        {{-- =====================================================
             SUBJECT LOOP
         ====================================================== --}}
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
 
-            @forelse($teachings as $teachingIndex => $teaching)
+        <div class="row g-4">
+
+            @forelse($allSubjects as $subject)
 
                 @php
 
                     /*
                     |--------------------------------------------------------------------------
-                    | SUBJECT IMAGES
+                    | DEFAULT IMAGE
                     |--------------------------------------------------------------------------
                     */
 
-                    $images = [];
-
-                    $subject = $teaching->subject;
+                    $imagePath = asset(
+                        'assets/images/default-subject.jpg'
+                    );
 
 
                     /*
                     |--------------------------------------------------------------------------
-                    | IMAGE COLUMN
+                    | SUBJECT IMAGE
                     |--------------------------------------------------------------------------
                     */
 
                     if (!empty($subject->image)) {
 
-                        if (is_array($subject->image)) {
-
-                            $images = $subject->image;
-
-                        }
-
-                        elseif (is_string($subject->image)) {
-
-                            $decodedImages =
-                                json_decode(
-                                    $subject->image,
-                                    true
-                                );
+                        $image = trim(
+                            $subject->image,
+                            "\"'"
+                        );
 
 
-                            if (
-                                json_last_error() === JSON_ERROR_NONE
-                                &&
-                                is_array($decodedImages)
-                            ) {
+                        if (
+                            filter_var(
+                                $image,
+                                FILTER_VALIDATE_URL
+                            )
+                        ) {
 
-                                $images =
-                                    $decodedImages;
-
-                            }
-
-                            else {
-
-                                $images =
-                                    array_filter(
-                                        array_map(
-                                            'trim',
-                                            explode(
-                                                ',',
-                                                $subject->image
-                                            )
-                                        )
-                                    );
-
-                            }
+                            $imagePath = $image;
 
                         }
 
-                    }
+                        elseif (
+                            str_starts_with(
+                                $image,
+                                'storage/'
+                            )
+                        ) {
 
+                            $imagePath = asset($image);
 
-                    /*
-                    |--------------------------------------------------------------------------
-                    | IMAGE RELATIONSHIP
-                    |--------------------------------------------------------------------------
-                    */
+                        }
 
-                    elseif (
-                        isset($subject->images)
-                        &&
-                        $subject->images->count() > 0
-                    ) {
+                        elseif (
+                            str_starts_with(
+                                $image,
+                                '/storage/'
+                            )
+                        ) {
 
-                        $images =
-                            $subject->images
-                                ->pluck('image')
-                                ->toArray();
+                            $imagePath = asset(
+                                ltrim($image, '/')
+                            );
+
+                        }
+
+                        elseif (
+                            file_exists(
+                                public_path(
+                                    'storage/' . $image
+                                )
+                            )
+                        ) {
+
+                            $imagePath = asset(
+                                'storage/' . $image
+                            );
+
+                        }
+
+                        elseif (
+                            file_exists(
+                                public_path($image)
+                            )
+                        ) {
+
+                            $imagePath = asset($image);
+
+                        }
+
+                        else {
+
+                            $imagePath = asset(
+                                'storage/' .
+                                ltrim($image, '/')
+                            );
+
+                        }
 
                     }
 
@@ -135,291 +260,143 @@
                 {{-- =================================================
                     SUBJECT CARD
                 ================================================== --}}
-                <div class="col">
 
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden custom-subject-card">
+                <div class="col-12 col-md-6 col-lg-4">
 
+                    <div class="subject-card h-100">
 
-                        {{-- =============================================
-                            IMAGE
-                        ============================================== --}}
-                        <div class="position-relative subject-image-wrapper">
 
+                        {{-- IMAGE --}}
 
-                            {{-- =========================================
-                                IMAGE LOOP
-                            ========================================== --}}
-                            @if(count($images) > 0)
+                        <div class="subject-image">
 
-                                <div
-                                    id="subjectCarousel{{ $teachingIndex }}"
-                                    class="carousel slide h-100"
-                                    data-bs-ride="carousel"
-                                >
+                            <img
+                                src="{{ $imagePath }}"
+                                alt="{{ $subject->long_name ?? $subject->name }}"
+                                loading="lazy"
+                                onerror="
+                                    this.onerror=null;
+                                    this.src='{{ asset('assets/images/default-subject.jpg') }}';
+                                "
+                            >
 
 
-                                    {{-- ===============================
-                                        INDICATORS LOOP
-                                    ================================ --}}
-                                    @if(count($images) > 1)
+                            {{-- YEAR BADGE --}}
 
-                                        <div class="carousel-indicators">
-
-                                            @foreach($images as $imageIndex => $image)
-
-                                                <button
-                                                    type="button"
-
-                                                    data-bs-target="#subjectCarousel{{ $teachingIndex }}"
-
-                                                    data-bs-slide-to="{{ $imageIndex }}"
-
-                                                    class="{{ $loop->first ? 'active' : '' }}"
-
-                                                    aria-current="{{ $loop->first ? 'true' : 'false' }}"
-
-                                                    aria-label="Slide {{ $imageIndex + 1 }}"
-                                                ></button>
-
-                                            @endforeach
-
-                                        </div>
-
-                                    @endif
-
-
-                                    {{-- ===============================
-                                        IMAGE SLIDES LOOP
-                                    ================================ --}}
-                                    <div class="carousel-inner h-100">
-
-                                        @foreach($images as $imageIndex => $image)
-
-                                            @php
-
-                                                /*
-                                                |--------------------------------------------------------------------------
-                                                | IMAGE PATH
-                                                |--------------------------------------------------------------------------
-                                                */
-
-                                                if (
-                                                    file_exists(
-                                                        public_path(
-                                                            'storage/' . $image
-                                                        )
-                                                    )
-                                                ) {
-
-                                                    $imagePath =
-                                                        asset(
-                                                            'storage/' . $image
-                                                        );
-
-                                                }
-
-                                                else {
-
-                                                    $imagePath =
-                                                        asset(
-                                                            $image
-                                                        );
-
-                                                }
-
-                                            @endphp
-
-
-                                            <div
-                                                class="carousel-item h-100
-                                                {{ $loop->first ? 'active' : '' }}"
-                                            >
-
-                                                <img
-                                                    src="{{ $imagePath }}"
-
-                                                    class="d-block w-100 h-100 object-fit-cover"
-
-                                                    alt="{{ $subject->long_name ?? 'Subject Image' }}"
-                                                >
-
-                                            </div>
-
-                                        @endforeach
-
-                                    </div>
-
-
-                                    {{-- ===============================
-                                        PREVIOUS / NEXT
-                                    ================================ --}}
-                                    @if(count($images) > 1)
-
-                                        <button
-                                            class="carousel-control-prev"
-
-                                            type="button"
-
-                                            data-bs-target="#subjectCarousel{{ $teachingIndex }}"
-
-                                            data-bs-slide="prev"
-                                        >
-
-                                            <span
-                                                class="carousel-control-prev-icon"
-                                                aria-hidden="true"
-                                            ></span>
-
-                                            <span class="visually-hidden">
-
-                                                Previous
-
-                                            </span>
-
-                                        </button>
-
-
-                                        <button
-                                            class="carousel-control-next"
-
-                                            type="button"
-
-                                            data-bs-target="#subjectCarousel{{ $teachingIndex }}"
-
-                                            data-bs-slide="next"
-                                        >
-
-                                            <span
-                                                class="carousel-control-next-icon"
-                                                aria-hidden="true"
-                                            ></span>
-
-                                            <span class="visually-hidden">
-
-                                                Next
-
-                                            </span>
-
-                                        </button>
-
-                                    @endif
-
-                                </div>
-
-
-                            {{-- =========================================
-                                NO IMAGE
-                            ========================================== --}}
-                            @else
-
-                                <img
-                                    src="{{ asset('assets/images/default-subject.jpg') }}"
-
-                                    class="w-100 h-100 object-fit-cover"
-
-                                    alt="No Subject Image"
-                                >
-
-                            @endif
-
-
-                            {{-- =========================================
-                                YEAR BADGE
-                            ========================================== --}}
                             <span class="year-badge">
 
-                                {{ $teaching->year->name ?? 'Year' }}
+                                {{ $subject->year->name ?? 'Year' }}
 
                             </span>
 
                         </div>
 
 
-                        {{-- =============================================
-                            CARD BODY
-                        ============================================== --}}
-                        <div class="p-4 card-body d-flex flex-column">
+                        {{-- CONTENT --}}
+
+                        <div class="subject-content">
 
 
-                            {{-- =========================================
-                                MAJOR / SECTION
-                            ========================================== --}}
-                            <div class="mb-3 subject-badges">
+                            {{-- CODE --}}
 
-                                <span class="border badge bg-light text-dark">
+                            @if(!empty($subject->short_name))
 
-                                    {{ $teaching->major->name ?? 'Major' }}
+                                <div class="subject-code">
 
-                                </span>
+                                    {{ $subject->short_name }}
 
+                                </div>
 
-                                <span class="border badge section-badge">
-
-                                    Section:
-                                    {{ $teaching->section->name ?? 'N/A' }}
-
-                                </span>
-
-                            </div>
+                            @endif
 
 
-                            {{-- =========================================
-                                SUBJECT NAME
-                            ========================================== --}}
-                            <h5 class="mb-3 card-title fw-bold text-dark">
+                            {{-- NAME --}}
 
-                                {{
-                                    $subject->long_name
-                                    ??
-                                    $subject->name
-                                    ??
-                                    'Subject Name'
+                            <h4 class="subject-title">
+
+                                {{ $subject->long_name
+                                    ?? $subject->name
+                                    ?? 'Subject Name'
                                 }}
 
-                            </h5>
+                            </h4>
 
 
-                            <hr class="mt-auto opacity-10">
+                            <div class="subject-line"></div>
 
 
-                            {{-- =========================================
-                                DETAILS
-                            ========================================== --}}
-                            <ul class="mb-0 list-unstyled subject-details">
+                            {{-- DETAILS --}}
+
+                            <div class="subject-info">
 
 
-                                {{-- ROOM --}}
-                                <li>
+                                <div class="info-item">
 
-                                    <i class="lni lni-map-marker"></i>
+                                    <div class="info-icon">
 
-                                    <span>
+                                        <i class="lni lni-graduation"></i>
 
-                                        <strong>Room:</strong>
+                                    </div>
 
-                                        {{ $teaching->room->name ?? 'N/A' }}
+                                    <div>
 
-                                    </span>
+                                        <small>Year</small>
 
-                                </li>
+                                        <strong>
+                                            {{ $subject->year->name ?? 'N/A' }}
+                                        </strong>
+
+                                    </div>
+
+                                </div>
 
 
-                                {{-- SEMESTER --}}
-                                <li>
+                                <div class="info-item">
 
-                                    <i class="lni lni-calendar"></i>
+                                    <div class="info-icon">
 
-                                    <span>
+                                        <i class="lni lni-calendar"></i>
 
-                                        <strong>Semester:</strong>
+                                    </div>
 
-                                        {{ $teaching->semester->name ?? 'N/A' }}
+                                    <div>
 
-                                    </span>
+                                        <small>Semester</small>
 
-                                </li>
+                                        <strong>
+                                            {{ $subject->semester->name ?? 'N/A' }}
+                                        </strong>
 
-                            </ul>
+                                    </div>
+
+                                </div>
+
+
+                                @if(isset($subject->time_number))
+
+                                    <div class="info-item">
+
+                                        <div class="info-icon">
+
+                                            <i class="lni lni-alarm-clock"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <small>Weekly Period</small>
+
+                                            <strong>
+                                                {{ $subject->time_number }}
+                                            </strong>
+
+                                        </div>
+
+                                    </div>
+
+                                @endif
+
+                            </div>
 
                         </div>
 
@@ -428,27 +405,28 @@
                 </div>
 
 
-            {{-- =====================================================
-                EMPTY
-            ====================================================== --}}
             @empty
 
-                <div class="py-5 text-center col-12">
+                {{-- =================================================
+                    NO SUBJECT
+                ================================================== --}}
 
-                    <div class="p-5 bg-white shadow-sm rounded-4 d-inline-block empty-subject-box">
+                <div class="col-12">
 
-                        <i class="mb-3 lni lni-book text-muted display-4 d-block"></i>
+                    <div class="empty-subject">
 
-                        <h5 class="fw-bold text-secondary">
+                        <div class="empty-icon">
 
-                            No Assigned Subjects Found
+                            <i class="lni lni-book"></i>
 
-                        </h5>
+                        </div>
 
-                        <p class="mb-0 text-muted small">
+                        <h4 class="mt-3">
+                            No Subjects Found
+                        </h4>
 
-                            There are currently no subjects assigned to display.
-
+                        <p>
+                            No subjects are available for this year.
                         </p>
 
                     </div>
@@ -464,14 +442,148 @@
 </section>
 
 
-{{-- =========================================================
-    CSS
-========================================================= --}}
 <style>
 
-.object-fit-cover {
+/* =========================================================
+   YEAR FILTER
+========================================================= */
 
-    object-fit: cover;
+.year-filter-wrapper {
+
+    display: flex;
+
+    justify-content: center;
+
+}
+
+
+.year-filter {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    padding: 8px;
+
+    background: #fff;
+
+    border-radius: 50px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, .06);
+
+}
+
+
+.year-filter-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 100px;
+
+    padding: 10px 20px;
+
+    border-radius: 50px;
+
+    text-decoration: none;
+
+    color: #495057;
+
+    background: transparent;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    transition: .25s ease;
+
+}
+
+
+.year-filter-btn:hover {
+
+    color: #0d6efd;
+
+    background:
+        rgba(13, 110, 253, .08);
+
+}
+
+
+.year-filter-btn.active {
+
+    color: #fff;
+
+    background: #0d6efd;
+
+    box-shadow:
+        0 5px 15px
+        rgba(13, 110, 253, .25);
+
+}
+
+
+/* =========================================================
+   SELECTED YEAR
+========================================================= */
+
+.selected-year {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 18px 22px;
+
+    background: #fff;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, .04);
+
+}
+
+
+.selected-year-label {
+
+    display: block;
+
+    color: #8a8f98;
+
+    font-size: 12px;
+
+    margin-bottom: 3px;
+
+}
+
+
+.subject-count {
+
+    padding: 7px 13px;
+
+    border-radius: 50px;
+
+    background:
+        rgba(13, 110, 253, .08);
+
+    color: #0d6efd;
+
+    font-size: 13px;
+
+    font-weight: 700;
 
 }
 
@@ -480,7 +592,18 @@
    SUBJECT CARD
 ========================================================= */
 
-.custom-subject-card {
+.subject-card {
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    border: 1px solid rgba(0, 0, 0, .05);
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, .05);
 
     transition:
         transform .3s ease,
@@ -489,14 +612,12 @@
 }
 
 
-.custom-subject-card:hover {
+.subject-card:hover {
 
-    transform: translateY(-6px);
+    transform: translateY(-7px);
 
     box-shadow:
-        0 15px 30px
-        rgba(0, 0, 0, .12)
-        !important;
+        0 15px 35px rgba(0, 0, 0, .12);
 
 }
 
@@ -505,22 +626,38 @@
    IMAGE
 ========================================================= */
 
-.subject-image-wrapper {
+.subject-image {
 
-    height: 200px;
+    position: relative;
+
+    height: 210px;
 
     overflow: hidden;
+
+    background: #f1f3f5;
 
 }
 
 
-.subject-image-wrapper img {
+.subject-image img {
 
     width: 100%;
 
     height: 100%;
 
+    display: block;
+
     object-fit: cover;
+
+    transition:
+        transform .4s ease;
+
+}
+
+
+.subject-card:hover .subject-image img {
+
+    transform: scale(1.05);
 
 }
 
@@ -537,9 +674,9 @@
 
     right: 15px;
 
-    z-index: 10;
+    padding: 7px 14px;
 
-    padding: 8px 14px;
+    border-radius: 50px;
 
     background: #0d6efd;
 
@@ -547,41 +684,61 @@
 
     font-size: 12px;
 
-    font-weight: 600;
-
-    border-radius: 50px;
-
-    box-shadow:
-        0 4px 10px
-        rgba(0, 0, 0, .15);
+    font-weight: 700;
 
 }
 
 
 /* =========================================================
-   BADGES
+   CONTENT
 ========================================================= */
 
-.subject-badges {
+.subject-content {
 
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 6px;
+    padding: 24px;
 
 }
 
 
-.section-badge {
+.subject-code {
 
-    background: rgba(13, 110, 253, .08);
+    margin-bottom: 8px;
 
     color: #0d6efd;
 
-    border-color:
-        rgba(13, 110, 253, .25)
-        !important;
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+}
+
+
+.subject-title {
+
+    min-height: 57px;
+
+    margin-bottom: 15px;
+
+    color: #212529;
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    line-height: 1.5;
+
+}
+
+
+.subject-line {
+
+    height: 1px;
+
+    margin-bottom: 18px;
+
+    background: #e9ecef;
 
 }
 
@@ -590,68 +747,72 @@
    DETAILS
 ========================================================= */
 
-.subject-details {
+.subject-info {
 
     display: flex;
 
     flex-direction: column;
 
-    gap: 10px;
-
-    color: #6c757d;
-
-    font-size: 14px;
+    gap: 13px;
 
 }
 
 
-.subject-details li {
+.info-item {
 
     display: flex;
 
     align-items: center;
 
+    gap: 10px;
+
 }
 
 
-.subject-details i {
+.info-icon {
 
-    width: 24px;
+    width: 34px;
 
-    margin-right: 8px;
+    height: 34px;
+
+    min-width: 34px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background:
+        rgba(13, 110, 253, .08);
 
     color: #0d6efd;
 
-    font-size: 17px;
+}
+
+
+.info-item small {
+
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #8a8f98;
+
+    font-size: 11px;
 
 }
 
 
-/* =========================================================
-   CAROUSEL
-========================================================= */
+.info-item strong {
 
-.carousel-control-prev,
-.carousel-control-next {
+    display: block;
 
-    width: 12%;
+    color: #343a40;
 
-    opacity: .7;
-
-}
-
-
-.carousel-control-prev:hover,
-.carousel-control-next:hover {
-
-    opacity: 1;
-
-}
-
-
-.carousel-indicators {
-
-    margin-bottom: 8px;
+    font-size: 14px;
 
 }
 
@@ -660,11 +821,47 @@
    EMPTY
 ========================================================= */
 
-.empty-subject-box {
+.empty-subject {
 
-    width: 450px;
+    max-width: 450px;
 
-    max-width: 100%;
+    margin: 30px auto;
+
+    padding: 50px 30px;
+
+    text-align: center;
+
+    background: #fff;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 5px 20px rgba(0, 0, 0, .05);
+
+}
+
+
+.empty-icon {
+
+    width: 75px;
+
+    height: 75px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f1f3f5;
+
+    color: #adb5bd;
+
+    font-size: 32px;
 
 }
 
@@ -673,11 +870,33 @@
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 768px) {
+@media (max-width: 576px) {
 
-    .subject-image-wrapper {
+    .year-filter {
 
-        height: 190px;
+        border-radius: 18px;
+
+    }
+
+    .year-filter-btn {
+
+        min-width: 80px;
+
+        padding: 9px 14px;
+
+    }
+
+    .selected-year {
+
+        align-items: flex-start;
+
+        flex-direction: column;
+
+    }
+
+    .subject-image {
+
+        height: 200px;
 
     }
 

@@ -58,19 +58,20 @@ Route::get('/about', [UserController::class, 'about'])->name('about');
 // AUTO GENERATE TIMETABLE - ContactController
 // ======================================================
 
-
 Route::get('/schedule/auto-generate', [ContactController::class, 'autoGenerate'])->name('schedule.autoGenerate');
 
-Route::post('/schedule/auto-generate',[ContactController::class, 'createSchedule'])->name('schedule.createSchedule');
+Route::post('/schedule/auto-generate', [ContactController::class, 'createSchedule'])->name('schedule.createSchedule');
 
-Route::get('/schedule/show',[ContactController::class, 'result'])->name('schedule.show');
+// Route::get('/schedule/show', [ContactController::class, 'result'])->name('schedule.show');
+Route::get(
+    '/schedule/show',
+    [ContactController::class, 'result']
+)->name('schedule.show');
+
 
 // Student Timetable
-Route::get('/admin/schedule/view-student-timetable/{yearID}',[AdminController::class, 'viewStudentTimetable']
+Route::get('/admin/schedule/view-student-timetable/{yearID}', [AdminController::class, 'viewStudentTimetable']
 )->name('schedule.viewStudentTimetable');
 
 //PDF
-Route::get(
-    'pdf/{year}/{room}/{major}/{academicYearID}',
-    [ScheduleController::class, 'downloadPDF']
-)->name('schedule.pdf');
+Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [ScheduleController::class, 'downloadPDF'])->name('schedule.pdf');

@@ -48,6 +48,7 @@ class ContactController extends Controller
                     ->orWhereHas('teacher.user', function ($q) use ($search) {
                         $q->where('phone', 'like', "%{$search}%");
                     });
+
             });
         }
 
@@ -63,7 +64,12 @@ class ContactController extends Controller
     }
 
 
-    //contact delete
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function deleteContact($id)
     {
         $contact = Contact::findOrFail($id);
@@ -79,11 +85,17 @@ class ContactController extends Controller
     }
 
 
-    //contact accept
+    /*
+    |--------------------------------------------------------------------------
+    | ACCEPT CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function accept($id)
     {
         Contact::findOrFail($id)->update([
-            'status' => 'accepted',
+            'status'       => 'accepted',
+            'is_user_read' => false,
         ]);
 
         return back()->with(
@@ -93,11 +105,17 @@ class ContactController extends Controller
     }
 
 
-    //contact reject
+    /*
+    |--------------------------------------------------------------------------
+    | REJECT CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function reject($id)
     {
         Contact::findOrFail($id)->update([
-            'status' => 'rejected',
+            'status'       => 'rejected',
+            'is_user_read' => false,
         ]);
 
         return back()->with(
@@ -107,7 +125,12 @@ class ContactController extends Controller
     }
 
 
-    //contact show
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function show($id)
     {
         $contact = Contact::with([
@@ -122,7 +145,12 @@ class ContactController extends Controller
     }
 
 
-    //contact store
+    /*
+    |--------------------------------------------------------------------------
+    | STORE CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function store(Request $request)
     {
         $request->validate([
@@ -135,19 +163,28 @@ class ContactController extends Controller
 
         $user = auth()->user();
 
+        if (!$user) {
+
+            return back()->withErrors([
+                'message' => 'You must be logged in to send a message.',
+            ]);
+        }
+
         $teacher = Teacher::where(
             'user_id',
             $user->id
         )->first();
 
         Contact::create([
-            'user_id'     => $user->id,
-            'teacher_id'  => $teacher?->id,
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'department'  => $request->department,
-            'subject'     => $request->subject,
-            'message'     => $request->message,
+            'user_id'      => $user->id,
+            'teacher_id'   => $teacher?->id,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'department'   => $request->department,
+            'subject'      => $request->subject,
+            'message'      => $request->message,
+            'status'       => 'pending',
+            'is_user_read' => true,
         ]);
 
         return back()->with(
@@ -156,28 +193,48 @@ class ContactController extends Controller
         );
     }
 
-    //notification page
+
+    /*
+    |--------------------------------------------------------------------------
+    | USER NOTIFICATIONS
+    |--------------------------------------------------------------------------
+    */
 
     public function userNotifications()
     {
         $userId = auth()->id();
 
-        $notifications = Contact::where('user_id', $userId)
+        $notifications = Contact::where(
+            'user_id',
+            $userId
+        )
             ->latest()
             ->get();
 
-
-        Contact::where('user_id', $userId)
-            ->where('is_user_read', false)
+        Contact::where(
+            'user_id',
+            $userId
+        )
+            ->where(
+                'is_user_read',
+                false
+            )
             ->where(function ($query) {
 
-                $query->whereNotNull('reply_message')
-                      ->where('reply_message', '!=', '');
+                $query->where(function ($q) {
 
-                $query->orWhereIn('status', [
-                    'accepted',
-                    'rejected',
-                ]);
+                    $q->whereNotNull('reply_message')
+                        ->where(
+                            'reply_message',
+                            '!=',
+                            ''
+                        );
+
+                })
+                    ->orWhereIn('status', [
+                        'accepted',
+                        'rejected',
+                    ]);
 
             })
             ->update([
@@ -191,7 +248,12 @@ class ContactController extends Controller
     }
 
 
-    //contact read
+    /*
+    |--------------------------------------------------------------------------
+    | READ CONTACT
+    |--------------------------------------------------------------------------
+    */
+
     public function read($id)
     {
         Contact::findOrFail($id)->update([
@@ -203,15 +265,30 @@ class ContactController extends Controller
         );
     }
 
-    //contact reply route
+
+    /*
+    |--------------------------------------------------------------------------
+    | REPLY PAGE
+    |--------------------------------------------------------------------------
+    */
+
     public function reply($id)
     {
         $contact = Contact::findOrFail($id);
 
-        return view('admin.contact.reply', compact('contact'));
+        return view(
+            'admin.contact.reply',
+            compact('contact')
+        );
     }
 
-    //send reply
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEND REPLY
+    |--------------------------------------------------------------------------
+    */
+
     public function sendReply(Request $request, $id)
     {
         $request->validate([
@@ -220,15 +297,20 @@ class ContactController extends Controller
 
         $contact = Contact::findOrFail($id);
 
-        $contact->reply_message = $request->reply_message;
-
-        $contact->is_user_read = false;
-
-        $contact->save();
+        $contact->update([
+            'reply_message' => $request->reply_message,
+            'is_user_read'  => false,
+        ]);
 
         return redirect()
-            ->route('contact.show', $contact->id)
-            ->with('success', 'Reply sent successfully.');
+            ->route(
+                'contact.show',
+                $contact->id
+            )
+            ->with(
+                'success',
+                'Reply sent successfully.'
+            );
     }
 
 
@@ -240,12 +322,17 @@ class ContactController extends Controller
 
     public function autoGenerate()
     {
-        $academicYears = AcademicYears::all();
-        $semesters     = Semesters::all();
-        $years         = Year::all();
-        $majors        = Major::all();
-        $sections      = Sections::all();
-        $rooms         = Room::all();
+        $academicYears = AcademicYears::orderBy('id')->get();
+
+        $semesters = Semesters::orderBy('id')->get();
+
+        $years = Year::orderBy('id')->get();
+
+        $majors = Major::orderBy('id')->get();
+
+        $sections = Sections::orderBy('id')->get();
+
+        $rooms = Room::orderBy('id')->get();
 
         return view(
             'admin.schedule.autoGenerate',
@@ -261,60 +348,68 @@ class ContactController extends Controller
     }
 
 
+    /*
+    |--------------------------------------------------------------------------
+    | CREATE AUTO SCHEDULE
+    |--------------------------------------------------------------------------
+    |
+    | Section ကို form မှာ မရွေးပါ။
+    |
+    | Selected:
+    | Academic Year
+    | Semester
+    | Year
+    | Major
+    |
+    | ဆိုရင် Section A/B/... အားလုံး generate လုပ်မယ်။
+    |
+    |--------------------------------------------------------------------------
+    */
+
     public function createSchedule(Request $request)
     {
         /*
         |--------------------------------------------------------------------------
-        | 1. VALIDATION
+        | VALIDATION
         |--------------------------------------------------------------------------
         */
 
         $request->validate([
-            'academicYearID' => 'required|integer',
-            'semesterID'     => 'required|integer',
-            'yearID'         => 'required|integer',
-            'majorID'        => 'required|integer',
-            'sectionID'      => 'required|integer',
-            'roomID'         => 'required|integer',
+            'academicYearID' => [
+                'required',
+                'integer',
+                'exists:academic_years,id',
+            ],
+
+            'semesterID' => [
+                'required',
+                'integer',
+                'exists:semesters,id',
+            ],
+
+            'yearID' => [
+                'required',
+                'integer',
+                'exists:years,id',
+            ],
+
+            'majorID' => [
+                'required',
+                'integer',
+                'exists:majors,id',
+            ],
         ]);
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | 2. IDS
-        |--------------------------------------------------------------------------
-        */
 
         $academicYearID = (int) $request->academicYearID;
         $semesterID     = (int) $request->semesterID;
         $yearID         = (int) $request->yearID;
         $majorID        = (int) $request->majorID;
-        $sectionID      = (int) $request->sectionID;
-        $selectedRoomID = (int) $request->roomID;
 
 
         /*
         |--------------------------------------------------------------------------
-        | 3. SELECTED ROOM
-        |--------------------------------------------------------------------------
-        */
-
-        $selectedRoom = Room::find($selectedRoomID);
-
-        if (!$selectedRoom) {
-
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'generate' =>
-                        'Selected room does not exist.',
-                ]);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 4. DAYS
+        | DAYS
         |--------------------------------------------------------------------------
         */
 
@@ -325,17 +420,18 @@ class ContactController extends Controller
             return back()
                 ->withInput()
                 ->withErrors([
-                    'generate' =>
-                        'No days found in database.',
+                    'generate' => 'No days found in database.',
                 ]);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 5. TIMES
+        | TIMES
+        |--------------------------------------------------------------------------
         |
-        | Lunch break excluded.
+        | Lunch break ကို auto generate မလုပ်ပါ။
+        |
         |--------------------------------------------------------------------------
         */
 
@@ -344,150 +440,75 @@ class ContactController extends Controller
             '!=',
             '12:00-01:00'
         )
-        ->orderBy('id')
-        ->get();
+            ->orderBy('id')
+            ->get();
 
         if ($times->isEmpty()) {
 
             return back()
                 ->withInput()
                 ->withErrors([
-                    'generate' =>
-                        'No usable time slots found.',
+                    'generate' => 'No usable time slots found.',
                 ]);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 6. GET TEACHINGS
+        | SECTIONS
         |--------------------------------------------------------------------------
         */
 
-        $teachings = Teaching::where(
-            'academic_year_id',
-            $academicYearID
-        )
-        ->where(
-            'semester_id',
-            $semesterID
-        )
-        ->where(
-            'year_id',
-            $yearID
-        )
-        ->where(
-            'major_id',
-            $majorID
-        )
-        ->where(
-            'section_id',
-            $sectionID
-        )
-        ->with([
-            'subject',
-        ])
-        ->get();
+        $sections = Sections::orderBy('id')->get();
 
-
-        if ($teachings->isEmpty()) {
+        if ($sections->isEmpty()) {
 
             return back()
                 ->withInput()
                 ->withErrors([
-                    'generate' =>
-                        'No teaching data found for this class.',
+                    'generate' => 'No sections found in database.',
                 ]);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 7. REMOVE DUPLICATE SUBJECTS
-        |--------------------------------------------------------------------------
-        |
-        | If Teaching table contains the same subject more than once,
-        | we still generate only ONE subject for this section.
-        |
-        |--------------------------------------------------------------------------
-        */
-
-        $uniqueTeachings = $teachings
-            ->filter(function ($teaching) {
-
-                return $teaching->subject !== null;
-            })
-            ->unique('subject_id')
-            ->values();
-
-
-        if ($uniqueTeachings->isEmpty()) {
-
-            return back()
-                ->withInput()
-                ->withErrors([
-                    'generate' =>
-                        'No valid subjects found for this class.',
-                ]);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | 8. ROOMS
-        |--------------------------------------------------------------------------
-        |
-        | Selected room gets first priority.
-        |
+        | ROOMS
         |--------------------------------------------------------------------------
         */
 
         $rooms = Room::query()
-            ->where(function ($query) use (
-                $yearID,
-                $majorID,
-                $selectedRoomID
-            ) {
-
-                $query
-                    ->where(function ($q) use (
-                        $yearID,
-                        $majorID
-                    ) {
-
-                        $q->where(
-                            'year_id',
-                            $yearID
-                        )
-                        ->where(
-                            'major_id',
-                            $majorID
-                        );
-                    })
-                    ->orWhere(
-                        'id',
-                        $selectedRoomID
-                    );
-            })
-            ->orderByRaw(
-                'CASE WHEN id = ? THEN 0 ELSE 1 END',
-                [$selectedRoomID]
-            )
+            ->where('year_id', $yearID)
+            ->where('major_id', $majorID)
             ->orderBy('id')
             ->get();
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | FALLBACK ROOMS
+        |--------------------------------------------------------------------------
+        */
+
         if ($rooms->isEmpty()) {
 
-            $rooms = collect([
-                $selectedRoom,
-            ]);
+            $rooms = Room::orderBy('id')->get();
+        }
+
+
+        if ($rooms->isEmpty()) {
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'generate' => 'No rooms found in database.',
+                ]);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 9. TRANSACTION
+        | TRANSACTION
         |--------------------------------------------------------------------------
         */
 
@@ -497,10 +518,39 @@ class ContactController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | 10. DELETE OLD AUTO GENERATED RECORDS
+            | EXISTING SHIFTED SCHEDULES
+            |--------------------------------------------------------------------------
+            */
+
+            $existingShifted = Schedule::where(
+                'academic_year_id',
+                $academicYearID
+            )
+                ->where(
+                    'semester_id',
+                    $semesterID
+                )
+                ->where(
+                    'year_id',
+                    $yearID
+                )
+                ->where(
+                    'major_id',
+                    $majorID
+                )
+                ->where(
+                    'is_shifted',
+                    true
+                )
+                ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | DELETE OLD AUTO GENERATED SCHEDULES
             |--------------------------------------------------------------------------
             |
-            | Shifted schedules are preserved.
+            | Shifted schedules မဖျက်ပါ။
             |
             |--------------------------------------------------------------------------
             */
@@ -509,61 +559,45 @@ class ContactController extends Controller
                 'academic_year_id',
                 $academicYearID
             )
-            ->where(
-                'semester_id',
-                $semesterID
-            )
-            ->where(
-                'year_id',
-                $yearID
-            )
-            ->where(
-                'major_id',
-                $majorID
-            )
-            ->where(
-                'section_id',
-                $sectionID
-            )
-            ->where(
-                'is_shifted',
-                false
-            )
-            ->delete();
+                ->where(
+                    'semester_id',
+                    $semesterID
+                )
+                ->where(
+                    'year_id',
+                    $yearID
+                )
+                ->where(
+                    'major_id',
+                    $majorID
+                )
+                ->where(
+                    'is_shifted',
+                    false
+                )
+                ->delete();
 
 
             /*
             |--------------------------------------------------------------------------
-            | 11. EXISTING SCHEDULES
-            |--------------------------------------------------------------------------
-            */
-
-            $existingSchedules = Schedule::where(
-                'academic_year_id',
-                $academicYearID
-            )
-            ->where(
-                'semester_id',
-                $semesterID
-            )
-            ->get();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 12. OCCUPANCY
+            | OCCUPANCY
             |--------------------------------------------------------------------------
             */
 
             $occupancy = [
-                'teacher'       => [],
-                'room'          => [],
-                'class'         => [],
-                'teacher_room'  => [],
+                'teacher' => [],
+                'room'    => [],
+                'class'   => [],
             ];
 
 
-            foreach ($existingSchedules as $schedule) {
+            /*
+            |--------------------------------------------------------------------------
+            | LOAD SHIFTED SCHEDULES
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($existingShifted as $schedule) {
 
                 if (
                     !$schedule->day_id ||
@@ -573,147 +607,89 @@ class ContactController extends Controller
                 }
 
 
-                $dayID  = (int) $schedule->day_id;
-                $timeID = (int) $schedule->time_id;
-
-                $slotKey = $dayID . '_' . $timeID;
+                $slotKey =
+                    (int) $schedule->day_id
+                    . '_'
+                    . (int) $schedule->time_id;
 
 
                 /*
-                |--------------------------------------------------------------------------
-                | TEACHER + SLOT
-                |--------------------------------------------------------------------------
+                | Teacher
                 */
 
                 if ($schedule->teacher_id) {
 
-                    $teacherID =
-                        (int) $schedule->teacher_id;
-
                     $occupancy['teacher']
-                        [$teacherID]
+                        [(int) $schedule->teacher_id]
                         [$slotKey] = true;
                 }
 
 
                 /*
-                |--------------------------------------------------------------------------
-                | ROOM + SLOT
-                |--------------------------------------------------------------------------
+                | Room
                 */
 
                 if ($schedule->room_id) {
 
-                    $roomID =
-                        (int) $schedule->room_id;
-
                     $occupancy['room']
-                        [$roomID]
+                        [(int) $schedule->room_id]
                         [$slotKey] = true;
                 }
 
 
                 /*
-                |--------------------------------------------------------------------------
-                | CLASS + SLOT
-                |--------------------------------------------------------------------------
+                | Class
                 */
 
                 $classKey =
-                    $schedule->year_id
+                    (int) $schedule->year_id
                     . '_'
-                    . $schedule->major_id
+                    . (int) $schedule->major_id
                     . '_'
-                    . $schedule->section_id;
+                    . (int) $schedule->section_id;
 
 
                 $occupancy['class']
                     [$classKey]
                     [$slotKey] = true;
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | TEACHER + ROOM + DAY
-                |--------------------------------------------------------------------------
-                |
-                | RULE:
-                |
-                | One teacher cannot teach the SAME ROOM
-                | more than once on the same day.
-                |
-                |--------------------------------------------------------------------------
-                */
-
-                if (
-                    $schedule->teacher_id &&
-                    $schedule->room_id
-                ) {
-
-                    $teacherRoomDayKey =
-                        $schedule->teacher_id
-                        . '_'
-                        . $schedule->room_id
-                        . '_'
-                        . $dayID;
-
-                    $occupancy['teacher_room']
-                        [$teacherRoomDayKey] = true;
-                }
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | 13. PREPARE SUBJECTS
-            |--------------------------------------------------------------------------
-            |
-            | IMPORTANT:
-            |
-            | DO NOT USE subject->time_number
-            |
-            | Every subject:
-            |
-            |       3 periods / week / section
-            |
+            | TOTAL
             |--------------------------------------------------------------------------
             */
 
-            $subjects = [];
+            $generatedTotal = 0;
+
+            $sectionResults = [];
 
 
-            foreach ($uniqueTeachings as $teaching) {
+            /*
+            |--------------------------------------------------------------------------
+            | GENERATE EACH SECTION
+            |--------------------------------------------------------------------------
+            */
 
-                $subject = $teaching->subject;
-
-                if (!$subject) {
-                    continue;
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | REQUIRED PERIODS
-                |--------------------------------------------------------------------------
-                |
-                | FIXED = 3
-                |
-                |--------------------------------------------------------------------------
-                */
-
-                $required = 3;
-
+            foreach ($sections as $section) {
 
                 /*
                 |--------------------------------------------------------------------------
-                | EXISTING SHIFTED PERIODS
+                | TEACHINGS
                 |--------------------------------------------------------------------------
                 */
 
-                $existingCount = $existingSchedules
+                $teachings = Teaching::with([
+                    'subject',
+                ])
                     ->where(
-                        'subject_id',
-                        $teaching->subject_id
+                        'academic_year_id',
+                        $academicYearID
+                    )
+                    ->where(
+                        'semester_id',
+                        $semesterID
                     )
                     ->where(
                         'year_id',
@@ -725,329 +701,367 @@ class ContactController extends Controller
                     )
                     ->where(
                         'section_id',
-                        $sectionID
+                        $section->id
                     )
-                    ->count();
+                    ->get();
 
 
                 /*
                 |--------------------------------------------------------------------------
-                | REMAINING
+                | NO TEACHINGS
                 |--------------------------------------------------------------------------
                 */
 
-                $remaining = max(
-                    0,
-                    $required - $existingCount
-                );
-
-
-                if ($remaining <= 0) {
+                if ($teachings->isEmpty()) {
                     continue;
                 }
 
 
-                $subjects[] = [
+                /*
+                |--------------------------------------------------------------------------
+                | UNIQUE SUBJECTS
+                |--------------------------------------------------------------------------
+                */
 
-                    'teaching' =>
-                        $teaching,
+                $uniqueTeachings = $teachings
+                    ->filter(function ($teaching) {
 
-                    'subject_id' =>
-                        (int) $teaching->subject_id,
+                        return
+                            $teaching->subject !== null
+                            &&
+                            $teaching->teacher_id !== null;
+                    })
+                    ->unique('subject_id')
+                    ->values();
 
-                    'teacher_id' =>
-                        (int) $teaching->teacher_id,
 
-                    'required' =>
-                        $required,
+                if ($uniqueTeachings->isEmpty()) {
+                    continue;
+                }
 
-                    'existing' =>
-                        $existingCount,
 
-                    'remaining' =>
-                        $remaining,
+                /*
+                |--------------------------------------------------------------------------
+                | SUBJECT DATA
+                |--------------------------------------------------------------------------
+                */
+
+                $subjects = [];
+
+
+                foreach ($uniqueTeachings as $teaching) {
+
+                    $subject = $teaching->subject;
+
+
+                    if (!$subject) {
+                        continue;
+                    }
+
+
+                    $required = (int) (
+                        $subject->time_number ?? 3
+                    );
+
+
+                    if ($required < 1) {
+                        $required = 1;
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | EXISTING SHIFTED COUNT
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $existingCount = $existingShifted
+                        ->where(
+                            'subject_id',
+                            $teaching->subject_id
+                        )
+                        ->where(
+                            'section_id',
+                            $section->id
+                        )
+                        ->count();
+
+
+                    $remaining = max(
+                        0,
+                        $required - $existingCount
+                    );
+
+
+                    if ($remaining <= 0) {
+                        continue;
+                    }
+
+
+                    $subjects[] = [
+                        'teaching'   => $teaching,
+                        'subject_id' => (int) $teaching->subject_id,
+                        'teacher_id' => (int) $teaching->teacher_id,
+                        'required'   => $required,
+                        'existing'   => $existingCount,
+                        'remaining'  => $remaining,
+                    ];
+                }
+
+
+                if (empty($subjects)) {
+                    continue;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | HARD SUBJECT FIRST
+                |--------------------------------------------------------------------------
+                */
+
+                usort(
+                    $subjects,
+                    function ($a, $b) {
+
+                        return
+                            $b['remaining']
+                            <=>
+                            $a['remaining'];
+                    }
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | BUILD SLOTS
+                |--------------------------------------------------------------------------
+                */
+
+                $slots = [];
+
+
+                foreach ($days as $day) {
+
+                    foreach ($times as $time) {
+
+                        $slots[] = [
+                            'day_id'  => (int) $day->id,
+                            'time_id' => (int) $time->id,
+                        ];
+                    }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GENERATED
+                |--------------------------------------------------------------------------
+                */
+
+                $generated = [];
+
+
+                $state = [
+                    'nodes'    => 0,
+                    'maxNodes' => 150000,
+                ];
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | CLASS KEY
+                |--------------------------------------------------------------------------
+                */
+
+                $classKey =
+                    $yearID
+                    . '_'
+                    . $majorID
+                    . '_'
+                    . $section->id;
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GENERATE
+                |--------------------------------------------------------------------------
+                */
+
+                $success = $this->generateSectionTimetable(
+                    $subjects,
+                    0,
+                    $slots,
+                    $rooms,
+                    $occupancy,
+                    $generated,
+                    $yearID,
+                    $majorID,
+                    $section->id,
+                    $classKey,
+                    $state,
+                    $academicYearID,
+                    $semesterID
+                );
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | GENERATION FAILED
+                |--------------------------------------------------------------------------
+                */
+
+                if (!$success) {
+
+                    $details = [];
+
+
+                    foreach ($subjects as $subjectData) {
+
+                        $assigned =
+                            $this->countGeneratedSubject(
+                                $generated,
+                                $subjectData['subject_id']
+                            );
+
+
+                        $totalAssigned =
+                            $subjectData['existing']
+                            +
+                            $assigned;
+
+
+                        if (
+                            $totalAssigned
+                            <
+                            $subjectData['required']
+                        ) {
+
+                            $subjectName =
+                                optional(
+                                    $subjectData['teaching']->subject
+                                )->long_name
+                                ??
+                                optional(
+                                    $subjectData['teaching']->subject
+                                )->name
+                                ??
+                                'Unknown Subject';
+
+
+                            $details[] =
+                                $subjectName
+                                .
+                                ' => Required: '
+                                .
+                                $subjectData['required']
+                                .
+                                ', Assigned: '
+                                .
+                                $totalAssigned
+                                .
+                                ', Missing: '
+                                .
+                                (
+                                    $subjectData['required']
+                                    -
+                                    $totalAssigned
+                                );
+                        }
+                    }
+
+
+                    $sectionName =
+                        $section->name
+                        ??
+                        $section->id;
+
+
+                    $message =
+                        'Section '
+                        .
+                        $sectionName
+                        .
+                        ' timetable could not be completed.';
+
+
+                    if (!empty($details)) {
+
+                        $message .=
+                            ' '
+                            .
+                            implode(
+                                ' | ',
+                                $details
+                            );
+                    }
+
+
+                    throw new \Exception(
+                        $message
+                    );
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | SAVE GENERATED
+                |--------------------------------------------------------------------------
+                */
+
+                foreach ($generated as $item) {
+
+                    Schedule::create([
+                        'academic_year_id' => $academicYearID,
+                        'semester_id'      => $semesterID,
+                        'year_id'          => $yearID,
+                        'major_id'         => $majorID,
+                        'section_id'       => $section->id,
+                        'room_id'          => $item['room_id'],
+                        'subject_id'       => $item['subject_id'],
+                        'teacher_id'       => $item['teacher_id'],
+                        'day_id'           => $item['day_id'],
+                        'time_id'          => $item['time_id'],
+                        'is_shifted'       => false,
+                    ]);
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | RESULT
+                |--------------------------------------------------------------------------
+                */
+
+                $generatedCount = count($generated);
+
+                $generatedTotal += $generatedCount;
+
+
+                $sectionResults[] = [
+                    'section' => $section->name,
+                    'periods' => $generatedCount,
                 ];
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | 14. TOTAL REQUIRED
+            | NOTHING GENERATED
             |--------------------------------------------------------------------------
             */
 
-            $totalRequired = collect($subjects)
-                ->sum('remaining');
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 15. WEEKLY CLASS CAPACITY
-            |--------------------------------------------------------------------------
-            */
-
-            $maxClassPeriods =
-                $days->count()
-                * $times->count();
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CAPACITY CHECK
-            |--------------------------------------------------------------------------
-            */
-
-            if ($totalRequired > $maxClassPeriods) {
-
-                $subjectDetails = [];
-
-                foreach ($subjects as $subjectData) {
-
-                    $subjectDetails[] =
-                        $subjectData['teaching']
-                            ->subject
-                            ->long_name
-                        . ' = '
-                        . $subjectData['required']
-                        . ' period(s)';
-                }
-
+            if ($generatedTotal <= 0) {
 
                 throw new \Exception(
-
-                    'This section requires '
-                    . $totalRequired
-                    . ' periods, but only '
-                    . $maxClassPeriods
-                    . ' usable periods are available ('
-                    . $days->count()
-                    . ' days × '
-                    . $times->count()
-                    . ' periods). '
-                    . 'Subjects: '
-                    . implode(
-                        ', ',
-                        $subjectDetails
-                    )
+                    'No timetable periods were generated. Please check Teaching data, Subject time_number, Teacher, Year, Major and Section records.'
                 );
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | 16. SORT SUBJECTS
-            |--------------------------------------------------------------------------
-            */
-
-            usort(
-                $subjects,
-                function ($a, $b) {
-
-                    /*
-                    |--------------------------------------------------------------
-                    | Subjects with fewer available teachers/constraints
-                    | can be placed first.
-                    |--------------------------------------------------------------
-                    */
-
-                    return
-                        $b['remaining']
-                        <=>
-                        $a['remaining'];
-                }
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 17. BUILD SLOTS
-            |--------------------------------------------------------------------------
-            */
-
-            $slots = [];
-
-
-            foreach ($days as $day) {
-
-                foreach ($times as $time) {
-
-                    $slots[] = [
-
-                        'day_id' =>
-                            (int) $day->id,
-
-                        'time_id' =>
-                            (int) $time->id,
-                    ];
-                }
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 18. GENERATE
-            |--------------------------------------------------------------------------
-            */
-
-            $generated = [];
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | BACKTRACKING STATE
-            |--------------------------------------------------------------------------
-            */
-
-            $state = [
-
-                'nodes' =>
-                    0,
-
-                /*
-                | 30,000 is enough for this type of timetable
-                | and prevents 60-second PHP timeout.
-                */
-                'maxNodes' =>
-                    30000,
-            ];
-
-
-            $success = $this->generateTimetable(
-                $subjects,
-                0,
-                $slots,
-                $rooms,
-                $occupancy,
-                $generated,
-                $yearID,
-                $majorID,
-                $sectionID,
-                $state,
-                $academicYearID,
-                $semesterID
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 19. GENERATION FAILED
-            |--------------------------------------------------------------------------
-            */
-
-            if (!$success) {
-
-                $details = [];
-
-
-                foreach ($subjects as $subjectData) {
-
-                    $assigned =
-                        $this->countGeneratedSubject(
-                            $generated,
-                            $subjectData['subject_id']
-                        );
-
-
-                    $totalAssigned =
-                        $subjectData['existing']
-                        + $assigned;
-
-
-                    if (
-                        $totalAssigned
-                        <
-                        $subjectData['required']
-                    ) {
-
-                        $details[] =
-                            $subjectData['teaching']
-                                ->subject
-                                ->long_name
-                            . ' => Required: '
-                            . $subjectData['required']
-                            . ', Assigned: '
-                            . $totalAssigned
-                            . ', Missing: '
-                            . (
-                                $subjectData['required']
-                                -
-                                $totalAssigned
-                            );
-                    }
-                }
-
-
-                $message =
-                    'Unable to generate complete timetable.';
-
-
-                if (!empty($details)) {
-
-                    $message .=
-                        ' '
-                        .
-                        implode(
-                            ' | ',
-                            $details
-                        );
-                }
-
-
-                throw new \Exception(
-                    $message
-                );
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 20. SAVE GENERATED SCHEDULE
-            |--------------------------------------------------------------------------
-            */
-
-            foreach ($generated as $item) {
-
-                Schedule::create([
-
-                    'academic_year_id' =>
-                        $academicYearID,
-
-                    'semester_id' =>
-                        $semesterID,
-
-                    'year_id' =>
-                        $yearID,
-
-                    'major_id' =>
-                        $majorID,
-
-                    'section_id' =>
-                        $sectionID,
-
-                    'room_id' =>
-                        $item['room_id'],
-
-                    'subject_id' =>
-                        $item['subject_id'],
-
-                    'teacher_id' =>
-                        $item['teacher_id'],
-
-                    'day_id' =>
-                        $item['day_id'],
-
-                    'time_id' =>
-                        $item['time_id'],
-
-                    'is_shifted' =>
-                        false,
-                ]);
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 21. COMMIT
+            | COMMIT
             |--------------------------------------------------------------------------
             */
 
@@ -1060,50 +1074,39 @@ class ContactController extends Controller
             return back()
                 ->withInput()
                 ->withErrors([
-                    'generate' =>
-                        $e->getMessage(),
+                    'generate' => $e->getMessage(),
                 ]);
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | 22. RESULT
+        | REDIRECT
         |--------------------------------------------------------------------------
         */
 
         return redirect()->route(
             'schedule.show',
             [
-                'academicYearID' =>
-                    $academicYearID,
-
-                'semesterID' =>
-                    $semesterID,
-
-                'yearID' =>
-                    $yearID,
-
-                'majorID' =>
-                    $majorID,
-
-                'sectionID' =>
-                    $sectionID,
+                'academicYearID' => $academicYearID,
+                'semesterID'     => $semesterID,
+                'yearID'         => $yearID,
+                'majorID'        => $majorID,
             ]
         )->with(
             'success',
-            'Schedule generated successfully!'
+            'All sections timetable generated successfully!'
         );
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | GENERATE TIMETABLE
+    | GENERATE SECTION TIMETABLE
     |--------------------------------------------------------------------------
     */
 
-    private function generateTimetable(
+    private function generateSectionTimetable(
         &$subjects,
         $index,
         $slots,
@@ -1113,18 +1116,14 @@ class ContactController extends Controller
         $yearID,
         $majorID,
         $sectionID,
+        $classKey,
         &$state,
         $academicYearID,
         $semesterID
     ) {
 
-        /*
-        |--------------------------------------------------------------------------
-        | NODE LIMIT
-        |--------------------------------------------------------------------------
-        */
-
         $state['nodes']++;
+
 
         if (
             $state['nodes']
@@ -1137,7 +1136,7 @@ class ContactController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | ALL SUBJECTS COMPLETE
+        | ALL SUBJECTS DONE
         |--------------------------------------------------------------------------
         */
 
@@ -1150,46 +1149,24 @@ class ContactController extends Controller
         }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | CURRENT SUBJECT
-        |--------------------------------------------------------------------------
-        */
-
-        $subjectData =
-            &$subjects[$index];
+        $subjectData = &$subjects[$index];
 
 
         $subjectID =
-            $subjectData['subject_id'];
+            (int) $subjectData['subject_id'];
 
 
         $teacherID =
-            $subjectData['teacher_id'];
+            (int) $subjectData['teacher_id'];
 
 
-        $remaining =
-            $subjectData['remaining'];
-
-
-        $classKey =
-            $yearID
-            . '_'
-            . $majorID
-            . '_'
-            . $sectionID;
+        $required =
+            (int) $subjectData['remaining'];
 
 
         /*
         |--------------------------------------------------------------------------
         | SUBJECT DAY COUNT
-        |--------------------------------------------------------------------------
-        |
-        | A subject can be taught only ONCE per day.
-        |
-        | Because required = 3,
-        | it will naturally be distributed over 3 days.
-        |
         |--------------------------------------------------------------------------
         */
 
@@ -1201,16 +1178,64 @@ class ContactController extends Controller
             if (
                 (int) $item['subject_id']
                 ===
-                (int) $subjectID
+                $subjectID
             ) {
 
                 $dayID =
                     (int) $item['day_id'];
 
+
                 $subjectDayCount[$dayID] =
-                    ($subjectDayCount[$dayID] ?? 0)
-                    + 1;
+                    (
+                        $subjectDayCount[$dayID]
+                        ??
+                        0
+                    )
+                    +
+                    1;
             }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TEACHER TIME BALANCE
+        |--------------------------------------------------------------------------
+        */
+
+        $teacherTimeCount = [];
+
+
+        foreach (
+            $occupancy['teacher'][$teacherID]
+            ??
+            []
+            as $slotKey => $value
+        ) {
+
+            $parts = explode(
+                '_',
+                $slotKey
+            );
+
+
+            if (count($parts) < 2) {
+                continue;
+            }
+
+
+            $timeID =
+                (int) $parts[1];
+
+
+            $teacherTimeCount[$timeID] =
+                (
+                    $teacherTimeCount[$timeID]
+                    ??
+                    0
+                )
+                +
+                1;
         }
 
 
@@ -1219,7 +1244,8 @@ class ContactController extends Controller
         | ORDER SLOTS
         |--------------------------------------------------------------------------
         |
-        | Prefer days with fewer class periods.
+        | Class daily load နည်းတဲ့နေ့ကို ဦးစားပေး
+        | Teacher time usage နည်းတဲ့ time ကို ဦးစားပေး
         |
         |--------------------------------------------------------------------------
         */
@@ -1229,39 +1255,128 @@ class ContactController extends Controller
 
         usort(
             $orderedSlots,
-            function ($a, $b)
-            use (
+            function ($a, $b) use (
                 &$occupancy,
-                $classKey
+                $classKey,
+                $teacherTimeCount
             ) {
 
-                $aCount =
+                $aDay =
+                    (int) $a['day_id'];
+
+                $bDay =
+                    (int) $b['day_id'];
+
+
+                $aTime =
+                    (int) $a['time_id'];
+
+                $bTime =
+                    (int) $b['time_id'];
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | CLASS DAILY LOAD
+                |--------------------------------------------------------------------------
+                */
+
+                $aClass =
                     $this->countClassDayPeriods(
                         $occupancy,
                         $classKey,
-                        $a['day_id']
+                        $aDay
                     );
 
 
-                $bCount =
+                $bClass =
                     $this->countClassDayPeriods(
                         $occupancy,
                         $classKey,
-                        $b['day_id']
+                        $bDay
                     );
 
+
+                if (
+                    $aClass
+                    !==
+                    $bClass
+                ) {
+
+                    return
+                        $aClass
+                        <=>
+                        $bClass;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | TEACHER TIME BALANCE
+                |--------------------------------------------------------------------------
+                */
+
+                $aTeacherTime =
+                    $teacherTimeCount[$aTime]
+                    ??
+                    0;
+
+
+                $bTeacherTime =
+                    $teacherTimeCount[$bTime]
+                    ??
+                    0;
+
+
+                if (
+                    $aTeacherTime
+                    !==
+                    $bTeacherTime
+                ) {
+
+                    return
+                        $aTeacherTime
+                        <=>
+                        $bTeacherTime;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | DAY
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $aDay
+                    !==
+                    $bDay
+                ) {
+
+                    return
+                        $aDay
+                        <=>
+                        $bDay;
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | TIME
+                |--------------------------------------------------------------------------
+                */
 
                 return
-                    $aCount
+                    $aTime
                     <=>
-                    $bCount;
+                    $bTime;
             }
         );
 
 
         /*
         |--------------------------------------------------------------------------
-        | TRY SLOTS
+        | TRY EVERY SLOT
         |--------------------------------------------------------------------------
         */
 
@@ -1275,6 +1390,7 @@ class ContactController extends Controller
                 >
                 $state['maxNodes']
             ) {
+
                 return false;
             }
 
@@ -1289,8 +1405,10 @@ class ContactController extends Controller
 
             $slotKey =
                 $dayID
-                . '_'
-                . $timeID;
+                .
+                '_'
+                .
+                $timeID;
 
 
             /*
@@ -1300,9 +1418,15 @@ class ContactController extends Controller
             */
 
             if (
-                ($subjectDayCount[$dayID] ?? 0)
-                >= 1
+                (
+                    $subjectDayCount[$dayID]
+                    ??
+                    0
+                )
+                >=
+                1
             ) {
+
                 continue;
             }
 
@@ -1320,29 +1444,27 @@ class ContactController extends Controller
                     [$slotKey]
                 )
             ) {
+
                 continue;
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | CLASS DAILY MAX = 4
+            | CLASS DAILY MAX = 5
             |--------------------------------------------------------------------------
             */
 
-            $classDaily =
+            if (
                 $this->countClassDayPeriods(
                     $occupancy,
                     $classKey,
                     $dayID
-                );
-
-
-            if (
-                $classDaily
+                )
                 >=
-                4
+                5
             ) {
+
                 continue;
             }
 
@@ -1360,6 +1482,7 @@ class ContactController extends Controller
                     [$slotKey]
                 )
             ) {
+
                 continue;
             }
 
@@ -1370,19 +1493,16 @@ class ContactController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $teacherDaily =
+            if (
                 $this->countTeacherDayPeriods(
                     $occupancy,
                     $teacherID,
                     $dayID
-                );
-
-
-            if (
-                $teacherDaily
+                )
                 >=
                 4
             ) {
+
                 continue;
             }
 
@@ -1393,25 +1513,22 @@ class ContactController extends Controller
             |--------------------------------------------------------------------------
             */
 
-            $teacherWeekly =
+            if (
                 $this->countTeacherWeekPeriods(
                     $occupancy,
                     $teacherID
-                );
-
-
-            if (
-                $teacherWeekly
+                )
                 >=
                 20
             ) {
+
                 continue;
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | FIND ROOM
+            | FIND AVAILABLE ROOM
             |--------------------------------------------------------------------------
             */
 
@@ -1424,12 +1541,6 @@ class ContactController extends Controller
                     (int) $room->id;
 
 
-                /*
-                |--------------------------------------------------------------
-                | ROOM + SLOT
-                |--------------------------------------------------------------
-                */
-
                 if (
                     isset(
                         $occupancy['room']
@@ -1437,41 +1548,12 @@ class ContactController extends Controller
                         [$slotKey]
                     )
                 ) {
+
                     continue;
                 }
 
 
-                /*
-                |--------------------------------------------------------------
-                | TEACHER + ROOM + DAY
-                |--------------------------------------------------------------
-                |
-                | Same teacher cannot teach the same room
-                | more than once in one day.
-                |
-                |--------------------------------------------------------------
-                */
-
-                $teacherRoomDayKey =
-                    $teacherID
-                    . '_'
-                    . $roomID
-                    . '_'
-                    . $dayID;
-
-
-                if (
-                    isset(
-                        $occupancy['teacher_room']
-                        [$teacherRoomDayKey]
-                    )
-                ) {
-                    continue;
-                }
-
-
-                $availableRoom =
-                    $room;
+                $availableRoom = $room;
 
                 break;
             }
@@ -1488,50 +1570,28 @@ class ContactController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | ADD TEMPORARY SCHEDULE
+            | TEMPORARY GENERATED ITEM
             |--------------------------------------------------------------------------
             */
 
             $generated[] = [
-
-                'academic_year_id' =>
-                    $academicYearID,
-
-                'semester_id' =>
-                    $semesterID,
-
-                'year_id' =>
-                    $yearID,
-
-                'major_id' =>
-                    $majorID,
-
-                'section_id' =>
-                    $sectionID,
-
-                'room_id' =>
-                    $roomID,
-
-                'subject_id' =>
-                    $subjectID,
-
-                'teacher_id' =>
-                    $teacherID,
-
-                'day_id' =>
-                    $dayID,
-
-                'time_id' =>
-                    $timeID,
-
-                'is_shifted' =>
-                    false,
+                'academic_year_id' => $academicYearID,
+                'semester_id'      => $semesterID,
+                'year_id'          => $yearID,
+                'major_id'         => $majorID,
+                'section_id'       => $sectionID,
+                'room_id'          => $roomID,
+                'subject_id'       => $subjectID,
+                'teacher_id'       => $teacherID,
+                'day_id'           => $dayID,
+                'time_id'          => $timeID,
+                'is_shifted'       => false,
             ];
 
 
             /*
             |--------------------------------------------------------------------------
-            | UPDATE OCCUPANCY
+            | OCCUPANCY UPDATE
             |--------------------------------------------------------------------------
             */
 
@@ -1552,29 +1612,11 @@ class ContactController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | TEACHER + ROOM + DAY
+            | COUNT ASSIGNED
             |--------------------------------------------------------------------------
             */
 
-            $teacherRoomDayKey =
-                $teacherID
-                . '_'
-                . $roomID
-                . '_'
-                . $dayID;
-
-
-            $occupancy['teacher_room']
-                [$teacherRoomDayKey] = true;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CHECK ASSIGNED
-            |--------------------------------------------------------------------------
-            */
-
-            $assignedNow =
+            $assigned =
                 $this->countGeneratedSubject(
                     $generated,
                     $subjectID
@@ -1583,18 +1625,18 @@ class ContactController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | SUBJECT COMPLETE
+            | NEXT STEP
             |--------------------------------------------------------------------------
             */
 
             if (
-                $assignedNow
+                $assigned
                 >=
-                $remaining
+                $required
             ) {
 
                 $success =
-                    $this->generateTimetable(
+                    $this->generateSectionTimetable(
                         $subjects,
                         $index + 1,
                         $slots,
@@ -1604,26 +1646,16 @@ class ContactController extends Controller
                         $yearID,
                         $majorID,
                         $sectionID,
+                        $classKey,
                         $state,
                         $academicYearID,
                         $semesterID
                     );
 
-
-                if ($success) {
-                    return true;
-                }
-
             } else {
 
-                /*
-                |--------------------------------------------------------------------------
-                | CONTINUE SAME SUBJECT
-                |--------------------------------------------------------------------------
-                */
-
                 $success =
-                    $this->generateTimetablePeriods(
+                    $this->generateSectionTimetable(
                         $subjects,
                         $index,
                         $slots,
@@ -1633,493 +1665,19 @@ class ContactController extends Controller
                         $yearID,
                         $majorID,
                         $sectionID,
+                        $classKey,
                         $state,
                         $academicYearID,
                         $semesterID
                     );
-
-
-                if ($success) {
-                    return true;
-                }
             }
 
 
             /*
             |--------------------------------------------------------------------------
-            | BACKTRACK
+            | SUCCESS
             |--------------------------------------------------------------------------
             */
-
-            array_pop($generated);
-
-
-            unset(
-                $occupancy['teacher']
-                    [$teacherID]
-                    [$slotKey]
-            );
-
-
-            unset(
-                $occupancy['room']
-                    [$roomID]
-                    [$slotKey]
-            );
-
-
-            unset(
-                $occupancy['class']
-                    [$classKey]
-                    [$slotKey]
-            );
-
-
-            unset(
-                $occupancy['teacher_room']
-                    [$teacherRoomDayKey]
-            );
-        }
-
-
-        return false;
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | GENERATE REMAINING PERIODS
-    |--------------------------------------------------------------------------
-    */
-
-    private function generateTimetablePeriods(
-        &$subjects,
-        $index,
-        $slots,
-        $rooms,
-        &$occupancy,
-        &$generated,
-        $yearID,
-        $majorID,
-        $sectionID,
-        &$state,
-        $academicYearID,
-        $semesterID
-    ) {
-
-        $state['nodes']++;
-
-
-        if (
-            $state['nodes']
-            >
-            $state['maxNodes']
-        ) {
-            return false;
-        }
-
-
-        $subjectData =
-            &$subjects[$index];
-
-
-        $subjectID =
-            $subjectData['subject_id'];
-
-
-        $teacherID =
-            $subjectData['teacher_id'];
-
-
-        $required =
-            $subjectData['remaining'];
-
-
-        $assigned =
-            $this->countGeneratedSubject(
-                $generated,
-                $subjectID
-            );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUBJECT COMPLETE
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            $assigned
-            >=
-            $required
-        ) {
-
-            return $this->generateTimetable(
-                $subjects,
-                $index + 1,
-                $slots,
-                $rooms,
-                $occupancy,
-                $generated,
-                $yearID,
-                $majorID,
-                $sectionID,
-                $state,
-                $academicYearID,
-                $semesterID
-            );
-        }
-
-
-        $classKey =
-            $yearID
-            . '_'
-            . $majorID
-            . '_'
-            . $sectionID;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUBJECT DAY COUNT
-        |--------------------------------------------------------------------------
-        */
-
-        $subjectDayCount = [];
-
-
-        foreach ($generated as $item) {
-
-            if (
-                (int) $item['subject_id']
-                ===
-                (int) $subjectID
-            ) {
-
-                $dayID =
-                    (int) $item['day_id'];
-
-                $subjectDayCount[$dayID] =
-                    ($subjectDayCount[$dayID] ?? 0)
-                    + 1;
-            }
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | TRY SLOTS
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($slots as $slot) {
-
-            $state['nodes']++;
-
-
-            if (
-                $state['nodes']
-                >
-                $state['maxNodes']
-            ) {
-                return false;
-            }
-
-
-            $dayID =
-                (int) $slot['day_id'];
-
-
-            $timeID =
-                (int) $slot['time_id'];
-
-
-            $slotKey =
-                $dayID
-                . '_'
-                . $timeID;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | SUBJECT DAILY MAX = 1
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                ($subjectDayCount[$dayID] ?? 0)
-                >= 1
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CLASS CONFLICT
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                isset(
-                    $occupancy['class']
-                    [$classKey]
-                    [$slotKey]
-                )
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | CLASS DAILY MAX = 4
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $this->countClassDayPeriods(
-                    $occupancy,
-                    $classKey,
-                    $dayID
-                )
-                >=
-                4
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TEACHER CONFLICT
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                isset(
-                    $occupancy['teacher']
-                    [$teacherID]
-                    [$slotKey]
-                )
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TEACHER DAILY MAX = 4
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $this->countTeacherDayPeriods(
-                    $occupancy,
-                    $teacherID,
-                    $dayID
-                )
-                >=
-                4
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TEACHER WEEKLY MAX = 20
-            |--------------------------------------------------------------------------
-            */
-
-            if (
-                $this->countTeacherWeekPeriods(
-                    $occupancy,
-                    $teacherID
-                )
-                >=
-                20
-            ) {
-                continue;
-            }
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | FIND ROOM
-            |--------------------------------------------------------------------------
-            */
-
-            $room = null;
-
-
-            foreach ($rooms as $candidateRoom) {
-
-                $candidateRoomID =
-                    (int) $candidateRoom->id;
-
-
-                /*
-                |--------------------------------------------------------------
-                | ROOM + SLOT
-                |--------------------------------------------------------------
-                */
-
-                if (
-                    isset(
-                        $occupancy['room']
-                        [$candidateRoomID]
-                        [$slotKey]
-                    )
-                ) {
-                    continue;
-                }
-
-
-                /*
-                |--------------------------------------------------------------
-                | TEACHER + ROOM + DAY
-                |--------------------------------------------------------------
-                */
-
-                $teacherRoomDayKey =
-                    $teacherID
-                    . '_'
-                    . $candidateRoomID
-                    . '_'
-                    . $dayID;
-
-
-                if (
-                    isset(
-                        $occupancy['teacher_room']
-                        [$teacherRoomDayKey]
-                    )
-                ) {
-                    continue;
-                }
-
-
-                $room =
-                    $candidateRoom;
-
-                break;
-            }
-
-
-            if (!$room) {
-                continue;
-            }
-
-
-            $roomID =
-                (int) $room->id;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | ADD
-            |--------------------------------------------------------------------------
-            */
-
-            $generated[] = [
-
-                'academic_year_id' =>
-                    $academicYearID,
-
-                'semester_id' =>
-                    $semesterID,
-
-                'year_id' =>
-                    $yearID,
-
-                'major_id' =>
-                    $majorID,
-
-                'section_id' =>
-                    $sectionID,
-
-                'room_id' =>
-                    $roomID,
-
-                'subject_id' =>
-                    $subjectID,
-
-                'teacher_id' =>
-                    $teacherID,
-
-                'day_id' =>
-                    $dayID,
-
-                'time_id' =>
-                    $timeID,
-
-                'is_shifted' =>
-                    false,
-            ];
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | UPDATE OCCUPANCY
-            |--------------------------------------------------------------------------
-            */
-
-            $occupancy['teacher']
-                [$teacherID]
-                [$slotKey] = true;
-
-
-            $occupancy['room']
-                [$roomID]
-                [$slotKey] = true;
-
-
-            $occupancy['class']
-                [$classKey]
-                [$slotKey] = true;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | TEACHER + ROOM + DAY
-            |--------------------------------------------------------------------------
-            */
-
-            $teacherRoomDayKey =
-                $teacherID
-                . '_'
-                . $roomID
-                . '_'
-                . $dayID;
-
-
-            $occupancy['teacher_room']
-                [$teacherRoomDayKey] = true;
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | RECURSION
-            |--------------------------------------------------------------------------
-            */
-
-            $success =
-                $this->generateTimetablePeriods(
-                    $subjects,
-                    $index,
-                    $slots,
-                    $rooms,
-                    $occupancy,
-                    $generated,
-                    $yearID,
-                    $majorID,
-                    $sectionID,
-                    $state,
-                    $academicYearID,
-                    $semesterID
-                );
-
 
             if ($success) {
                 return true;
@@ -2137,28 +1695,22 @@ class ContactController extends Controller
 
             unset(
                 $occupancy['teacher']
-                    [$teacherID]
-                    [$slotKey]
+                [$teacherID]
+                [$slotKey]
             );
 
 
             unset(
                 $occupancy['room']
-                    [$roomID]
-                    [$slotKey]
+                [$roomID]
+                [$slotKey]
             );
 
 
             unset(
                 $occupancy['class']
-                    [$classKey]
-                    [$slotKey]
-            );
-
-
-            unset(
-                $occupancy['teacher_room']
-                    [$teacherRoomDayKey]
+                [$classKey]
+                [$slotKey]
             );
         }
 
@@ -2200,7 +1752,7 @@ class ContactController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | COUNT TEACHER DAILY
+    | TEACHER DAILY PERIODS
     |--------------------------------------------------------------------------
     */
 
@@ -2214,15 +1766,16 @@ class ContactController extends Controller
 
 
         foreach (
-            $occupancy['teacher'][$teacherID] ?? []
+            $occupancy['teacher'][$teacherID]
+            ??
+            []
             as $slotKey => $value
         ) {
 
-            $parts =
-                explode(
-                    '_',
-                    $slotKey
-                );
+            $parts = explode(
+                '_',
+                $slotKey
+            );
 
 
             if (
@@ -2244,7 +1797,7 @@ class ContactController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | COUNT TEACHER WEEKLY
+    | TEACHER WEEKLY PERIODS
     |--------------------------------------------------------------------------
     */
 
@@ -2255,14 +1808,15 @@ class ContactController extends Controller
 
         return count(
             $occupancy['teacher'][$teacherID]
-            ?? []
+            ??
+            []
         );
     }
 
 
     /*
     |--------------------------------------------------------------------------
-    | COUNT CLASS DAILY
+    | CLASS DAILY PERIODS
     |--------------------------------------------------------------------------
     */
 
@@ -2276,15 +1830,16 @@ class ContactController extends Controller
 
 
         foreach (
-            $occupancy['class'][$classKey] ?? []
+            $occupancy['class'][$classKey]
+            ??
+            []
             as $slotKey => $value
         ) {
 
-            $parts =
-                explode(
-                    '_',
-                    $slotKey
-                );
+            $parts = explode(
+                '_',
+                $slotKey
+            );
 
 
             if (
@@ -2306,30 +1861,62 @@ class ContactController extends Controller
 
     /*
     |--------------------------------------------------------------------------
-    | RESULT
+    | RESULT / SHOW TIMETABLE
+    |--------------------------------------------------------------------------
+    |
+    | sectionID မပါရင် = ALL
+    |
+    | sectionID ပါရင် = A / B / C တစ်ခုတည်း
+    |
     |--------------------------------------------------------------------------
     */
 
     public function result(Request $request)
     {
+        /*
+        |--------------------------------------------------------------------------
+        | VALIDATION
+        |--------------------------------------------------------------------------
+        */
+
         $request->validate([
+            'academicYearID' => [
+                'required',
+                'integer',
+                'exists:academic_years,id',
+            ],
 
-            'academicYearID' =>
-                'required|integer',
+            'semesterID' => [
+                'required',
+                'integer',
+                'exists:semesters,id',
+            ],
 
-            'semesterID' =>
-                'required|integer',
+            'yearID' => [
+                'required',
+                'integer',
+                'exists:years,id',
+            ],
 
-            'yearID' =>
-                'required|integer',
+            'majorID' => [
+                'required',
+                'integer',
+                'exists:majors,id',
+            ],
 
-            'majorID' =>
-                'required|integer',
-
-            'sectionID' =>
-                'required|integer',
+            'sectionID' => [
+                'nullable',
+                'integer',
+                'exists:sections,id',
+            ],
         ]);
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | IDS
+        |--------------------------------------------------------------------------
+        */
 
         $academicYearID =
             (int) $request->academicYearID;
@@ -2347,13 +1934,25 @@ class ContactController extends Controller
             (int) $request->majorID;
 
 
-        $sectionID =
-            (int) $request->sectionID;
+        /*
+        |--------------------------------------------------------------------------
+        | SECTION ID
+        |--------------------------------------------------------------------------
+        */
+
+        $sectionID = null;
+
+
+        if ($request->filled('sectionID')) {
+
+            $sectionID =
+                (int) $request->sectionID;
+        }
 
 
         /*
         |--------------------------------------------------------------------------
-        | DATA
+        | BASIC DATA
         |--------------------------------------------------------------------------
         */
 
@@ -2381,19 +1980,47 @@ class ContactController extends Controller
             );
 
 
-        $section =
-            Sections::findOrFail(
-                $sectionID
-            );
+        /*
+        |--------------------------------------------------------------------------
+        | ALL SECTIONS
+        |--------------------------------------------------------------------------
+        */
+
+        $sections =
+            Sections::orderBy('id')->get();
 
 
         /*
         |--------------------------------------------------------------------------
-        | SCHEDULES
+        | SELECTED SECTION
+        |--------------------------------------------------------------------------
+        |
+        | ALL => null
+        | A   => Section A
+        | B   => Section B
+        |
         |--------------------------------------------------------------------------
         */
 
-        $schedules =
+        $section = null;
+
+
+        if ($sectionID !== null) {
+
+            $section =
+                Sections::find(
+                    $sectionID
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SCHEDULE QUERY
+        |--------------------------------------------------------------------------
+        */
+
+        $schedulesQuery =
             Schedule::with([
                 'academicYear',
                 'semester',
@@ -2406,29 +2033,51 @@ class ContactController extends Controller
                 'day',
                 'time',
             ])
-            ->where(
-                'academic_year_id',
-                $academicYearID
-            )
-            ->where(
-                'semester_id',
-                $semesterID
-            )
-            ->where(
-                'year_id',
-                $yearID
-            )
-            ->where(
-                'major_id',
-                $majorID
-            )
-            ->where(
+                ->where(
+                    'academic_year_id',
+                    $academicYearID
+                )
+                ->where(
+                    'semester_id',
+                    $semesterID
+                )
+                ->where(
+                    'year_id',
+                    $yearID
+                )
+                ->where(
+                    'major_id',
+                    $majorID
+                );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SECTION FILTER
+        |--------------------------------------------------------------------------
+        */
+
+        if ($sectionID !== null) {
+
+            $schedulesQuery->where(
                 'section_id',
                 $sectionID
-            )
-            ->orderBy('day_id')
-            ->orderBy('time_id')
-            ->get();
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET SCHEDULES
+        |--------------------------------------------------------------------------
+        */
+
+        $schedules =
+            $schedulesQuery
+                ->orderBy('section_id')
+                ->orderBy('day_id')
+                ->orderBy('time_id')
+                ->get();
 
 
         /*
@@ -2453,17 +2102,6 @@ class ContactController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | ROOM
-        |--------------------------------------------------------------------------
-        */
-
-        $room =
-            $schedules
-                ->first()?->room;
-
-
-        /*
-        |--------------------------------------------------------------------------
         | VIEW
         |--------------------------------------------------------------------------
         */
@@ -2472,12 +2110,12 @@ class ContactController extends Controller
             'admin.schedule.show',
             compact(
                 'schedules',
+                'sections',
+                'section',
                 'academicYear',
                 'semester',
                 'yearData',
                 'major',
-                'section',
-                'room',
                 'days',
                 'times',
                 'academicYearID',
@@ -2490,16 +2128,14 @@ class ContactController extends Controller
     }
 
 
-    // =====================================================
-    // Drag & Drop Swap
-    // =====================================================
+    /*
+    |--------------------------------------------------------------------------
+    | SWAP
+    |--------------------------------------------------------------------------
+    */
 
     public function swap(Request $request)
     {
-        // =====================================================
-        // 1. Validate Request
-        // =====================================================
-
         $request->validate([
             'schedule1_id' => [
                 'required',
@@ -2517,301 +2153,310 @@ class ContactController extends Controller
         ]);
 
 
-        $id1 = (int) $request->schedule1_id;
-        $id2 = (int) $request->schedule2_id;
+        $id1 =
+            (int) $request->schedule1_id;
 
 
-        // =====================================================
-        // 2. Same Schedule
-        // =====================================================
+        $id2 =
+            (int) $request->schedule2_id;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAME ID
+        |--------------------------------------------------------------------------
+        */
 
         if ($id1 === $id2) {
 
             return response()->json([
                 'success' => false,
-                'message' => 'You cannot swap the same subject.',
+                'message' =>
+                    'You cannot swap the same subject.',
             ], 422);
         }
 
 
         try {
 
-            DB::transaction(function () use ($id1, $id2) {
-
-                // =================================================
-                // 3. Get Schedule 1
-                // =================================================
-
-                $schedule1 = Schedule::lockForUpdate()
-                    ->findOrFail($id1);
-
-
-                // =================================================
-                // 4. Get Schedule 2
-                // =================================================
-
-                $schedule2 = Schedule::lockForUpdate()
-                    ->findOrFail($id2);
-
-
-                // =================================================
-                // 5. Same Timetable Check
-                // =================================================
-                //
-                // Drag & Drop Swap ကို
-                // Year + Major + Room + Semester + Section
-                // တူတဲ့ timetable ထဲမှာပဲ ခွင့်ပြုမယ်
-                //
-
-                if (
-                    (int) $schedule1->year_id !==
-                    (int) $schedule2->year_id
-
-                    ||
-
-                    (int) $schedule1->major_id !==
-                    (int) $schedule2->major_id
-
-                    ||
-
-                    (int) $schedule1->room_id !==
-                    (int) $schedule2->room_id
-
-                    ||
-
-                    (int) $schedule1->semester_id !==
-                    (int) $schedule2->semester_id
-
-                    ||
-
-                    (int) $schedule1->section_id !==
-                    (int) $schedule2->section_id
+            DB::transaction(
+                function () use (
+                    $id1,
+                    $id2
                 ) {
 
-                    throw new \Exception(
-                        'These subjects belong to different timetables.'
-                    );
-                }
+                    /*
+                    |--------------------------------------------------------------------------
+                    | LOCK
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $schedule1 =
+                        Schedule::lockForUpdate()
+                            ->findOrFail($id1);
 
 
-                // =================================================
-                // 6. Check Day / Time IDs
-                // =================================================
-
-                if (
-                    empty($schedule1->day_id) ||
-                    empty($schedule1->time_id) ||
-                    empty($schedule2->day_id) ||
-                    empty($schedule2->time_id)
-                ) {
-
-                    throw new \Exception(
-                        'Invalid timetable position.'
-                    );
-                }
+                    $schedule2 =
+                        Schedule::lockForUpdate()
+                            ->findOrFail($id2);
 
 
-                $day1  = (int) $schedule1->day_id;
-                $time1 = (int) $schedule1->time_id;
+                    /*
+                    |--------------------------------------------------------------------------
+                    | SAME TIMETABLE
+                    |--------------------------------------------------------------------------
+                    */
 
-                $day2  = (int) $schedule2->day_id;
-                $time2 = (int) $schedule2->time_id;
+                    if (
+                        $schedule1->academic_year_id
+                        !=
+                        $schedule2->academic_year_id
 
+                        ||
 
-                // =================================================
-                // 7. Teacher Conflict - Subject 1
-                // =================================================
-                //
-                // Subject 1 ရဲ့ Teacher က
-                // Subject 2 ရဲ့ Day + Time မှာ
-                // အခြား Room / Section မှာ ရှိနေသလား?
-                //
+                        $schedule1->semester_id
+                        !=
+                        $schedule2->semester_id
 
-                if (!empty($schedule1->teacher_id)) {
+                        ||
 
-                    $teacherConflict1 = Schedule::query()
+                        $schedule1->year_id
+                        !=
+                        $schedule2->year_id
 
-                        ->where(
-                            'teacher_id',
-                            $schedule1->teacher_id
-                        )
+                        ||
 
-                        ->where('day_id', $day2)
+                        $schedule1->major_id
+                        !=
+                        $schedule2->major_id
 
-                        ->where('time_id', $time2)
+                        ||
 
-                        // Swap လုပ်နေတဲ့ schedule ၂ ခုကို
-                        // conflict ထဲက ဖယ်မယ်
-                        ->whereNotIn('id', [
-                            $id1,
-                            $id2,
-                        ])
-
-                        ->exists();
-
-
-                    if ($teacherConflict1) {
-
-                        $teacherName =
-                            optional($schedule1->teacher)->name
-                            ?? 'Unknown Teacher';
-
+                        $schedule1->section_id
+                        !=
+                        $schedule2->section_id
+                    ) {
 
                         throw new \Exception(
-                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် အခြားအခန်း သို့မဟုတ် Section တွင် ထိုနေ့၊ ထိုအချိန်၌ သင်ကြားနေပါသည်။"
+                            'These subjects belong to different timetables.'
                         );
                     }
-                }
 
 
-                // =================================================
-                // 8. Teacher Conflict - Subject 2
-                // =================================================
-                //
-                // Subject 2 ရဲ့ Teacher က
-                // Subject 1 ရဲ့ Day + Time မှာ
-                // အခြား Room / Section မှာ ရှိနေသလား?
-                //
+                    /*
+                    |--------------------------------------------------------------------------
+                    | ORIGINAL SLOTS
+                    |--------------------------------------------------------------------------
+                    */
 
-                if (!empty($schedule2->teacher_id)) {
-
-                    $teacherConflict2 = Schedule::query()
-
-                        ->where(
-                            'teacher_id',
-                            $schedule2->teacher_id
-                        )
-
-                        ->where('day_id', $day1)
-
-                        ->where('time_id', $time1)
-
-                        ->whereNotIn('id', [
-                            $id1,
-                            $id2,
-                        ])
-
-                        ->exists();
+                    $day1 =
+                        (int) $schedule1->day_id;
 
 
-                    if ($teacherConflict2) {
-
-                        $teacherName =
-                            optional($schedule2->teacher)->name
-                            ?? 'Unknown Teacher';
+                    $time1 =
+                        (int) $schedule1->time_id;
 
 
-                        throw new \Exception(
-                            "Swap မလုပ်နိုင်ပါ။ {$teacherName} ဆရာ/မသည် အခြားအခန်း သို့မဟုတ် Section တွင် ထိုနေ့၊ ထိုအချိန်၌ သင်ကြားနေပါသည်။"
-                        );
+                    $day2 =
+                        (int) $schedule2->day_id;
+
+
+                    $time2 =
+                        (int) $schedule2->time_id;
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | TEACHER 1
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($schedule1->teacher_id) {
+
+                        $conflict =
+                            Schedule::where(
+                                'teacher_id',
+                                $schedule1->teacher_id
+                            )
+                                ->where(
+                                    'day_id',
+                                    $day2
+                                )
+                                ->where(
+                                    'time_id',
+                                    $time2
+                                )
+                                ->whereNotIn(
+                                    'id',
+                                    [
+                                        $id1,
+                                        $id2,
+                                    ]
+                                )
+                                ->exists();
+
+
+                        if ($conflict) {
+
+                            throw new \Exception(
+                                'Teacher conflict at destination slot.'
+                            );
+                        }
                     }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | TEACHER 2
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($schedule2->teacher_id) {
+
+                        $conflict =
+                            Schedule::where(
+                                'teacher_id',
+                                $schedule2->teacher_id
+                            )
+                                ->where(
+                                    'day_id',
+                                    $day1
+                                )
+                                ->where(
+                                    'time_id',
+                                    $time1
+                                )
+                                ->whereNotIn(
+                                    'id',
+                                    [
+                                        $id1,
+                                        $id2,
+                                    ]
+                                )
+                                ->exists();
+
+
+                        if ($conflict) {
+
+                            throw new \Exception(
+                                'Teacher conflict at destination slot.'
+                            );
+                        }
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | ROOM 1
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($schedule1->room_id) {
+
+                        $conflict =
+                            Schedule::where(
+                                'room_id',
+                                $schedule1->room_id
+                            )
+                                ->where(
+                                    'day_id',
+                                    $day2
+                                )
+                                ->where(
+                                    'time_id',
+                                    $time2
+                                )
+                                ->whereNotIn(
+                                    'id',
+                                    [
+                                        $id1,
+                                        $id2,
+                                    ]
+                                )
+                                ->exists();
+
+
+                        if ($conflict) {
+
+                            throw new \Exception(
+                                'Room conflict at destination slot.'
+                            );
+                        }
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | ROOM 2
+                    |--------------------------------------------------------------------------
+                    */
+
+                    if ($schedule2->room_id) {
+
+                        $conflict =
+                            Schedule::where(
+                                'room_id',
+                                $schedule2->room_id
+                            )
+                                ->where(
+                                    'day_id',
+                                    $day1
+                                )
+                                ->where(
+                                    'time_id',
+                                    $time1
+                                )
+                                ->whereNotIn(
+                                    'id',
+                                    [
+                                        $id1,
+                                        $id2,
+                                    ]
+                                )
+                                ->exists();
+
+
+                        if ($conflict) {
+
+                            throw new \Exception(
+                                'Room conflict at destination slot.'
+                            );
+                        }
+                    }
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | SWAP
+                    |--------------------------------------------------------------------------
+                    */
+
+                    $schedule1->update([
+                        'day_id'  => $day2,
+                        'time_id' => $time2,
+                    ]);
+
+
+                    $schedule2->update([
+                        'day_id'  => $day1,
+                        'time_id' => $time1,
+                    ]);
                 }
+            );
 
-
-                // =================================================
-                // 9. Room Conflict
-                // =================================================
-                //
-                // Same room + same day + same time
-                // တခြား schedule ရှိမရှိစစ်
-                //
-
-                $roomConflict1 = Schedule::query()
-
-                    ->where(
-                        'room_id',
-                        $schedule1->room_id
-                    )
-
-                    ->where('day_id', $day2)
-
-                    ->where('time_id', $time2)
-
-                    ->whereNotIn('id', [
-                        $id1,
-                        $id2,
-                    ])
-
-                    ->exists();
-
-
-                if ($roomConflict1) {
-
-                    throw new \Exception(
-                        'Destination room is already occupied at this time.'
-                    );
-                }
-
-
-                // =================================================
-                // 10. Room Conflict - Subject 2
-                // =================================================
-
-                $roomConflict2 = Schedule::query()
-
-                    ->where(
-                        'room_id',
-                        $schedule2->room_id
-                    )
-
-                    ->where('day_id', $day1)
-
-                    ->where('time_id', $time1)
-
-                    ->whereNotIn('id', [
-                        $id1,
-                        $id2,
-                    ])
-
-                    ->exists();
-
-
-                if ($roomConflict2) {
-
-                    throw new \Exception(
-                        'Destination room is already occupied at this time.'
-                    );
-                }
-
-
-                // =================================================
-                // 11. Swap
-                // =================================================
-
-                $schedule1->day_id = $day2;
-                $schedule1->time_id = $time2;
-
-                $schedule1->save();
-
-
-                $schedule2->day_id = $day1;
-                $schedule2->time_id = $time1;
-
-                $schedule2->save();
-
-
-            });
-
-
-            // =====================================================
-            // 12. Success
-            // =====================================================
 
             return response()->json([
                 'success' => true,
-                'message' => 'Timetable swapped successfully.',
+                'message' =>
+                    'Timetable swapped successfully.',
             ]);
-
 
         } catch (\Throwable $e) {
 
-            // =====================================================
-            // 13. Error
-            // =====================================================
-
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' =>
+                    $e->getMessage(),
             ], 422);
         }
     }
