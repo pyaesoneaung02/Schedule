@@ -199,6 +199,22 @@ class ContactController extends Controller
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE CONTACT
+    |--------------------------------------------------------------------------
+    */
+    public function delete($id)
+    {
+        $notification = Contact::findOrFail($id);
+
+        $notification->delete();
+
+        return redirect()
+            ->back()
+            ->with('success', 'Message deleted successfully.');
+    }
+
 
     /*
     |--------------------------------------------------------------------------

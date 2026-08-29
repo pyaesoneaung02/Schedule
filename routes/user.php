@@ -39,6 +39,8 @@ Route::group(['prefix' => 'user', 'middleware' => 'user'], function () {
     // Notification
     Route::get('notifications', [ContactController::class, 'userNotifications'])->name('user.notifications');
 
+    Route::get('/notification/{id}',[ContactController::class, 'delete'])->name('notification.delete');
+
     // PDF Download Route
     // Route::get('/schedule/pdf', [UserController::class, 'downloadSchedulePdf'])->name('schedule.pdf');
     Route::get('pdf/{year}/{room}/{major}/{academicYearID}', [UserController::class, 'downloadSchedulePdf'])->name('schedule.pdf');

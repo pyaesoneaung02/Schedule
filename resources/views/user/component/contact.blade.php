@@ -6,7 +6,7 @@
             <div class="row justify-content-center">
                 <div class="col-xxl-5 col-xl-5 col-lg-7 col-md-10">
                     <div class="text-center section-title mb-50">
-                        <h3 class="mb-15">Contact Administration</h3>
+                        <h4 class="mb-15">Contact Administration</h4>
                         <p>Need assistance with your schedule, leave requests, or technical support? Send a message directly
                             to the UCSM admin office.</p>
                     </div>

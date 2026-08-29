@@ -2,981 +2,808 @@
 
 @section('content')
 
-@php
+    @php
 
-    /*
+        /*
     |--------------------------------------------------------------------------
     | PREPARE SCHEDULE LOOKUP
     |--------------------------------------------------------------------------
     */
 
-    $scheduleMap = $schedules->keyBy(function ($schedule) {
+        $scheduleMap = $schedules->keyBy(function ($schedule) {
+            return $schedule->year_id .
+                '-' .
+                $schedule->section_id .
+                '-' .
+                $schedule->day_id .
+                '-' .
+                $schedule->time_id;
+        });
 
-        return $schedule->year_id
-            . '-' .
-            $schedule->section_id
-            . '-' .
-            $schedule->day_id
-            . '-' .
-            $schedule->time_id;
-
-    });
-
-
-    /*
+        /*
     |--------------------------------------------------------------------------
     | FIND LUNCH TIME
     |--------------------------------------------------------------------------
     */
 
-    $lunchTime = $times->first(function ($time) {
+        $lunchTime = $times->first(function ($time) {
+            return str_replace(' ', '', trim($time->name)) === '12:00-01:00';
+        });
 
-        return str_replace(
-            ' ',
-            '',
-            trim($time->name)
-        ) === '12:00-01:00';
+        $lunchTimeId = $lunchTime?->id;
 
-    });
+    @endphp
 
-    $lunchTimeId = $lunchTime?->id;
 
-@endphp
+    <style>
+        /* =========================================================
+           SUBJECT LIST
+        ========================================================= */
 
+        .subject-list-wrapper {
 
-<style>
+            margin-top: 30px;
 
-/* =========================================================
-   SUBJECT LIST
-========================================================= */
+            padding: 0;
 
-.subject-list-wrapper {
+        }
 
-    margin-top: 30px;
+        .subject-list-header {
 
-    padding: 0;
+            display: flex;
 
-}
+            align-items: center;
 
-.subject-list-header {
+            width: 100%;
 
-    display: flex;
+            margin-bottom: 10px;
 
-    align-items: center;
+        }
 
-    width: 100%;
 
-    margin-bottom: 10px;
+        /* =========================================================
+           SUBJECT CODE HEADER
+        ========================================================= */
 
-}
+        .subject-code-header {
 
+            width: 20%;
 
-/* =========================================================
-   SUBJECT CODE HEADER
-========================================================= */
+            padding-bottom: 7px;
 
-.subject-code-header {
+            border-bottom: 2px solid #6c757d;
 
-    width: 20%;
+            font-size: 13px;
 
-    padding-bottom: 7px;
+            font-weight: 600;
 
-    border-bottom: 2px solid #6c757d;
+            color: #343a40;
 
-    font-size: 13px;
+            text-align: left;
 
-    font-weight: 600;
+        }
 
-    color: #343a40;
 
-    text-align: left;
+        /* =========================================================
+           SUBJECT NAME HEADER
+        ========================================================= */
 
-}
+        .subject-name-header {
 
+            width: 80%;
 
-/* =========================================================
-   SUBJECT NAME HEADER
-========================================================= */
+            padding-bottom: 7px;
 
-.subject-name-header {
+            border-bottom: 2px solid #6c757d;
 
-    width: 80%;
+            font-size: 13px;
 
-    padding-bottom: 7px;
+            font-weight: 600;
 
-    border-bottom: 2px solid #6c757d;
+            color: #343a40;
 
-    font-size: 13px;
+            text-align: left;
 
-    font-weight: 600;
+        }
 
-    color: #343a40;
 
-    text-align: left;
+        /* =========================================================
+           SUBJECT ROW
+        ========================================================= */
 
-}
+        .subject-list-row {
 
+            display: flex;
 
-/* =========================================================
-   SUBJECT ROW
-========================================================= */
+            align-items: center;
 
-.subject-list-row {
+            width: 100%;
 
-    display: flex;
+            min-height: 35px;
 
-    align-items: center;
+        }
 
-    width: 100%;
 
-    min-height: 35px;
+        /* =========================================================
+           SUBJECT CODE
+        ========================================================= */
 
-}
+        .subject-code-item {
 
+            width: 20%;
 
-/* =========================================================
-   SUBJECT CODE
-========================================================= */
+            padding: 7px 12px;
 
-.subject-code-item {
+            font-size: 15px;
 
-    width: 20%;
+            font-weight: 600;
 
-    padding: 7px 12px;
+            color: #007bff;
 
-    font-size: 15px;
+            text-align: left;
 
-    font-weight: 600;
+        }
 
-    color: #007bff;
 
-    text-align: left;
+        /* =========================================================
+           SUBJECT NAME
+        ========================================================= */
 
-}
+        .subject-name-item {
 
+            width: 80%;
 
-/* =========================================================
-   SUBJECT NAME
-========================================================= */
+            padding: 7px 12px;
 
-.subject-name-item {
+            font-size: 15px;
 
-    width: 80%;
+            color: #000000;
 
-    padding: 7px 12px;
+            text-align: left;
 
-    font-size: 15px;
+        }
 
-    color: #000000;
 
-    text-align: left;
+        /* =========================================================
+           TEACHER
+        ========================================================= */
 
-}
+        .teacher-text {
 
+            color: #000000;
 
-/* =========================================================
-   TEACHER
-========================================================= */
+            font-size: 15px;
 
-.teacher-text {
+        }
 
-    color: #000000;
 
-    font-size: 15px;
+        /* =========================================================
+           EMPTY
+        ========================================================= */
 
-}
+        .subject-list-empty {
 
+            padding: 25px;
 
-/* =========================================================
-   EMPTY
-========================================================= */
+            text-align: center;
 
-.subject-list-empty {
+            color: #6c757d;
 
-    padding: 25px;
+            border-top: 1px solid #dee2e6;
 
-    text-align: center;
+        }
 
-    color: #6c757d;
 
-    border-top: 1px solid #dee2e6;
+        /* =========================================================
+           MOBILE
+        ========================================================= */
 
-}
+        @media (max-width: 768px) {
 
+            .subject-code-header,
+            .subject-name-header {
 
-/* =========================================================
-   MOBILE
-========================================================= */
+                font-size: 12px;
 
-@media (max-width: 768px) {
+            }
 
-    .subject-code-header,
-    .subject-name-header {
+            .subject-code-item,
+            .subject-name-item {
 
-        font-size: 12px;
+                padding: 7px 8px;
 
-    }
+                font-size: 12px;
 
-    .subject-code-item,
-    .subject-name-item {
+            }
 
-        padding: 7px 8px;
+            .teacher-text {
 
-        font-size: 12px;
+                font-size: 11px;
 
-    }
+            }
 
-    .teacher-text {
+        }
+    </style>
 
-        font-size: 11px;
 
-    }
+    <section id="schedule" class="pb-100 pt-35 feature-section feature-style-5">
 
-}
 
-</style>
+        <div class="container">
 
 
-<section
-    id="schedule"
-    class="pb-100 pt-35 feature-section feature-style-5"
->
-
-
-<div class="container">
-
-
-    {{-- =========================================================
+            {{-- =========================================================
          PAGE TITLE
     ========================================================== --}}
 
-    <div class="row justify-content-center">
+            <div class="row justify-content-center">
 
-        <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
+                <div class="col-xxl-6 col-xl-6 col-lg-8 col-md-10">
 
-            <div
-                class="text-center mb-50 section-title"
-            >
+                    <div class="text-center mb-50 section-title">
 
-                <h3
-                    class="mb-15 wow fadeInUp"
-                    data-wow-delay=".2s"
-                >
+                        <h4 class="mb-15 wow fadeInUp" data-wow-delay=".2s">
 
-                    Weekly Timetable (By Year & Section)
+                            Weekly Timetable (By Year & Section)
 
-                </h3>
+                        </h4>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </div>
 
-    </div>
-
-
-    {{-- =========================================================
+            {{-- =========================================================
          MAIN CONTENT
     ========================================================== --}}
 
-    <div
-        class="row wow fadeInUp"
-        data-wow-delay=".5s"
-    >
+            <div class="row wow fadeInUp" data-wow-delay=".5s">
 
-        <div class="col-12">
+                <div class="col-12">
 
 
-            {{-- =================================================
+                    {{-- =================================================
                  CHECK YEARS
             ================================================== --}}
 
-            @if($years->isNotEmpty())
-
-
-                {{-- =================================================
+                    @if ($years->isNotEmpty())
+                        {{-- =================================================
                      YEAR TABS
                 ================================================== --}}
 
-                <ul
-                    class="mb-4 border-0 nav nav-tabs justify-content-center"
-                    id="timetableTabs"
-                    role="tablist" style="gap: 15px;"
-                >
+                        <ul class="mb-4 border-0 nav nav-tabs justify-content-center" id="timetableTabs" role="tablist"
+                            style="gap: 15px;">
 
-                    @foreach($years as $year)
+                            @foreach ($years as $year)
+                                <li class="nav-item" role="presentation">
 
-                        <li
-                            class="nav-item"
-                            role="presentation"
-                        >
+                                    <button class="nav-link {{ $loop->first ? 'active' : '' }}"
+                                        id="year-{{ $year->id }}-tab" data-bs-toggle="tab"
+                                        data-bs-target="#year-{{ $year->id }}" type="button" role="tab"
+                                        aria-controls="year-{{ $year->id }}"
+                                        aria-selected="{{ $loop->first ? 'true' : 'false' }}">
 
-                            <button
-                                class="nav-link {{ $loop->first ? 'active' : '' }}"
-                                id="year-{{ $year->id }}-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#year-{{ $year->id }}"
-                                type="button"
-                                role="tab"
-                                aria-controls="year-{{ $year->id }}"
-                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                            >
+                                        {{ $year->name }}
 
-                                {{ $year->name }}
+                                    </button>
 
-                            </button>
+                                </li>
+                            @endforeach
 
-                        </li>
-
-                    @endforeach
-
-                </ul>
+                        </ul>
 
 
-                {{-- =================================================
+                        {{-- =================================================
                      YEAR TAB CONTENT
                 ================================================== --}}
 
-                <div
-                    class="p-4 bg-white rounded shadow-sm tab-content"
-                    id="timetableTabContent"
-                >
+                        <div class="p-4 bg-white rounded shadow-sm tab-content" id="timetableTabContent">
 
 
-                    @foreach($years as $year)
+                            @foreach ($years as $year)
+                                @php
 
-                        @php
-
-                            /*
+                                    /*
                             |--------------------------------------------------------------------------
                             | SECTIONS FOR CURRENT YEAR
                             |--------------------------------------------------------------------------
                             */
 
-                            $yearSections = $sections
-                                ->where('year_id', $year->id)
-                                ->values();
+                                    $yearSections = $sections->where('year_id', $year->id)->values();
 
-                        @endphp
+                                @endphp
 
 
-                        {{-- =================================================
+                                {{-- =================================================
                              YEAR TAB
                         ================================================== --}}
 
-                        <div
-                            class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                            id="year-{{ $year->id }}"
-                            role="tabpanel"
-                            aria-labelledby="year-{{ $year->id }}-tab"
-                        >
+                                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                    id="year-{{ $year->id }}" role="tabpanel"
+                                    aria-labelledby="year-{{ $year->id }}-tab">
 
 
-                            @if($yearSections->isNotEmpty())
-
-
-                                {{-- =================================================
+                                    @if ($yearSections->isNotEmpty())
+                                        {{-- =================================================
                                      SECTION TABS
                                 ================================================== --}}
 
-                                <ul
-                                    class="mb-3 nav nav-pills justify-content-center"
-                                    id="pills-tab-year-{{ $year->id }}"
-                                    role="tablist"
-                                >
+                                        <ul class="mb-3 nav nav-pills justify-content-center"
+                                            id="pills-tab-year-{{ $year->id }}" role="tablist">
 
-                                    @foreach($yearSections as $section)
+                                            @foreach ($yearSections as $section)
+                                                <li class="nav-item" role="presentation">
 
-                                        <li
-                                            class="nav-item"
-                                            role="presentation"
-                                        >
+                                                    <button
+                                                        class="nav-link {{ $loop->first ? 'active' : '' }} btn-sm px-4 py-2 me-2 rounded-pill"
+                                                        id="pills-year-{{ $year->id }}-sec-{{ $section->id }}-tab"
+                                                        data-bs-toggle="pill"
+                                                        data-bs-target="#pills-year-{{ $year->id }}-sec-{{ $section->id }}"
+                                                        type="button" role="tab"
+                                                        aria-controls="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
+                                                        aria-selected="{{ $loop->first ? 'true' : 'false' }}">
 
-                                            <button
-                                                class="nav-link {{ $loop->first ? 'active' : '' }} btn-sm px-4 py-2 me-2 rounded-pill"
-                                                id="pills-year-{{ $year->id }}-sec-{{ $section->id }}-tab"
-                                                data-bs-toggle="pill"
-                                                data-bs-target="#pills-year-{{ $year->id }}-sec-{{ $section->id }}"
-                                                type="button"
-                                                role="tab"
-                                                aria-controls="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
-                                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                                            >
+                                                        {{ $section->name }}
 
-                                                {{ $section->name }}
+                                                    </button>
 
-                                            </button>
+                                                </li>
+                                            @endforeach
 
-                                        </li>
-
-                                    @endforeach
-
-                                </ul>
+                                        </ul>
 
 
-                                {{-- =================================================
+                                        {{-- =================================================
                                      SECTION TAB CONTENT
                                 ================================================== --}}
 
-                                <div
-                                    class="tab-content"
-                                    id="pills-tabContent-year-{{ $year->id }}"
-                                >
+                                        <div class="tab-content" id="pills-tabContent-year-{{ $year->id }}">
 
 
-                                    @foreach($yearSections as $section)
+                                            @foreach ($yearSections as $section)
+                                                @php
 
-                                        @php
-
-                                            /*
+                                                    /*
                                             |--------------------------------------------------------------------------
                                             | CURRENT SECTION SCHEDULES
                                             |--------------------------------------------------------------------------
                                             */
 
-                                            $sectionSchedules = $schedules
-                                                ->where('year_id', $year->id)
-                                                ->where('section_id', $section->id)
-                                                ->values();
+                                                    $sectionSchedules = $schedules
+                                                        ->where('year_id', $year->id)
+                                                        ->where('section_id', $section->id)
+                                                        ->values();
 
-
-                                            /*
+                                                    /*
                                             |--------------------------------------------------------------------------
                                             | UNIQUE SUBJECTS
                                             |--------------------------------------------------------------------------
                                             */
 
-                                            $subjectList = $sectionSchedules
-                                                ->filter(function ($schedule) {
+                                                    $subjectList = $sectionSchedules
+                                                        ->filter(function ($schedule) {
+                                                            return $schedule->subject !== null;
+                                                        })
+                                                        ->unique('subject_id')
+                                                        ->values();
 
-                                                    return $schedule->subject !== null;
-
-                                                })
-                                                ->unique('subject_id')
-                                                ->values();
-
-
-                                            /*
+                                                    /*
                                             |--------------------------------------------------------------------------
                                             | FIRST SCHEDULE
                                             |--------------------------------------------------------------------------
                                             */
 
-                                            $firstSchedule = $sectionSchedules->first();
+                                                    $firstSchedule = $sectionSchedules->first();
 
-                                        @endphp
+                                                @endphp
 
 
-                                        {{-- =================================================
+                                                {{-- =================================================
                                              SECTION TAB
                                         ================================================== --}}
 
-                                        <div
-                                            class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
-                                            id="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
-                                            role="tabpanel"
-                                            aria-labelledby="pills-year-{{ $year->id }}-sec-{{ $section->id }}-tab"
-                                        >
+                                                <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}"
+                                                    id="pills-year-{{ $year->id }}-sec-{{ $section->id }}"
+                                                    role="tabpanel"
+                                                    aria-labelledby="pills-year-{{ $year->id }}-sec-{{ $section->id }}-tab">
 
 
-                                            {{-- =================================================
+                                                    {{-- =================================================
                                                  SECTION TITLE
                                             ================================================== --}}
 
-                                            <h5
-                                                class="mb-3 text-center"
-                                                style="color: #6c757d;"
-                                            >
+                                                    <h5 class="mb-3 text-center" style="color: #6c757d;">
 
-                                                {{ $year->name }}
+                                                        {{ $year->name }}
 
-                                                -
+                                                        -
 
-                                                Section ({{ $section->name }})
+                                                        Section ({{ $section->name }})
 
-                                                Timetable
+                                                        Timetable
 
-                                            </h5>
+                                                    </h5>
 
 
-                                            {{-- =================================================
+                                                    {{-- =================================================
                                                  PDF DOWNLOAD
                                             ================================================== --}}
 
-                                            <div
-                                                class="mb-3 text-end"
-                                            >
+                                                    <div class="mb-3 text-end">
 
-                                                @if($firstSchedule)
+                                                        @if ($firstSchedule)
+                                                            <a href="{{ route('schedule.pdf', [
+                                                                'year' => $year->id,
+                                                                'room' => $firstSchedule->room_id,
+                                                                'major' => $firstSchedule->major_id,
+                                                                'academicYearID' => $firstSchedule->academic_year_id,
+                                                                'semesterID' => $firstSchedule->semester_id,
+                                                                'sectionID' => $section->id,
+                                                            ]) }}"
+                                                                class="px-4 btn btn-danger" target="_blank" rel="noopener">
 
-                                                    <a
-                                                        href="{{ route('schedule.pdf', [
-                                                            'year' => $year->id,
-                                                            'room' => $firstSchedule->room_id,
-                                                            'major' => $firstSchedule->major_id,
-                                                            'academicYearID' => $firstSchedule->academic_year_id,
-                                                            'semesterID' => $firstSchedule->semester_id,
-                                                            'sectionID' => $section->id,
-                                                        ]) }}"
-                                                        class="px-4 btn btn-danger"
-                                                        target="_blank"
-                                                        rel="noopener"
-                                                    >
+                                                                <i class="me-1 fa-solid fa-file-pdf"></i>
 
-                                                        <i
-                                                            class="me-1 fa-solid fa-file-pdf"
-                                                        ></i>
+                                                                Download PDF
 
-                                                        Download PDF
+                                                            </a>
+                                                        @else
+                                                            <button type="button" class="px-4 btn btn-secondary" disabled>
 
-                                                    </a>
+                                                                <i class="me-1 fa-solid fa-file-pdf"></i>
 
-                                                @else
+                                                                PDF Not Available
 
-                                                    <button
-                                                        type="button"
-                                                        class="px-4 btn btn-secondary"
-                                                        disabled
-                                                    >
+                                                            </button>
+                                                        @endif
 
-                                                        <i
-                                                            class="me-1 fa-solid fa-file-pdf"
-                                                        ></i>
-
-                                                        PDF Not Available
-
-                                                    </button>
-
-                                                @endif
-
-                                            </div>
+                                                    </div>
 
 
-                                            {{-- =================================================
+                                                    {{-- =================================================
                                                  TIMETABLE
                                             ================================================== --}}
 
-                                            <div class="table-responsive">
+                                                    <div class="table-responsive">
 
-                                                <table
-                                                    class="table mb-0 text-center shadow-sm table-bordered timetable-table"
-                                                >
+                                                        <table
+                                                            class="table mb-0 text-center shadow-sm table-bordered timetable-table">
 
-                                                    <thead class="align-middle">
+                                                            <thead class="align-middle">
 
-                                                    <tr>
+                                                                <tr>
 
-                                                        <th
-                                                            scope="col"
-                                                            style="
+                                                                    <th scope="col"
+                                                                        style="
                                                                 width: 15%;
                                                                 background-color: #6c757d;
                                                                 color: #fff;
                                                                 border-color: #6c757d;
-                                                            "
-                                                        >
+                                                            ">
 
-                                                            Day / Time
+                                                                        Day / Time
 
-                                                        </th>
-
-
-                                                        @foreach($times as $time)
-
-                                                            @php
-
-                                                                $isLunch =
-                                                                    $time->id === $lunchTimeId;
-
-                                                            @endphp
+                                                                    </th>
 
 
-                                                            <th
-                                                                scope="col"
-                                                                style="
+                                                                    @foreach ($times as $time)
+                                                                        @php
+
+                                                                            $isLunch = $time->id === $lunchTimeId;
+
+                                                                        @endphp
+
+
+                                                                        <th scope="col"
+                                                                            style="
                                                                     background-color: #6c757d;
                                                                     color: #fff;
                                                                     border-color: #6c757d;
-                                                                "
-                                                            >
+                                                                ">
 
-                                                                @if($isLunch)
+                                                                            @if ($isLunch)
+                                                                                &nbsp;
+                                                                            @else
+                                                                                {{ $time->name }}
+                                                                            @endif
 
-                                                                    &nbsp;
+                                                                        </th>
+                                                                    @endforeach
 
-                                                                @else
+                                                                </tr>
 
-                                                                    {{ $time->name }}
-
-                                                                @endif
-
-                                                            </th>
-
-                                                        @endforeach
-
-                                                    </tr>
-
-                                                    </thead>
+                                                            </thead>
 
 
-                                                    <tbody>
+                                                            <tbody>
 
 
-                                                    @foreach($days as $dayIndex => $day)
+                                                                @foreach ($days as $dayIndex => $day)
+                                                                    <tr>
 
-                                                        <tr>
 
+                                                                        {{-- DAY --}}
 
-                                                            {{-- DAY --}}
-
-                                                            <th
-                                                                scope="row"
-                                                                class="align-middle"
-                                                                style="
+                                                                        <th scope="row" class="align-middle"
+                                                                            style="
                                                                     background-color: #6c757d;
                                                                     color: #fff;
                                                                     border-color: #6c757d;
-                                                                "
-                                                            >
+                                                                ">
 
-                                                                {{ $day->name }}
+                                                                            {{ $day->name }}
 
-                                                            </th>
-
-
-                                                            {{-- TIMES --}}
-
-                                                            @foreach($times as $time)
-
-                                                                @php
-
-                                                                    $isLunch =
-                                                                        $time->id === $lunchTimeId;
-
-                                                                @endphp
+                                                                        </th>
 
 
-                                                                {{-- LUNCH --}}
+                                                                        {{-- TIMES --}}
 
-                                                                @if($isLunch)
+                                                                        @foreach ($times as $time)
+                                                                            @php
+
+                                                                                $isLunch = $time->id === $lunchTimeId;
+
+                                                                            @endphp
 
 
-                                                                    @if($dayIndex === 0)
+                                                                            {{-- LUNCH --}}
 
-                                                                        <td
-                                                                            rowspan="{{ $days->count() }}"
-                                                                            class="align-middle bg-light"
-                                                                        >
+                                                                            @if ($isLunch)
+                                                                                @if ($dayIndex === 0)
+                                                                                    <td rowspan="{{ $days->count() }}"
+                                                                                        class="align-middle bg-light">
 
-                                                                            <span
-                                                                                class="fw-bold d-block text-secondary"
-                                                                                style="
+                                                                                        <span class="fw-bold d-block"
+                                                                                            style="
                                                                                     writing-mode: vertical-rl;
                                                                                     transform: rotate(180deg);
                                                                                     margin: 0 auto;
                                                                                     letter-spacing: 2px;
-                                                                                "
-                                                                            >
+                                                                                    color:#000000;
+                                                                                ">
 
-                                                                                ထမင်းစားနားချိန်
+                                                                                            ထမင်းစားနားချိန်
 
-                                                                            </span>
+                                                                                        </span>
 
-                                                                        </td>
-
-                                                                    @endif
-
-
-                                                                {{-- NORMAL PERIOD --}}
-
-                                                                @else
-
-                                                                    @php
-
-                                                                        $scheduleKey =
-                                                                            $year->id
-                                                                            . '-'
-                                                                            . $section->id
-                                                                            . '-'
-                                                                            . $day->id
-                                                                            . '-'
-                                                                            . $time->id;
-
-                                                                        $class =
-                                                                            $scheduleMap->get(
-                                                                                $scheduleKey
-                                                                            );
-
-                                                                    @endphp
+                                                                                    </td>
+                                                                                @endif
 
 
-                                                                    <td class="align-middle">
+                                                                                {{-- NORMAL PERIOD --}}
+                                                                            @else
+                                                                                @php
+
+                                                                                    $scheduleKey =
+                                                                                        $year->id .
+                                                                                        '-' .
+                                                                                        $section->id .
+                                                                                        '-' .
+                                                                                        $day->id .
+                                                                                        '-' .
+                                                                                        $time->id;
+
+                                                                                    $class = $scheduleMap->get(
+                                                                                        $scheduleKey,
+                                                                                    );
+
+                                                                                @endphp
 
 
-                                                                        @if($class)
-
-                                                                            {{-- SUBJECT --}}
-
-                                                                            <span
-                                                                                class="fw-bold d-block subject-title"
-                                                                            >
-
-                                                                                {{
-                                                                                    $class->subject->short_name
-                                                                                    ?? $class->subject->name
-                                                                                    ?? $class->subject->long_name
-                                                                                    ?? ''
-                                                                                }}
-
-                                                                            </span>
+                                                                                <td class="align-middle">
 
 
-                                                                            {{-- TEACHER --}}
+                                                                                    @if ($class)
+                                                                                        {{-- SUBJECT --}}
 
-                                                                            @if($class->teacher)
+                                                                                        <span
+                                                                                            class="fw-bold d-block subject-title"
+                                                                                            style="color: #000000">
 
-                                                                                <span
-                                                                                    class="small text-muted room-no"
-                                                                                >
+                                                                                            {{ $class->subject->short_name ?? ($class->subject->name ?? ($class->subject->long_name ?? '')) }}
 
-                                                                                    {{ $class->teacher->name }}
+                                                                                        </span>
 
-                                                                                </span>
 
+                                                                                        {{-- TEACHER --}}
+
+                                                                                        @if ($class->teacher)
+                                                                                            <span class="small room-no"
+                                                                                                style="color: #000000">
+
+                                                                                                {{ $class->teacher->name }}
+
+                                                                                            </span>
+                                                                                        @endif
+                                                                                    @else
+                                                                                        {{-- EMPTY SLOT --}}
+
+                                                                                        <span class="small subject-title"
+                                                                                            style="color: #000000">
+
+                                                                                            Extra Curriculum
+
+                                                                                        </span>
+                                                                                    @endif
+
+                                                                                </td>
                                                                             @endif
+                                                                        @endforeach
+
+                                                                    </tr>
+                                                                @endforeach
 
 
-                                                                        @else
+                                                            </tbody>
 
-                                                                            {{-- EMPTY SLOT --}}
+                                                        </table>
 
-                                                                            <span
-                                                                                class="small text-black-50 subject-title"
-                                                                            >
-
-                                                                                Extra Curriculum
-
-                                                                            </span>
-
-                                                                        @endif
-
-                                                                    </td>
-
-                                                                @endif
-
-                                                            @endforeach
-
-                                                        </tr>
-
-                                                    @endforeach
+                                                    </div>
 
 
-                                                    </tbody>
-
-                                                </table>
-
-                                            </div>
-
-
-                                            {{-- =================================================
+                                                    {{-- =================================================
                                                  SUBJECT LIST
                                             ================================================== --}}
 
-                                            <div class="subject-list-wrapper">
+                                                    <div class="subject-list-wrapper">
 
 
-                                                @if($subjectList->isNotEmpty())
-
-
-                                                    {{-- =================================================
+                                                        @if ($subjectList->isNotEmpty())
+                                                            {{-- =================================================
                                                          SUBJECT HEADINGS
                                                     ================================================== --}}
 
-                                                    <div class="subject-list-header">
+                                                            <div class="subject-list-header">
 
-                                                        <div class="subject-code-header">
+                                                                <div class="subject-code-header" style="color: #000000">
 
-                                                            Subject Code
+                                                                    Subject Code
 
-                                                        </div>
-
-
-                                                        <div class="subject-name-header">
-
-                                                            Subject Name
-
-                                                        </div>
-
-                                                    </div>
+                                                                </div>
 
 
-                                                    {{-- =================================================
+                                                                <div class="subject-name-header" style="color: #000000">
+
+                                                                    Subject Name
+
+                                                                </div>
+
+                                                            </div>
+
+
+                                                            {{-- =================================================
                                                          SUBJECT ITEMS
                                                     ================================================== --}}
 
-                                                    @foreach($subjectList as $subjectSchedule)
-
-                                                        <div class="subject-list-row">
-
-
-                                                            {{-- SUBJECT CODE --}}
-
-                                                            <div class="subject-code-item">
-
-                                                                {{
-                                                                    $subjectSchedule->subject->short_name
-                                                                    ?? $subjectSchedule->subject->code
-                                                                    ?? '-'
-                                                                }}
-
-                                                            </div>
+                                                            @foreach ($subjectList as $subjectSchedule)
+                                                                <div class="subject-list-row">
 
 
-                                                            {{-- SUBJECT NAME --}}
+                                                                    {{-- SUBJECT CODE --}}
 
-                                                            <div class="subject-name-item">
+                                                                    <div class="subject-code-item" style="color: #000000">
 
-                                                                {{
-                                                                    $subjectSchedule->subject->long_name
-                                                                    ?? $subjectSchedule->subject->name
-                                                                    ?? '-'
-                                                                }}
+                                                                        {{ $subjectSchedule->subject->short_name ?? ($subjectSchedule->subject->code ?? '-') }}
+
+                                                                    </div>
 
 
-                                                                @if($subjectSchedule->teacher)
+                                                                    {{-- SUBJECT NAME --}}
 
-                                                                    <span class="teacher-text">
+                                                                    <div class="subject-name-item" style="color: #000000">
 
-                                                                        ({{ $subjectSchedule->teacher->name }})
-
-                                                                    </span>
-
-                                                                @endif
-
-                                                            </div>
-
-                                                        </div>
-
-                                                    @endforeach
+                                                                        {{ $subjectSchedule->subject->long_name ?? ($subjectSchedule->subject->name ?? '-') }}
 
 
-                                                @else
+                                                                        @if ($subjectSchedule->teacher)
+                                                                            <span class="teacher-text"
+                                                                                style="color: #000000">
 
+                                                                                ({{ $subjectSchedule->teacher->name }})
+                                                                            </span>
+                                                                        @endif
 
-                                                    {{-- =================================================
+                                                                    </div>
+
+                                                                </div>
+                                                            @endforeach
+                                                        @else
+                                                            {{-- =================================================
                                                          NO SUBJECT
                                                     ================================================== --}}
 
-                                                    <div class="subject-list-empty">
+                                                            <div class="subject-list-empty">
 
-                                                        <i
-                                                            class="mb-2 fa-solid fa-book-open text-muted"
-                                                        ></i>
+                                                                <i class="mb-2 fa-solid fa-book-open text-muted"></i>
 
-                                                        <div>
+                                                                <div>
 
-                                                            No subjects available
-                                                            for this section.
+                                                                    No subjects available
+                                                                    for this section.
 
-                                                        </div>
+                                                                </div>
+
+                                                            </div>
+                                                        @endif
+
 
                                                     </div>
 
-                                                @endif
 
-
-                                            </div>
+                                                </div>
+                                            @endforeach
 
 
                                         </div>
-
-                                    @endforeach
-
-
-                                </div>
-
-
-                            @else
-
-
-                                {{-- =================================================
+                                    @else
+                                        {{-- =================================================
                                      NO SECTION
                                 ================================================== --}}
 
-                                <div class="py-5 text-center">
+                                        <div class="py-5 text-center">
 
-                                    <i
-                                        class="mb-3 fa-solid fa-calendar-xmark fa-2x text-muted"
-                                    ></i>
+                                            <i class="mb-3 fa-solid fa-calendar-xmark fa-2x text-muted"></i>
 
 
-                                    <h5 class="text-muted">
+                                            <h5 class="text-muted">
 
-                                        No sections available for
-                                        {{ $year->name }}.
+                                                No sections available for
+                                                {{ $year->name }}.
 
-                                    </h5>
+                                            </h5>
 
 
-                                    <p class="mb-0 text-muted">
+                                            <p class="mb-0 text-muted">
 
-                                        There is no timetable section
-                                        available for this year.
+                                                There is no timetable section
+                                                available for this year.
 
-                                    </p>
+                                            </p>
+
+                                        </div>
+                                    @endif
+
 
                                 </div>
-
-
-                            @endif
+                            @endforeach
 
 
                         </div>
-
-                    @endforeach
-
-
-                </div>
-
-
-            @else
-
-
-                {{-- =================================================
+                    @else
+                        {{-- =================================================
                      NO YEAR
                 ================================================== --}}
 
-                <div class="py-5 text-center">
+                        <div class="py-5 text-center">
 
-                    <i
-                        class="mb-3 fa-solid fa-calendar-xmark fa-2x text-muted"
-                    ></i>
+                            <i class="mb-3 fa-solid fa-calendar-xmark fa-2x text-muted"></i>
 
 
-                    <h5 class="text-muted">
+                            <h5 class="text-muted">
 
-                        No academic year available.
+                                No academic year available.
 
-                    </h5>
+                            </h5>
 
 
-                    <p class="mb-0 text-muted">
+                            <p class="mb-0 text-muted">
 
-                        There is no timetable available at the moment.
+                                There is no timetable available at the moment.
 
-                    </p>
+                            </p>
+
+                        </div>
+                    @endif
+
 
                 </div>
 
-
-            @endif
-
+            </div>
 
         </div>
 
-    </div>
-
-</div>
-
-</section>
+    </section>
 
 @endsection
