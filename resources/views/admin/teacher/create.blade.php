@@ -1,0 +1,274 @@
+@extends('admin.layouts.master')
+
+@section('content')
+    <div class="container-fluid">
+
+
+        <div class="mb-4">
+
+            <h2 class="text-primary font-weight-bold">
+                <i class="mr-2 fa-solid fa-chalkboard-user"></i>
+                Teacher Management
+            </h2>
+
+            <p class="mb-0 text-muted">
+                Create and manage teachers.
+            </p>
+
+        </div>
+
+
+
+        <div class="row justify-content-center">
+
+            <div class="col-lg-8">
+
+
+                <div class="border-0 shadow-sm card">
+
+
+                    <div class="text-white card-header bg-primary">
+
+                        <h5 class="mb-0">
+                            <i class="mr-2 fa-solid fa-plus"></i>
+                            Add Teacher
+                        </h5>
+
+                    </div>
+
+
+
+
+                    <div class="card-body">
+
+
+                        <form action="{{ route('teacher.createTeacher') }}" method="POST">
+
+                            @csrf
+
+
+
+                            <div class="row">
+
+
+                                {{-- Left Column --}}
+                                <div class="col-md-6">
+
+
+                                    {{-- Teacher Name --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Teacher Name
+                                        </label>
+
+
+                                        <input type="text" name="name" value="{{ old('name') }}"
+                                            class="form-control @error('name') is-invalid @enderror"
+                                            placeholder="Enter Teacher Name">
+
+
+                                        @error('name')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+
+
+
+                                    {{-- Email --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Email
+                                        </label>
+
+
+                                        <input type="email" name="email" value="{{ old('email') }}"
+                                            class="form-control @error('email') is-invalid @enderror"
+                                            placeholder="Enter Email">
+
+
+                                        @error('email')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+
+
+
+                                    {{-- Password --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Password
+                                        </label>
+
+
+                                        <input type="password" name="password"
+                                            class="form-control @error('password') is-invalid @enderror"
+                                            placeholder="Enter Password">
+
+
+                                        @error('password')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+
+
+                                </div>
+
+
+
+
+
+
+                                {{-- Right Column --}}
+                                <div class="col-md-6">
+
+
+                                    {{-- Confirm Password --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Confirm Password
+                                        </label>
+
+
+                                        <input type="password" name="password_confirmation" class="form-control"
+                                            placeholder="Confirm Password">
+
+
+                                    </div>
+
+
+
+
+
+                                    {{-- Position --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Rank
+                                        </label>
+
+
+                                        <select name="positionID"
+                                            class="form-control @error('positionID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                -- Choose Rank --
+                                            </option>
+
+                                            @foreach ($positions as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('positionID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+                                        @error('positionID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+                                    {{-- Department --}}
+                                    <div class="mb-3">
+
+                                        <label class="form-label">
+                                            Select Department
+                                        </label>
+
+                                        <select name="departmentID"
+                                            class="form-control @error('departmentID') is-invalid @enderror">
+
+
+                                            <option value="">
+                                                -- Choose Department --
+                                            </option>
+
+                                            @foreach ($departments as $item)
+                                                <option value="{{ $item->id }}"
+                                                    @if (old('departmentID') == $item->id) selected @endif>
+
+                                                    {{ $item->name }}
+
+                                                </option>
+                                            @endforeach
+
+
+                                        </select>
+
+                                        @error('departmentID')
+                                            <span class="invalid-feedback">
+                                                {{ $message }}
+                                            </span>
+                                        @enderror
+
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+                            <button type="submit" class="mb-3 btn btn-primary w-100">
+
+
+                                <i class="mr-2 fa-solid fa-floppy-disk"></i>
+
+                                Create Teacher
+
+
+                            </button>
+
+                            <a href="{{ route('teacher.list') }}" class="btn btn-outline-primary w-100">
+
+
+                                <i class="mr-2 fa-solid fa-list"></i>
+
+                                View Teacher List
+
+
+                            </a>
+
+                        </form>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+@endsection
