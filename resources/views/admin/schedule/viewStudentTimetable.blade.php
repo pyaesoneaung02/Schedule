@@ -110,7 +110,7 @@
     <div class="filter-card print-hide">
 
         <div class="filter-title font-weight-bold"
-             style="color: #1e3a8a !important;">
+             style="color: #010408 !important;">
 
             <i class="mr-2 fa-solid fa-filter text-primary"></i>
 
@@ -126,14 +126,14 @@
             <div class="filter-group">
 
                 <label class="font-weight-bold"
-                       style="color: #1e3a8a !important;">
+                       style="color: #010408 !important;">
                     Year
                 </label>
 
                 <select name="yearID"
                         class="form-control font-weight-bold"
                         onchange="this.form.submit()"
-                        style="color: #1e3a8a !important;">
+                        style="color: #010408 !important;">
 
                     @foreach($years as $year)
 
@@ -155,14 +155,14 @@
             <div class="filter-group">
 
                 <label class="font-weight-bold"
-                       style="color: #1e3a8a !important;">
+                       style="color: #010408 !important;">
                     Major
                 </label>
 
                 <select name="majorID"
                         class="form-control font-weight-bold"
                         onchange="this.form.submit()"
-                        style="color: #1e3a8a !important;">
+                        style="color: #010408 !important;">
 
                     <option value="">
                         All Major
@@ -188,14 +188,14 @@
             <div class="filter-group">
 
                 <label class="font-weight-bold"
-                       style="color: #1e3a8a !important;">
+                       style="color: #010408 !important;">
                     Section
                 </label>
 
                 <select name="sectionID"
                         class="form-control font-weight-bold"
                         onchange="this.form.submit()"
-                        style="color: #1e3a8a !important;">
+                        style="color: #010408 !important;">
 
                     <option value="">
                         All Section
@@ -242,7 +242,7 @@
     ========================================================== --}}
     <div class="mb-4 text-center timetable-header">
 
-        <h2 class="font-weight-bold text-primary">
+        <h2 class="font-weight-bold" style="color: #010408 !important;">
 
             <i class="mr-2 fa-solid fa-building-columns"></i>
 
@@ -252,7 +252,7 @@
 
 
         <h4 class="mt-3 font-weight-bold"
-            style="color: #1e3a8a !important;">
+            style="color: #010408 !important;">
 
             {{ $displayAcademicYear->name ?? '' }}
             ပညာသင်နှစ်
@@ -302,19 +302,19 @@
     @if($displaySchedules->isEmpty())
 
         <div class="empty-timetable font-weight-bold"
-             style="color: #1e3a8a !important;">
+             style="color: #010408 !important;">
 
             <i class="text-primary fa-solid fa-calendar-xmark"></i>
 
             <h5 class="font-weight-bold"
-                style="color: #1e3a8a !important;">
+                style="color: #010408 !important;">
 
                 အချိန်ဇယား မရှိပါ။
 
             </h5>
 
             <p class="font-weight-bold"
-               style="color: #1e3a8a !important;">
+               style="color: #010408 !important;">
 
                 ရွေးချယ်ထားသော Major / Section အတွက် timetable မရှိသေးပါ။
 
@@ -331,7 +331,7 @@
         <div class="section-filter print-hide">
 
             <div class="section-filter-title font-weight-bold"
-                 style="color: #1e3a8a !important;">
+                 style="color: #010408 !important;">
 
                 <i class="mr-2 fa-solid fa-layer-group text-primary"></i>
 
@@ -429,7 +429,7 @@
 
 
                         <span class="font-weight-bold"
-                              style="color: #1e3a8a !important;">
+                              style="color: #010408 !important;">
 
                             Section {{ $sectionItem->name }}
 
@@ -439,7 +439,7 @@
 
 
                     <div class="section-title-info font-weight-bold"
-                         style="color: #1e3a8a !important;">
+                         style="color: #010408 !important;">
 
                         {{ $yearData->name ?? '' }}
                         -
@@ -455,13 +455,13 @@
                     INFO
                 ================================================== --}}
                 <div class="timetable-info font-weight-bold"
-                     style="color: #1e3a8a !important;">
+                     style="color: #010408 !important;">
 
                     <div>
 
                         အတန်း -
 
-                        <strong style="color: #1e3a8a !important;">
+                        <strong style="color: #010408 !important;">
 
                             {{ $yearData->name ?? '-' }}
 
@@ -480,7 +480,7 @@
 
                         Section
 
-                        <strong style="color: #1e3a8a !important;">
+                        <strong style="color: #010408 !important;">
 
                             {{ $sectionItem->name }}
 
@@ -490,7 +490,7 @@
 
                         အခန်း
 
-                        <strong style="color: #1e3a8a !important;">
+                        <strong style="color: #010408 !important;">
 
                             {{ $sectionRoom->name ?? '-' }}
 
@@ -571,7 +571,7 @@
                                                     class="lunch-cell lunch-column">
 
                                                     <span class="lunch-text font-weight-bold"
-                                                          style="color: #1e3a8a !important;">
+                                                          style="color: #010408 !important;">
 
                                                         ထမင်းစားနားချိန်
 
@@ -608,7 +608,7 @@
                                                     data-time-id="{{ $time->id }}">
 
                                                     <span class="extra-text font-weight-bold"
-                                                          style="color: #64748b !important;">
+                                                          style="color: #010408 !important;">
 
                                                         Extra Curriculum
 
@@ -628,7 +628,7 @@
                                                     <div class="subject-content">
 
                                                         <span class="subject-code font-weight-bold"
-                                                              style="color: #1d4ed8 !important;">
+                                                              style="color: #010408 !important;">
 
                                                             {{ $schedule->subject->short_name ?? '' }}
 
@@ -638,7 +638,7 @@
                                                         @if($schedule->teacher)
 
                                                             <small class="teacher-name font-weight-bold"
-                                                                   style="color: #1e3a8a !important;">
+                                                                   style="color: #010408 !important;">
 
                                                                 {{ $schedule->teacher->name }}
 
@@ -681,7 +681,7 @@
 
                                 <th width="15%"
                                     class="font-weight-bold"
-                                    style="color: #1e3a8a !important;">
+                                    style="color: #010408 !important;">
 
                                     Subject Code
 
@@ -690,7 +690,7 @@
 
                                 <th width="85%"
                                     class="font-weight-bold"
-                                    style="color: #1e3a8a !important;">
+                                    style="color: #010408 !important;">
 
                                     Subject Name
 
@@ -715,8 +715,8 @@
 
                                 <tr>
 
-                                    <td class="font-weight-bold text-primary"
-                                        style="color: #1d4ed8 !important;">
+                                    <td class="font-weight-bold"
+                                        style="color: #010309 !important;">
 
                                         {{ $subjectItem->subject->short_name ?? '' }}
 
@@ -724,7 +724,7 @@
 
 
                                     <td class="font-weight-bold"
-                                        style="color: #1e3a8a !important;">
+                                        style="color: #01030a !important;">
 
                                         {{ $subjectItem->subject->long_name ?? '' }}
 
@@ -732,7 +732,7 @@
                                         @if($subjectItem->teacher)
 
                                             <span class="font-weight-bold"
-                                                  style="color: #475569 !important;">
+                                                  style="color: #010408 !important;">
 
                                                 ({{ $subjectItem->teacher->name }})
 

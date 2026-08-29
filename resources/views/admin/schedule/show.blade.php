@@ -10,7 +10,7 @@
 
         <div class="section-filter">
 
-            <div class="section-filter-title">
+            <div class="section-filter-title" style="color: #010408 !important;">
 
                 <i class="mr-2 fa-solid fa-layer-group"></i>
 
@@ -65,7 +65,7 @@
 
         <div class="mb-4 text-center">
 
-            <h2 class="text-primary font-weight-bold">
+            <h2 class="font-weight-bold" style="color: #010408 !important;">
 
                 <i class="mr-2 fa-solid fa-building-columns"></i>
 
@@ -74,7 +74,7 @@
             </h2>
 
 
-            <h4 class="mt-3 text-dark font-weight-bold">
+            <h4 class="mt-3 font-weight-bold" style="color: #010408 !important;">
 
                 {{ $academicYear->name ?? '' }}
 
@@ -189,7 +189,7 @@
                         SECTION HEADER
                     ================================================== --}}
 
-                        <div class="section-title">
+                        <div class="section-title" style="color: #010408 !important;">
 
                             <div>
 
@@ -209,7 +209,7 @@
                             </div>
 
 
-                            <div class="section-title-info">
+                            <div class="section-title-info" style="color: #010408 !important;">
 
                                 {{ $yearData->name ?? '' }}
 
@@ -227,7 +227,7 @@
                         INFO
                     ================================================== --}}
 
-                        <div class="timetable-info">
+                        <div class="timetable-info" style="color: #010408 !important;">
 
                             <div>
 
@@ -332,7 +332,7 @@
                                                     @if ($dayIndex == 0)
                                                         <td rowspan="{{ $days->count() }}" class="lunch-cell lunch-column">
 
-                                                            <span class="lunch-text">
+                                                            <span class="lunch-text" style="color: #010408 !important;">
 
                                                                 ထမင်းစားနားချိန်
 
@@ -372,7 +372,7 @@
                                                             <div class="subject-content">
 
 
-                                                                <span class="subject-code">
+                                                                <span class="subject-code" style="color: #010408 !important;">
 
                                                                     {{ $schedule->subject->short_name ?? '' }}
 
@@ -380,7 +380,7 @@
 
 
                                                                 @if ($schedule->teacher)
-                                                                    <small class="teacher-name">
+                                                                    <small class="teacher-name" style="color: #010408 !important;">
 
                                                                         {{ $schedule->teacher->name }}
 
@@ -398,7 +398,7 @@
                                                             data-day-id="{{ $day->id }}"
                                                             data-time-id="{{ $time->id }}">
 
-                                                            <span class="text-muted extra-text">
+                                                            <span class="text-muted extra-text" style="color: #010408 !important;">
 
                                                                 Extra Curriculum
 
@@ -432,13 +432,13 @@
 
                                     <tr>
 
-                                        <th width="15%">
+                                        <th class="font-weight-bold" width="15%" style="color: #010408 !important;">
 
                                             Subject Code
 
                                         </th>
 
-                                        <th width="85%">
+                                        <th class="font-weight-bold" width="85%" style="color: #010408 !important;">
 
                                             Subject Name
 
@@ -454,20 +454,20 @@
                                     @foreach ($sectionSchedules->unique('subject_id') as $item)
                                         <tr>
 
-                                            <td class="font-weight-bold text-primary">
+                                            <td class="font-weight-bold" style="color: #010408 !important;">
 
                                                 {{ $item->subject->short_name ?? '' }}
 
                                             </td>
 
 
-                                            <td>
+                                            <td class="font-weight-bold" style="color: #010408 !important;">
 
                                                 {{ $item->subject->long_name ?? '' }}
 
 
                                                 @if ($item->teacher)
-                                                    <span class="text-muted">
+                                                    <span class="font-weight-bold" style="color: #010408 !important;">
 
                                                         ({{ $item->teacher->name }})
                                                     </span>
