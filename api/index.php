@@ -19,6 +19,17 @@ try {
 
 } catch (\Throwable $e) {
 
+    error_log(
+        "Laravel Vercel Error: " .
+        get_class($e) .
+        " - " .
+        $e->getMessage() .
+        " in " .
+        $e->getFile() .
+        ":" .
+        $e->getLine()
+    );
+
     http_response_code(500);
 
     header('Content-Type: text/plain; charset=utf-8');
@@ -27,6 +38,5 @@ try {
     echo "Class: " . get_class($e) . "\n";
     echo "Message: " . $e->getMessage() . "\n";
     echo "File: " . $e->getFile() . "\n";
-    echo "Line: " . $e->getLine() . "\n\n";
-    echo $e->getTraceAsString();
+    echo "Line: " . $e->getLine() . "\n";
 }
